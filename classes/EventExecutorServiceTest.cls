@@ -43,10 +43,10 @@ public with sharing class EventExecutorServiceTest {
         //ARRANGE
         EventExecutorService service = new EventExecutorService();
 
-        List<EventExecutor__e> eventToEnqueue = new List<EventExecutor__e>();
+        List<EventExecutor__e> eventsToEnqueue = new List<EventExecutor__e>();
 
         //ACT
-        List<Id> enqueuedJobs = service.enqueueEventExecutors(eventToEnqueue);
+        List<Id> enqueuedJobs = service.enqueueEventExecutors(eventsToEnqueue);
 
         //ASSERT
         Assert.isNotNull(enqueuedJobs, 'Enqueued jobs is not null');
@@ -58,7 +58,7 @@ public with sharing class EventExecutorServiceTest {
         //ARRANGE
         EventExecutorService service = new EventExecutorService();
 
-        List<EventExecutor__e> eventToEnqueue = new List<EventExecutor__e>();
+        List<EventExecutor__e> eventsToEnqueue = new List<EventExecutor__e>();
 
         EventExecutor__e e1 = new EventExecutor__e(Executor__c = 'EventExecutorExampleImpl', Parameters__c = '{"action":"SUCCESS"}');
         e1.RetryCount__c = 2;
@@ -69,17 +69,46 @@ public with sharing class EventExecutorServiceTest {
         EventExecutor__e e3 = new EventExecutor__e(Executor__c = 'EventExecutorExampleImpl', Parameters__c = '{"action":"SUCCESS"}');
         e3.RetryCount__c = 2;
 
-        eventToEnqueue.add(e1);
-        eventToEnqueue.add(e2);
-        eventToEnqueue.add(e3);
+        eventsToEnqueue.add(e1);
+        eventsToEnqueue.add(e2);
+        eventsToEnqueue.add(e3);
 
         //ACT
-        List<Id> enqueuedJobs = service.enqueueEventExecutors(eventToEnqueue);
+        List<Id> enqueuedJobs = service.enqueueEventExecutors(eventsToEnqueue);
 
         //ASSERT
         Assert.isNotNull(enqueuedJobs, 'Enqueued jobs is not null');
-        Assert.isTrue(enqueuedJobs.size() == 3, 'One queueuble job/event');
+        Assert.isTrue(enqueuedJobs.size() == 3, 'One queueable job/event');
     }
+
+    @IsTest
+    public static void enqueueEventExecutors_skipsExecutionWhenRetryIsBiggerThanFive_returnList() {
+        //ARRANGE
+        EventExecutorService service = new EventExecutorService();
+
+        List<EventExecutor__e> eventsToEnqueue = new List<EventExecutor__e>();
+
+        EventExecutor__e e1 = new EventExecutor__e(Executor__c = 'EventExecutorExampleImpl', Parameters__c = '{"action":"SUCCESS"}');
+        e1.RetryCount__c = 2;
+
+        EventExecutor__e e2 = new EventExecutor__e(Executor__c = 'EventExecutorExampleImpl', Parameters__c = '{"action":"SUCCESS"}');
+        e2.RetryCount__c = 2;
+
+        EventExecutor__e e3 = new EventExecutor__e(Executor__c = 'EventExecutorExampleImpl', Parameters__c = '{"action":"SUCCESS"}');
+        e3.RetryCount__c = 6;
+
+        eventsToEnqueue.add(e1);
+        eventsToEnqueue.add(e2);
+        eventsToEnqueue.add(e3);
+
+        //ACT
+        List<Id> enqueuedJobs = service.enqueueEventExecutors(eventsToEnqueue);
+
+        //ASSERT
+        Assert.isNotNull(enqueuedJobs, 'Enqueued jobs is not null');
+        Assert.isTrue(enqueuedJobs.size() == 2, 'One queueable job/event'); //e3 will not return a queueable
+    }
+
 
     @IsTest
     public static void attachEventExecutorFinalizer_withNull_returnFinalizer() {

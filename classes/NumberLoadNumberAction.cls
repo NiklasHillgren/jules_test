@@ -29,13 +29,13 @@ public with sharing class NumberLoadNumberAction {
         OutputVariables output = new OutputVariables();
         
         try{
-			logger.logInfo('inputVariables ' + inputVariables);
+            logger.logInfo('inputVariables ' + inputVariables);
             logger.logInfo('inputVariables size ' + inputVariables.size());
 
             NumberClientRequestDTO.NumberDetails detailsRequest = getNumberDetailsRequest(inputVariables.get(0));
             
             //get a number of possible numbers from the number api to present to the user for choosing
-        	NumberClientResponseDTO.NumberDetails numberDetailsResponse = numberClient.getNumberDetails(detailsRequest);
+            NumberClientResponseDTO.NumberDetails numberDetailsResponse = numberClient.getNumberDetails(detailsRequest);
             
             logger.logInfo('numberDetailsResponse ' + numberDetailsResponse);
             logger.logInfo('numberDetailsResponse.data ' + numberDetailsResponse.data);
@@ -50,7 +50,7 @@ public with sharing class NumberLoadNumberAction {
         }
         
         return new List<OutputVariables>{output};
-	}
+    }
     
     /**
      * @description This method creates a NumberClientRequestDTO.NumberDetails object from the input variables.
@@ -75,15 +75,15 @@ public with sharing class NumberLoadNumberAction {
         return detailsRequest;
     }
     
-	public class InputVariables {
-		@InvocableVariable
-		public Account_Phone_Number_Series__c serie;
-		@InvocableVariable
+    public class InputVariables {
+        @InvocableVariable
+        public Account_Phone_Number_Series__c serie;
+        @InvocableVariable
         public Integer amountOfNumbers;
-	}
+    }
 
-	public class OutputVariables {
+    public class OutputVariables {
         @InvocableVariable
         public List<String> phoneNumbers = new List<String>();
-	}
+    }
 }

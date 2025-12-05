@@ -1,198 +1,135 @@
 /**
- * The NumberAssignmentResetExecutorHandlerTest class is responsible for testing the NumberAssignmentResetExecutorHandler class.
- *  -----------------------------------------------------------------------------
- *  Developer            Date            Description
- *  -----------------------------------------------------------------------------
- *  Kenneth Houkjær         29/07/2025      Initial version
- *
- * @author Kenneth Houkjær
- * @date 29/07/2025
+ * @description Test class for the NumberAssignmentResetExecutorHandler.
+ * It verifies that the handler correctly resets assignments based on the number of junctions and series type.
+ * @group SUnit
  */
-@IsTest(IsParallel = true)
-public class NumberAssignmentResetExecutorHandlerTest {
+@isTest
+private class NumberAssignmentResetExecutorHandlerTest {
 
-    @IsTest
-    public static void execute_openSeriesNumber_resetsAssignmentValues() {
+    /**
+     * @description Given a non-openseries number with a single junction,
+     * when the handler is executed, then the number is unreserved and the junction is deleted.
+     */
+    @isTest
+    static void givenSingleJunctionNonOpenSeries_whenExecute_thenUnreservesAndDeletesJunction() {
+        // Arrange
+        NorlysTestScenarios.ScenarioResult scenario = NorlysTestScenarios.newBuilder()
+            .forNumberCaseHandling()
+            .withActivationLines(1)
+            .withNumberSeries('SAL', 'P', 1, 1)
+            .withPhoneNumberStatus('AR')
+            .build();
+
+        NumberClient numberClient = NorlysTestMocks.forNumberClient()
+            .withSuccessOnUnreserve()
+            .build();
         
-        Mock numberClientMock = Mock.forType(NumberClient.class);
-        MethodSpy unreserveNumberDetailByMsisdn = numberClientMock.spyOn('unreserveNumberDetailByMsisdn');
-        NumberClientResponseDTO.NumberDetail tmpResponse = new NumberClientResponseDTO.NumberDetail();
-        tmpResponse.data = new NumberClientResponseDTO.NumberData();
-        tmpResponse.data.id = '12345678';
-        unreserveNumberDetailByMsisdn.whenCalledWith(Argument.any()).thenReturn(tmpResponse);
-
-        NumberClient numberClient = (NumberClient) numberClientMock.stub;
         DatabaseService dbMock = new DatabaseService().mockDMLs();
+        NumberAssignmentResetExecutorHandler handler = new NumberAssignmentResetExecutorHandler(numberClient, dbMock);
 
-        NumberAssignmentResetExecutorHandler handler = new NumberAssignmentResetExecutorHandler(numberClient, dbMock);       
-        
-        // Create mock data
-        Account acc = new Account(Name = 'Test Account', CVR__c = '12345678');
-        insert acc;
-
-        Case c = new Case(AccountId = acc.Id);
-        insert c;
-
-        Activation__c activation = new Activation__c(Case__c = c.Id);
-        insert activation;
-
-        Account_Phone_Number_Series__c series = new Account_Phone_Number_Series__c(
-            Account__c = acc.Id,
-            Number_Group__c = 'P',
-            Number_Location__c = 'EKC',
-            Product_Type__c = 'GSM'
+        EventExecutor__e event = NorlysTestMocks.createEventExecutor('NumberAssignmentResetExecutorHandler', 
+            new Map<String, Object>{
+                'activationLineIdToNumber' => new Map<Id, String>{
+                    scenario.activationLines[0].Id => scenario.activationLines[0].Mobile_No__c
+                }
+            }
         );
-        insert series;
 
-        List<Account_Phone_Number_Assignment__c> phoneAssignments = new List<Account_Phone_Number_Assignment__c>();
-        for (Integer i = 0; i < 1; i++) {
-            phoneAssignments.add(
-                new Account_Phone_Number_Assignment__c(
-                    Account__c = acc.Id, 
-                    Account_Phone_Number_Series__c = series.Id,             
-                    CTN_Number_Status__c = 'AR',
-                    Phone_Number_Reservation_Status__c = '',
-                    Phone_Number_Reservation_Error__c = null,
-                    Activation_line__c = null,
-                    Phone_Number__c = '2222222' + i
-                    ));
-        }
-        insert phoneAssignments;
-
-        List<Activation_line__c> activationLines = new List<Activation_line__c>();
-        for (Integer i = 0; i < 1; i++) {
-            activationLines.add(
-                new Activation_line__c(
-                    Case__c = c.Id, 
-                    Activation__c = activation.Id,
-                    Phone_Number_Reservation_Status__c = '',
-                    Phone_Number_Reservation_Error__c = null,
-                    First_Name__c = 'Peter',
-                    Last_Name__c = 'Griffin' + i,
-                    Email__c = 'pg' + i + '@test.com'
-                    //Mobile_No__c = '2222222' + i                    
-                    ));
-        }
-        insert activationLines;
-
-        activationLines.get(0).Mobile_No__c = '22222220';
-        update activationLines;
-
-        phoneAssignments.get(0).Activation_line__c = activationLines.get(0).Id;
-        phoneAssignments.get(0).Phone_Number_User__c = activationLines.get(0).First_Name__c;
-        update phoneAssignments;    
-
-        Map<Id, String> tmpMap = new  Map<Id, String>();
-        tmpMap.put(activationLines.get(0).Id, activationLines.get(0).Mobile_No__c);
-
-        String parameters = JSON.serialize(new Map<String, Object>{'activationLineIdToNumber' => tmpMap});
-
-        Logger.logInfo('parameters' + parameters);
-
-        EventExecutor__e event = new EventExecutor__e(Parameters__c = parameters, RetryCount__c = 5);
-
-        //ACT
+        // Act
+        Test.startTest();
         handler.execute(event);
+        Test.stopTest();
 
-        //ASSERT
+        // Assert
+        System.assertEquals(1, dbMock.register.updated.size(), 'Should update one assignment');
+        System.assertEquals(1, dbMock.register.deleted.size(), 'Should delete one junction');
         Account_Phone_Number_Assignment__c updatedAssignment = (Account_Phone_Number_Assignment__c) dbMock.register.updated.get(0);
-
-        Assert.areEqual(1, dbMock.register.updated.size(), 'We updated an assignment');
-        Assert.areEqual(updatedAssignment.Activation_Line__c,null, 'Assignment and ActivationLine got unrelated');
-        Assert.areEqual(updatedAssignment.Phone_Number_User__c, null, 'Assignment phone number user is reset');
-        Assert.areEqual(updatedAssignment.CTN_Number_Status__c, 'AR', 'Assignment status is set');  
+        System.assertEquals('AA', updatedAssignment.CTN_Number_Status__c, 'Assignment status should be unreserved');
     }
 
-    @IsTest
-    public static void execute_fixedSeriesNumber_resetsAssignmentValuesAndUnreservesNumber() {
-        
-        Mock numberClientMock = Mock.forType(NumberClient.class);
-        MethodSpy unreserveNumberDetailByMsisdn = numberClientMock.spyOn('unreserveNumberDetailByMsisdn');
-        NumberClientResponseDTO.NumberDetail tmpResponse = new NumberClientResponseDTO.NumberDetail();
-        tmpResponse.data = new NumberClientResponseDTO.NumberData();
-        tmpResponse.data.id = '12345678';
-        tmpResponse.data.numberStatus = 'AA';
-        unreserveNumberDetailByMsisdn.whenCalledWith(Argument.any()).thenReturn(tmpResponse);
+    /**
+     * @description Given an openseries number with a single junction,
+     * when the handler is executed, then only the junction is deleted and the number is not unreserved.
+     */
+    @isTest
+    static void givenSingleJunctionOpenSeries_whenExecute_thenDeletesJunctionOnly() {
+        // Arrange
+        NorlysTestScenarios.ScenarioResult scenario = NorlysTestScenarios.newBuilder()
+            .forNumberCaseHandling()
+            .withActivationLines(1)
+            .withNumberSeries('EKC', 'P', 1, 1)
+            .withPhoneNumberStatus('AR')
+            .build();
 
-        NumberClient numberClient = (NumberClient) numberClientMock.stub;
+        NumberClient numberClient = NorlysTestMocks.forNumberClient().build();
         DatabaseService dbMock = new DatabaseService().mockDMLs();
+        NumberAssignmentResetExecutorHandler handler = new NumberAssignmentResetExecutorHandler(numberClient, dbMock);
 
-        NumberAssignmentResetExecutorHandler handler = new NumberAssignmentResetExecutorHandler(numberClient, dbMock);       
-        
-        // Create mock data
-        Account acc = new Account(Name = 'Test Account', CVR__c = '12345678');
-        insert acc;
-
-        Case c = new Case(AccountId = acc.Id);
-        insert c;
-
-        Activation__c activation = new Activation__c(Case__c = c.Id);
-        insert activation;
-
-        Account_Phone_Number_Series__c series = new Account_Phone_Number_Series__c(
-            Account__c = acc.Id,
-            Number_Group__c = 'P',
-            Number_Location__c = 'SAL',
-            Product_Type__c = 'GSM'
+        EventExecutor__e event = NorlysTestMocks.createEventExecutor('NumberAssignmentResetExecutorHandler', 
+            new Map<String, Object>{
+                'activationLineIdToNumber' => new Map<Id, String>{
+                    scenario.activationLines[0].Id => scenario.activationLines[0].Mobile_No__c
+                }
+            }
         );
-        insert series;
 
-        List<Account_Phone_Number_Assignment__c> phoneAssignments = new List<Account_Phone_Number_Assignment__c>();
-        for (Integer i = 0; i < 1; i++) {
-            phoneAssignments.add(
-                new Account_Phone_Number_Assignment__c(
-                    Account__c = acc.Id, 
-                    Account_Phone_Number_Series__c = series.Id,             
-                    CTN_Number_Status__c = 'AR',
-                    Phone_Number_Reservation_Status__c = '',
-                    Phone_Number_Reservation_Error__c = null,
-                    Activation_line__c = null,
-                    Phone_Number__c = '2222222' + i
-                    ));
-        }
-        insert phoneAssignments;
-
-        List<Activation_line__c> activationLines = new List<Activation_line__c>();
-        for (Integer i = 0; i < 1; i++) {
-            activationLines.add(
-                new Activation_line__c(
-                    Case__c = c.Id, 
-                    Activation__c = activation.Id,
-                    Phone_Number_Reservation_Status__c = '',
-                    Phone_Number_Reservation_Error__c = null,
-                    First_Name__c = 'Peter',
-                    Last_Name__c = 'Griffin' + i,
-                    Email__c = 'pg' + i + '@test.com'
-                    //Mobile_No__c = '2222222' + i                    
-                    ));
-        }
-        insert activationLines;
-
-        activationLines.get(0).Mobile_No__c = '22222220';
-        update activationLines;
-
-        phoneAssignments.get(0).Activation_line__c = activationLines.get(0).Id;
-        phoneAssignments.get(0).Phone_Number_User__c = activationLines.get(0).First_Name__c;
-        update phoneAssignments;    
-
-        Map<Id, String> tmpMap = new  Map<Id, String>();
-        tmpMap.put(activationLines.get(0).Id, activationLines.get(0).Mobile_No__c);
-
-        String parameters = JSON.serialize(new Map<String, Object>{'activationLineIdToNumber' => tmpMap});
-
-        Logger.logInfo('parameters' + parameters);
-
-        EventExecutor__e event = new EventExecutor__e(Parameters__c = parameters, RetryCount__c = 5);
-
-        //ACT
+        // Act
+        Test.startTest();
         handler.execute(event);
+        Test.stopTest();
 
-        //ASSERT
+        // Assert
+        System.assertEquals(1, dbMock.register.updated.size(), 'Should update one assignment');
+        System.assertEquals(1, dbMock.register.deleted.size(), 'Should delete one junction');
         Account_Phone_Number_Assignment__c updatedAssignment = (Account_Phone_Number_Assignment__c) dbMock.register.updated.get(0);
+        System.assertEquals('AR', updatedAssignment.CTN_Number_Status__c, 'Assignment status should be unchanged');
+    }
 
-        Assert.areEqual(1, dbMock.register.updated.size(), 'We updated an assignment');
-        Assert.areEqual(updatedAssignment.Activation_Line__c,null, 'Assignment and ActivationLine got unrelated');
-        Assert.areEqual(updatedAssignment.Phone_Number_User__c, null, 'Assignment phone number user is reset');
-        Assert.areEqual(updatedAssignment.CTN_Number_Status__c, 'AA', 'Assignment status is set');  
+    /**
+     * @description Given an assignment with multiple junctions,
+     * when the handler is executed for one activation line, then only the corresponding junction is deleted.
+     */
+    @isTest
+    static void givenMultipleJunctions_whenExecute_thenDeletesJunctionOnly() {
+        // Arrange
+        NorlysTestScenarios.ScenarioResult scenario = NorlysTestScenarios.newBuilder()
+            .forNumberCaseHandling()
+            .withActivationLines(1)
+            .withNumberSeries('SAL', 'P', 1, 1)
+            .withPhoneNumberStatus('AR')
+            .build();
+        
+        // Manually create a second activation line and junction to the same assignment
+        Activation_Line__c secondActivationLine = (Activation_Line__c) NorlysSUnit.newFactory()
+            .create('Activation_Line__c')
+            .set('Case__c', scenario.caseRecord.Id)
+            .set('Activation__c', scenario.activations[0].Id)
+            .insertRecord();
+
+        insert new Activation_Assignment_Junction__c(
+            Activation_line__c = secondActivationLine.Id,
+            Account_Phone_Number_Assignment__c = scenario.phoneNumberAssignments[0].Id
+        );
+
+        NumberClient numberClient = NorlysTestMocks.forNumberClient().build();
+        DatabaseService dbMock = new DatabaseService().mockDMLs();
+        NumberAssignmentResetExecutorHandler handler = new NumberAssignmentResetExecutorHandler(numberClient, dbMock);
+
+        EventExecutor__e event = NorlysTestMocks.createEventExecutor('NumberAssignmentResetExecutorHandler', 
+            new Map<String, Object>{
+                'activationLineIdToNumber' => new Map<Id, String>{
+                    scenario.activationLines[0].Id => scenario.activationLines[0].Mobile_No__c
+                }
+            }
+        );
+
+        // Act
+        Test.startTest();
+        handler.execute(event);
+        Test.stopTest();
+
+        // Assert
+        System.assertEquals(0, dbMock.register.updated.size(), 'Should not update any assignment');
+        System.assertEquals(1, dbMock.register.deleted.size(), 'Should delete one junction');
     }
 }

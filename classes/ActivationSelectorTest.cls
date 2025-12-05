@@ -11,7 +11,6 @@ public with sharing class ActivationSelectorTest {
 	 * makeData
 	 */
 	static void makeData() {
-        SBQQ.TriggerControl.disable();
 		Profile prof = ProfileSelector.getProfileByProfileName(ProfileConstants.SYSTEM_ADMINISTRATOR);
 		User usr = testDataFactory.createUser('standt', prof.Id);
 		Account account = testDataFactory.createAccountWithCVR(CVR);
@@ -90,7 +89,6 @@ public with sharing class ActivationSelectorTest {
 			RecordTypeId = Schema.sObjectType.Activation__c.getRecordTypeInfosByName().get('Home office activation').getRecordTypeId()
 		);
 		insert activation;
-        SBQQ.TriggerControl.enable();
 	}
 
 	/**
@@ -187,6 +185,41 @@ public with sharing class ActivationSelectorTest {
 
 		// ASSERT
 		Assert.areEqual(1, testActivationsResult.size(), 'Expect 1 Activation record');
+	}
+
+	/**
+	 * @description test getActivationsById
+	 */
+	@IsTest
+    private static void getActivationsById() {
+        // ARRANGE		
+        String cvr = '88888888';
+		Integer countActivation = 2;
+
+        NorlysTestScenarios.ScenarioResult scenario = NorlysTestScenarios.newBuilder()
+            .withCvr(cvr)
+            .forNumberCaseHandling()
+            .withActivations(countActivation)
+            .build();
+
+        Set<Id> activationIds = new Set<Id>();
+        for (Activation__c activation : scenario.activations) {
+            activationIds.add(activation.Id);
+        }
+
+        // ACT
+        Test.startTest();
+
+        List<Activation__c> result = ActivationSelector.getActivationsById(activationIds);
+        
+        Test.stopTest();
+
+        // ASSERT
+        Assert.areEqual(countActivation, result.size(), 'Should return 2 Activations.');
+        // loop through the activations
+        for (Activation__c activation : result) {
+            Assert.isTrue(activationIds.contains(activation.Id), 'Activation returned is not matching the Id.');
+        }
 	}
 
 }

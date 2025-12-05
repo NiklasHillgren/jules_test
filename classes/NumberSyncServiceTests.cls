@@ -158,6 +158,18 @@ private class NumberSyncServiceTests {
         }
     }
 
+    private class MockAccountPhoneNumberAssignmentSelector extends AccountPhoneNumberAssignmentSelector {
+        private List<Account_Phone_Number_Assignment__c> mockAssignmentsToReturn;
+
+        public MockAccountPhoneNumberAssignmentSelector(List<Account_Phone_Number_Assignment__c> assignments) {
+            this.mockAssignmentsToReturn = assignments;
+        }
+
+        public override List<Account_Phone_Number_Assignment__c> getAssignmentsImpl(Account acc) {
+            return this.mockAssignmentsToReturn;
+        }
+    }
+
     /**
      * @description Tests the creation of new assignments.
      */
@@ -257,6 +269,8 @@ private class NumberSyncServiceTests {
         List<Account_Phone_Number_Assignment__c> localAssignments = new List<Account_Phone_Number_Assignment__c>{
             createTestAssignment('10101010', 'AA', series1Id, null)
         };
+        localAssignments[0].Phone_Number_Reservation_Error__c = 'Some error';
+        localAssignments[0].Phone_Number_Reservation_Status__c = 'ERROR';
         insert localAssignments;
 
         // 4. Setup Mock Remote Payload - 10101010 status changes from AA to AR
@@ -277,6 +291,7 @@ private class NumberSyncServiceTests {
 
         //ACT
         AccountPhoneNumberSeriesSelector.setMock(new AccountPhoneNumberSeriesSelectorMock(seriesForMock));
+        AccountPhoneNumberAssignmentSelector.setMock(new MockAccountPhoneNumberAssignmentSelector(localAssignments));
         Test.startTest();
         MockNumberSyncService service = new MockNumberSyncService(
             mockRemotePayload, testOpenSeriesList
@@ -285,13 +300,16 @@ private class NumberSyncServiceTests {
         Test.stopTest();
 
         List<Account_Phone_Number_Assignment__c> updatedList = [
-            SELECT Phone_Number__c, CTN_Number_Status__c FROM Account_Phone_Number_Assignment__c
+            SELECT Phone_Number__c, CTN_Number_Status__c, Phone_Number_Reservation_Error__c, Phone_Number_Reservation_Status__c
+            FROM Account_Phone_Number_Assignment__c
             WHERE Phone_Number__c = '10101010'
         ];
 
         //ASSERT
         System.assertEquals(1, updatedList.size(), 'Should be 1 assignment for 10101010.');
         System.assertEquals(SFConstants.ASSIGNED_RESERVED, updatedList[0].CTN_Number_Status__c, 'Status should be updated to AR.');
+        System.assertEquals(null, updatedList[0].Phone_Number_Reservation_Error__c, 'Reservation error should be cleared.');
+        System.assertEquals('SUCCESS', updatedList[0].Phone_Number_Reservation_Status__c, 'Reservation status should be set to SUCCESS.');
     }
 
     /**
@@ -597,5 +615,165 @@ private class NumberSyncServiceTests {
         System.assert(finalPhones.contains('10101010'), '10101010 should exist.');
         System.assert(finalPhones.contains('20202020'), '20202020 should exist.');
         System.assert(finalPhones.contains('30303030'), 'The missing assignment 30303030 should have been recreated.');
+    }
+
+    @isTest
+    static void testDeleteObsoleteAssignmentsButOneIsInUse() {
+        
+        //ARRANGE
+        Account testAccount = createTestAccount();
+        insert testAccount;
+        // 1. Setup Series
+        List<Account_Phone_Number_Series__c> testSeriesList = new List<Account_Phone_Number_Series__c>{
+            createTestSeries('SAL', 'BRZ', '10101010','', 'GSM'),
+            createTestSeries('SAL', 'SAL', '20202020','', 'GSM')
+        };
+        testSeriesList[0].Account__c = testAccount.Id;
+        testSeriesList[1].Account__c = testAccount.Id;
+        insert testSeriesList;
+
+        // Re-query the series to ensure the Account relationship is populated for the mock selector
+        List<Account_Phone_Number_Series__c> seriesForMock = [
+            SELECT Id, Name, Number_Group__c, Number_Location__c, CVR__c, Number_Pattern__c, Product_type__c, Account__c, Account__r.CVR__c
+            FROM Account_Phone_Number_Series__c
+            WHERE Id IN :testSeriesList
+        ];
+        Id series1Id = seriesForMock[0].Id;
+        Id series2Id = seriesForMock[1].Id;
+
+        // 2. Setup Open Series CMD (empty)
+        List<OpenPhoneNumberSeries__mdt> testOpenSeriesList = new List<OpenPhoneNumberSeries__mdt>();
+
+        // 3. Setup Local Assignments
+        List<Account_Phone_Number_Assignment__c> localAssignments = new List<Account_Phone_Number_Assignment__c>{
+            createTestAssignment('10101010', 'AA', series1Id, null), // This one will be deleted
+            createTestAssignment('20202020', 'AA', series2Id, null)  // This one is in use
+        };
+        localAssignments[1].Phone_Number_Reservation_Error__c = 'Some error';
+        localAssignments[1].Phone_Number_Reservation_Status__c = 'ERROR';
+        insert localAssignments;
+
+        // 4. Mark one assignment as "in use" by creating a junction object
+        Case testCase = new Case(AccountId = testAccount.Id, Status = 'New', Origin = 'Phone');
+        insert testCase;
+
+        Activation__c activation = new Activation__c(Case__c = testCase.Id);
+        insert activation;
+
+        Activation_Line__c activationLine = new Activation_Line__c(Activation__c = activation.Id);
+        insert activationLine;
+
+        Activation_Assignment_Junction__c junction = new Activation_Assignment_Junction__c(
+            Account_Phone_Number_Assignment__c = localAssignments[1].Id,
+            Activation_line__c = activationLine.Id
+        );
+        insert junction;
+
+        // 5. Setup Mock Remote Payload
+        // Remote has no numbers, so both are candidates for deletion.
+        Map<String, List<NumberClientResponseDTO.NumberData>> mockRemotePayload =
+            new Map<String, List<NumberClientResponseDTO.NumberData>>{
+                'SAL_BRZ_AA' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_BRZ_AR' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_BRZ_AI' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_BRZ_AS' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_SAL_AA' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_SAL_AR' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_SAL_AI' => new List<NumberClientResponseDTO.NumberData>(),
+                'SAL_SAL_AS' => new List<NumberClientResponseDTO.NumberData>()
+            };
+
+        //ACT
+        AccountPhoneNumberSeriesSelector.setMock(new AccountPhoneNumberSeriesSelectorMock(seriesForMock));
+        Test.startTest();
+        MockNumberSyncService service = new MockNumberSyncService(
+            mockRemotePayload, testOpenSeriesList
+        );
+        service.synchronizeAllAssignments();
+        Test.stopTest();
+
+        List<Account_Phone_Number_Assignment__c> remainingAssignments = [
+            SELECT Phone_Number__c, Phone_Number_Reservation_Error__c, Phone_Number_Reservation_Status__c
+            FROM Account_Phone_Number_Assignment__c
+        ];
+
+        //ASSERT
+        System.assertEquals(1, remainingAssignments.size(), 'Only one assignment should remain.');
+        System.assertEquals('20202020', remainingAssignments[0].Phone_Number__c, 'The in-use assignment 20202020 should remain.');
+        System.assertEquals('[NSS001] Phone number is assigned to line but does not exist in the customer list of numbers', remainingAssignments[0].Phone_Number_Reservation_Error__c, 'Reservation error should be set for in-use assignment not found remotely.');
+    }
+
+    @isTest
+    static void testDoNotDeleteOpenSeriesARAssignments() {
+        
+        //ARRANGE
+        Account testAccount = createTestAccount();
+        insert testAccount;
+
+        // 1. Setup Series - one of which is an "Open Series"
+        List<Account_Phone_Number_Series__c> testSeriesList = new List<Account_Phone_Number_Series__c>{
+            createTestSeries('P', 'EKC', '10101010','', 'GSM') // This will be our open series
+        };
+        testSeriesList[0].Account__c = testAccount.Id;
+        insert testSeriesList;
+
+        List<Account_Phone_Number_Series__c> seriesForMock = [
+            SELECT Id, Name, Number_Group__c, Number_Location__c, CVR__c, Number_Pattern__c, Product_type__c, Account__c, Account__r.CVR__c
+            FROM Account_Phone_Number_Series__c
+            WHERE Id IN :testSeriesList
+        ];
+        Id series1Id = seriesForMock[0].Id;
+
+        // 2. Setup Mock Open Series Metadata to mark P_EKC as open
+        List<OpenPhoneNumberSeries__mdt> testOpenSeriesList = new List<OpenPhoneNumberSeries__mdt>{
+            createMockOpenSeriesMetadata('P', 'EKC')
+        };
+
+        // 3. Setup Local Assignment with 'AR' status in the open series
+        List<Account_Phone_Number_Assignment__c> localAssignments = new List<Account_Phone_Number_Assignment__c>{
+            createTestAssignment('30303030', 'AR', series1Id, testAccount.Id) 
+        };
+        localAssignments[0].Phone_Number_Reservation_Error__c = 'Some error';
+        localAssignments[0].Phone_Number_Reservation_Status__c = 'ERROR';
+        insert localAssignments;
+
+        // Re-query to populate relationship fields
+        List<Account_Phone_Number_Assignment__c> queriedAssignments = [
+            SELECT Id, Name, Phone_Number__c, CTN_Number_Status__c, Account_Phone_Number_Series__c, Account__c,
+                   Account_Phone_Number_Series__r.Number_Group__c, Account_Phone_Number_Series__r.Number_Location__c,
+                   Phone_Number_Reservation_Error__c, Phone_Number_Reservation_Status__c
+            FROM Account_Phone_Number_Assignment__c
+            WHERE Id IN :localAssignments
+        ];
+
+        // 4. No junction object - this assignment is not "in use".
+
+        // 5. Setup Mock Remote Payload - remote is empty, making the local assignment a candidate for deletion.
+        Map<String, List<NumberClientResponseDTO.NumberData>> mockRemotePayload =
+            new Map<String, List<NumberClientResponseDTO.NumberData>>{
+                'P_EKC_AR' => new List<NumberClientResponseDTO.NumberData>()
+            };
+
+        //ACT
+        AccountPhoneNumberSeriesSelector.setMock(new AccountPhoneNumberSeriesSelectorMock(seriesForMock));
+        AccountPhoneNumberAssignmentSelector.setMock(new MockAccountPhoneNumberAssignmentSelector(queriedAssignments));
+        
+        Test.startTest();
+        MockNumberSyncService service = new MockNumberSyncService(
+            mockRemotePayload, testOpenSeriesList
+        );
+        service.synchronizeAllAssignments();
+        Test.stopTest();
+
+        List<Account_Phone_Number_Assignment__c> remainingAssignments = [
+            SELECT Phone_Number__c, Phone_Number_Reservation_Error__c, Phone_Number_Reservation_Status__c
+            FROM Account_Phone_Number_Assignment__c
+        ];
+
+        //ASSERT
+        System.assertEquals(1, remainingAssignments.size(), 'The open series AR assignment should remain.');
+        System.assertEquals('30303030', remainingAssignments[0].Phone_Number__c, 'The assignment 30303030 should not be deleted.');
+        System.assertEquals('Some error', remainingAssignments[0].Phone_Number_Reservation_Error__c, 'Reservation error should not be cleared for preserved assignment.');
+        System.assertEquals('ERROR', remainingAssignments[0].Phone_Number_Reservation_Status__c, 'Reservation status should not be cleared for preserved assignment.');
     }
 }

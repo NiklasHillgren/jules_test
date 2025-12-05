@@ -8,13 +8,13 @@
  * @author Kenneth Houkjær
  * @date 27/07/2025
  */
-@IsTest(IsParallel = true)
-public class NumberLoadNumberActionTest {
+@IsTest
+public class NumberLoadNumberActionTest extends NorlysSUnitTest {
     /**
      * @description This method tests that the loadPhoneNumbers method returns the correct data.
      */
-	@IsTest
-    public static void loadPhoneNumbers_returns_tableData(){
+    @IsTest
+    public static void testAction_WithValidInputs_ShouldReturnTableData(){
         //Arrange
         Mock numberClientMock = Mock.forType(NumberClient.class);
         MethodSpy getNumberDetailsSpy = numberClientMock.spyOn('getNumberDetails');
@@ -35,28 +35,23 @@ public class NumberLoadNumberActionTest {
             numberDetailsResponse.data.add(numberData);
         }
 
-        
         numberDetailsResponse.pageSize = 10;
         
         getNumberDetailsSpy.returns(numberDetailsResponse);
 
-        
         List<NumberLoadNumberAction.InputVariables> inputVariables = new List<NumberLoadNumberAction.InputVariables>();
         NumberLoadNumberAction.InputVariables vars = new NumberLoadNumberAction.InputVariables();
         vars.serie = new Account_Phone_Number_Series__c(Product_Type__c = 'GSM', Number_Group__c = 'P', Number_Location__c = 'EKC');
         vars.amountOfNumbers = 10;
         inputVariables.add(vars);
         
-        
         NumberLoadNumberAction.numberClient = (NumberClient) numberClientMock.stub;
 
         //Act
         List<NumberLoadNumberAction.OutputVariables> outputs = NumberLoadNumberAction.loadPhoneNumbers(inputVariables);
+        
         //Assert
         Expect.that(getNumberDetailsSpy).hasBeenCalled();
-        
-        //Ensure that we return all the numbers in the phoneNumberOutput that was returned from the NumberClient.
-        Assert.areEqual(outputs.get(0).phoneNumbers.size(), 10, 'We have 10 numbers');
-        
+        Assert.areEqual(10, outputs.get(0).phoneNumbers.size(), 'We have 10 numbers');
     }
 }

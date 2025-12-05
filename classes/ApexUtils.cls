@@ -137,16 +137,16 @@ public string GetVASColumnNamesfromActivationLines()
     
      public Map<String,String> LoadProductContractGroups()
     {
-        list<Product2> ProductInfoList = [SELECT Id,ProductAPI_Telia_Product_Id__c,Contract_Group__c  
-                                            from Product2 where IsActive = true];
-                                            //and activate_with_other_products__c = false
-                                            //and ProductAPI_Telia_Product_Id__c != null   
-        Map<String,String> ALLProductContractTypes= new Map<String, String>();
-        //Name,ProductId         
-        for(Product2 pr : ProductInfoList)
-        {
-            ALLProductContractTypes.put(pr.Id, pr.Contract_Group__c != null ? pr.Contract_Group__c : 'Mobile');
-        }
+           list<Product2> ProductInfoList = [SELECT Id,ProductAPI_Telia_Product_Id__c,Contract_Group__c  
+                                              from Product2 where IsActive = true];
+                                              //and activate_with_other_products__c = false
+                                              //and ProductAPI_Telia_Product_Id__c != null   
+            Map<String,String> ALLProductContractTypes= new Map<String, String>();
+            //Name,ProductId         
+            for(Product2 pr : ProductInfoList)
+            {
+                ALLProductContractTypes.put(pr.Id, pr.Contract_Group__c != null ? pr.Contract_Group__c : 'Mobile');
+            }
 
     	return ALLProductContractTypes;
     }

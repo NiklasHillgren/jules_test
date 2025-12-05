@@ -8,64 +8,51 @@
  * @author Kenneth Houkjær
  * @date 27/07/2025
  */
-@IsTest
-private with sharing class NumberSeriesRefreshActionTest {
-    private static final List<String> CVR_LIST = new List<String>{
-        '12345678',
-        '87654321'
-    };
+/**
+ * @description
+ *  Test class for the NumberSeriesRefreshAction, using the SUnit framework.
+ * @group SUnit
+ */
+@isTest
+private class NumberSeriesRefreshActionTest {
 
     /**
-     * @description Sets up the test data.
+     * @description Tests that the refreshPhoneNumberSeries action correctly processes multiple accounts.
      */
-    @TestSetup
-    static void makeData() {
-        // create the Accounts
-        List<Account> testAccounts = new List<Account>();
-        for (String cvr : CVR_LIST) {
-            // create the Account
-            Account testAccount = TDF_AccountUtils.createAccountWithCVR(cvr);
-            testAccount.Status__c = 'Active';
-            testAccounts.add(testAccount);
-        }
-        insert testAccounts;
+    @isTest
+    static void refreshPhoneNumberSeries_twoAccounts_returnsTwoOutputs() {
+        // Arrange
+        NorlysTestScenarios.ScenarioResult scenario1 = NorlysTestScenarios.newBuilder()
+            .forNumberCaseHandling()
+            .withCvr('12345678')
+            .withoutCaseAndActivations()
+            .build();
         
-        // TODO we need phone number series 
-        // TODO we need phone number assignments
-    }
-
-    /**
-     * @description Tests the refreshPhoneNumberSeries method.
-     */
-    @IsTest  
-    private static void testRefreshPhoneNumberSeries() {
-        // ARRANGE
-        // re-query the accounts
-        List<Account> testAccounts = [SELECT Id FROM Account WHERE CVR__c IN :CVR_LIST];        
-
+        NorlysTestScenarios.ScenarioResult scenario2 = NorlysTestScenarios.newBuilder()
+            .forNumberCaseHandling()
+            .withCvr('87654321')
+            .withoutCaseAndActivations()
+            .build();
+            
+        List<Account> testAccounts = new List<Account>{ scenario1.account, scenario2.account };
+        
         List<NumberSeriesRefreshAction.InputVariables> inputVariablesList = new List<NumberSeriesRefreshAction.InputVariables>();
-        List<NumberSeriesRefreshAction.OutputVariables> outputVariables = new List<NumberSeriesRefreshAction.OutputVariables>();
-
-        // for each account we create phone number series refresh action input variables
         for (Account testAccount : testAccounts) {
             NumberSeriesRefreshAction.InputVariables inputVariables = new NumberSeriesRefreshAction.InputVariables();
             inputVariables.inputAccount = testAccount;
             inputVariablesList.add(inputVariables);
         }
 
-        // ACT
+        // Act
         Test.startTest();
-
         List<NumberSeriesRefreshAction.OutputVariables> outputVariablesListResult = NumberSeriesRefreshAction.refreshPhoneNumberSeries(inputVariablesList);
-
         Test.stopTest();
 
-        // ASSERT
+        // Assert
         Assert.areEqual(
-            CVR_LIST.size(), 
+            2, 
             outputVariablesListResult.size(), 
-            'We expected ' + CVR_LIST.size() + ' output variables to be returned'
+            'The action should return an output variable for each input account.'
         );
-
     }
 }

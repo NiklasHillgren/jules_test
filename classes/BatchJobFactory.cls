@@ -1,5 +1,5 @@
 /**
- * @description The default factory for creating batch job instances.
+ * @description  The default factory for creating batch job instances.
  * @author Kenneth Houkjaer
  */
 public class BatchJobFactory implements IBatchJobFactory {

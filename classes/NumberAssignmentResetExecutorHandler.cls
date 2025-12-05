@@ -5,9 +5,10 @@
  *  Developer            Date            Description
  *  -----------------------------------------------------------------------------
  *  Kenneth Houkjær         29/07/2025      Initial version
+ *  Kenneth Houkjær         16/08/2025      Changed SOQL to use Query Framework
  *
  * @author Kenneth Houkjær
- * @date 29/07/2025
+ * @date 16/08/2025
  */
 public with sharing class NumberAssignmentResetExecutorHandler implements IEventExecutableHandler {
     private final NumberClient numberClient;
@@ -68,6 +69,7 @@ public with sharing class NumberAssignmentResetExecutorHandler implements IEvent
         }
         
         List<Account_Phone_Number_Assignment__c> assignmentsToUpdate = new List<Account_Phone_Number_Assignment__c>();
+        List<Activation_Assignment_Junction__c> junctionsToDelete = new List<Activation_Assignment_Junction__c>();
         
         Map<Id, String> retryResetActivationLineIdToNumber = new Map<Id, String>();
         
@@ -88,36 +90,55 @@ public with sharing class NumberAssignmentResetExecutorHandler implements IEvent
                     continue;
                 }  
 
-                //we only need to unreserve numbers in the fixed series
-                //TODO: look in custom metadata to find the open series
-                String defaultOpenSeriesLocation = SFConstants.DEFAULT_OPENSERIES_NUMBERLOCATION;
-                String defaultOpenSeriesGroup = SFConstants.DEFAULT_OPENSERIES_PRODUCTGROUP;
-                Boolean isOpenSeries = assignment.Account_Phone_Number_Series__r.Number_Group__c == defaultOpenSeriesGroup 
-                    && assignment.Account_Phone_Number_Series__r.Number_Location__c == defaultOpenSeriesLocation;
+                List<Activation_Assignment_Junction__c> allJunctionsForAssignment = new Query('Activation_Assignment_Junction__c')
+                    .selectFields(new List<String>{'Id'})
+                    .addConditionEq('Account_Phone_Number_Assignment__c', assignment.Id)
+                    .run();
 
-                if(assignment.CTN_Number_Status__c == 'AR' && !isOpenSeries) {
-                    NumberClientResponseDTO.NumberDetail numberUnreserveResponse = numberClient.unreserveNumberDetailByMsisdn(
-                    addCountryCodeToPhoneNumber(assignment.Phone_Number__c));
-               
-                    if (numberUnreserveResponse.data != null && numberUnreserveResponse.data.id != null) {
-                        assignment = resetAssignment(assignment);
-                        assignment.CTN_Number_Status__c = numberUnreserveResponse.data.numberStatus;
-                    } else {
-                        String errorMessage = String.format(
-                            'numberUnreserveResponse( {0} ) response was not expected.',
-                            new List<Object>{ numberUnreserveResponse }
-                        );
-                        //If we end up here something is really off! Better log it
-                        Logger.logInfo(errorMessage);
+                List<Activation_Assignment_Junction__c> currentJunctionToDelete = new Query('Activation_Assignment_Junction__c')
+                    .selectFields(new List<String>{'Id'})
+                    .addConditionEq('Activation_line__c', activationLineId)
+                    .addConditionEq('Account_Phone_Number_Assignment__c', assignment.Id)
+                    .run();
 
-                        assignment = setNumberUnreserveErrorOnAssignment(assignment, errorMessage);
-                    }
-                } 
-                //if its an open series we just need to reset, the status is already AR
-                else if (assignment.CTN_Number_Status__c == 'AR' && isOpenSeries) { 
-                    assignment = resetAssignment(assignment);
-                    Logger.logInfo('assignment ' + assignment);
+                if (!currentJunctionToDelete.isEmpty()) {
+                    junctionsToDelete.addAll(currentJunctionToDelete);
                 }
+
+                if (allJunctionsForAssignment.size() == 1) {
+                    //we only need to unreserve numbers in the fixed series
+                    //TODO: look in custom metadata to find the open series
+                    String defaultOpenSeriesLocation = SFConstants.DEFAULT_OPENSERIES_NUMBERLOCATION;
+                    String defaultOpenSeriesGroup = SFConstants.DEFAULT_OPENSERIES_PRODUCTGROUP;
+                    Boolean isOpenSeries = assignment.Account_Phone_Number_Series__r.Number_Group__c == defaultOpenSeriesGroup 
+                        && assignment.Account_Phone_Number_Series__r.Number_Location__c == defaultOpenSeriesLocation;
+
+                    if(assignment.CTN_Number_Status__c == 'AR' && !isOpenSeries) {
+                        NumberClientResponseDTO.NumberDetail numberUnreserveResponse = numberClient.unreserveNumberDetailByMsisdn(
+                        addCountryCodeToPhoneNumber(assignment.Phone_Number__c));
+                   
+                        if (numberUnreserveResponse.data != null && numberUnreserveResponse.data.id != null) {
+                            assignment = resetAssignment(assignment);
+                            assignment.CTN_Number_Status__c = numberUnreserveResponse.data.numberStatus;
+                        } else {
+                            String errorMessage = String.format(
+                                'numberUnreserveResponse( {0} ) response was not expected.',
+                                new List<Object>{ numberUnreserveResponse }
+                            );
+                            //If we end up here something is really off! Better log it
+                            Logger.logInfo(errorMessage);
+
+                            assignment = setNumberUnreserveErrorOnAssignment(assignment, errorMessage);
+                        }
+                    } 
+                    //if its an open series we just need to reset, the status is already AR
+                    else if (assignment.CTN_Number_Status__c == 'AR' && isOpenSeries) { 
+                        assignment = resetAssignment(assignment);
+                        Logger.logInfo('assignment ' + assignment);
+                    }
+                    assignmentsToUpdate.add(assignment);
+                }
+                
             }catch (HTTPException ex) {
                 switch on ex.getStatusCode() {
                     when 500 {
@@ -137,12 +158,12 @@ public with sharing class NumberAssignmentResetExecutorHandler implements IEvent
                 }
                 
                 assignment = setNumberUnreserveErrorOnAssignment(assignment, ex.getMessage());
+                assignmentsToUpdate.add(assignment);
             }
-
-            assignmentsToUpdate.add(assignment);
         }
         
         databaseService.updateRecords(assignmentsToUpdate);
+        databaseService.deleteRecords(junctionsToDelete);
         
                 
         if( !retryResetActivationLineIdToNumber.isEmpty() ){
@@ -191,9 +212,8 @@ public with sharing class NumberAssignmentResetExecutorHandler implements IEvent
             return null;
         }
 
-        assignment.Phone_Number_Reservation_Status__c = '';
+        assignment.Phone_Number_Reservation_Status__c = 'SUCCESS';
         assignment.Phone_Number_Reservation_Error__c = null;
-        assignment.Activation_line__c = null;
         assignment.Phone_Number_User__c = null;
 
         return assignment;
@@ -241,22 +261,19 @@ public with sharing class NumberAssignmentResetExecutorHandler implements IEvent
  
         Map<String, Account_Phone_Number_Assignment__c> assignmentsMap = new Map<String, Account_Phone_Number_Assignment__c>();
         
-        List<Account_Phone_Number_Assignment__c> listOfAssignments = [
-            SELECT
-                Phone_Number__c,
-                Account__c,
-                Account_Phone_Number_Series__c,
-                Id,
-                Phone_Number_Reservation_Status__c,
-                Phone_Number_Reservation_Error__c,
-                CTN_Number_Status__c,
-                Account__r.cvr__c,
-                Account_Phone_Number_Series__r.Product_Type__c,
-                Account_Phone_Number_Series__r.Number_Group__c, 
-                Account_Phone_Number_Series__r.Number_Location__c, 
-                Activation_Line__c
-            FROM Account_Phone_Number_Assignment__c
-            WHERE Phone_Number__c IN :mapOfactivationLineIdToNumber.values()];
+        List<String> fields = new List<String>{
+            'Phone_Number__c', 'Account__c', 'Account_Phone_Number_Series__c', 'Id',
+            'Phone_Number_Reservation_Status__c', 'Phone_Number_Reservation_Error__c',
+            'CTN_Number_Status__c', 'Account__r.cvr__c',
+            'Account_Phone_Number_Series__r.Product_Type__c',
+            'Account_Phone_Number_Series__r.Number_Group__c', 
+            'Account_Phone_Number_Series__r.Number_Location__c'
+        };
+
+        List<Account_Phone_Number_Assignment__c> listOfAssignments = new Query('Account_Phone_Number_Assignment__c')
+            .selectFields(fields)
+            .addConditionIn('Phone_Number__c', mapOfactivationLineIdToNumber.values())
+            .run();
 
         for(Account_Phone_Number_Assignment__c assignment : listOfAssignments){
             assignmentsMap.put(assignment.Phone_Number__c, assignment);  
@@ -269,25 +286,28 @@ public with sharing class NumberAssignmentResetExecutorHandler implements IEvent
  
         Map<String, Account_Phone_Number_Assignment__c> assignmentsMap = new Map<String, Account_Phone_Number_Assignment__c>();
         
-        List<Account_Phone_Number_Assignment__c> listOfAssignments = [
-            SELECT
-                Activation_line__c,
-                Phone_Number__c,
-                Account__c,
-                Account_Phone_Number_Series__c,
-                Id,
-                Phone_Number_Reservation_Status__c,
-                Phone_Number_Reservation_Error__c,
-                CTN_Number_Status__c,
-                Account__r.cvr__c,
-                Account_Phone_Number_Series__r.Product_Type__c,
-                Account_Phone_Number_Series__r.Number_Group__c, 
-                Account_Phone_Number_Series__r.Number_Location__c    
-            FROM Account_Phone_Number_Assignment__c
-            WHERE Activation_line__c IN :mapOfactivationLineIdToNumber.keyset()];
+        List<String> fieldsToQuery = new List<String>{
+            'Account_Phone_Number_Assignment__c', 'Activation_line__c',
+            'Account_Phone_Number_Assignment__r.Phone_Number__c',
+            'Account_Phone_Number_Assignment__r.Account__c',
+            'Account_Phone_Number_Assignment__r.Account_Phone_Number_Series__c',
+            'Account_Phone_Number_Assignment__r.Id',
+            'Account_Phone_Number_Assignment__r.Phone_Number_Reservation_Status__c',
+            'Account_Phone_Number_Assignment__r.Phone_Number_Reservation_Error__c',
+            'Account_Phone_Number_Assignment__r.CTN_Number_Status__c',
+            'Account_Phone_Number_Assignment__r.Account__r.cvr__c',
+            'Account_Phone_Number_Assignment__r.Account_Phone_Number_Series__r.Product_Type__c',
+            'Account_Phone_Number_Assignment__r.Account_Phone_Number_Series__r.Number_Group__c',
+            'Account_Phone_Number_Assignment__r.Account_Phone_Number_Series__r.Number_Location__c'
+        };
 
-        for(Account_Phone_Number_Assignment__c assignment :listOfAssignments){
-            assignmentsMap.put(assignment.Activation_line__c, assignment);    
+        List<Activation_Assignment_Junction__c> junctions = new Query('Activation_Assignment_Junction__c')
+            .selectFields(fieldsToQuery)
+            .addConditionIn('Activation_line__c', mapOfactivationLineIdToNumber.keySet())
+            .run();
+
+        for(Activation_Assignment_Junction__c junction : junctions){
+            assignmentsMap.put(junction.Activation_line__c, junction.Account_Phone_Number_Assignment__r);    
         }
 
         return assignmentsMap;

@@ -11,23 +11,26 @@
 public virtual class NumberSyncService {
 
     private NumberClient numberClient;
+    private Set<String> openSeriesKeys;
  
     /**
      * @description Default constructor that initializes the NumberClient using the SingletonFactory.
      */
     public NumberSyncService() {
         this(SingletonFactory.getFactory());
+        this.openSeriesKeys = new Set<String>();
     }
 
     /**
      * @description Private constructor for dependency injection.
      * @param singletonFactory The SingletonFactory instance to use for creating dependencies.
      */
-	private NumberSyncService(SingletonFactory singletonFactory) {
-		this.numberClient = (NumberClient) singletonFactory.getOrRegisterSingleton(
-			NumberClient.class
-		);
-	}
+    private NumberSyncService(SingletonFactory singletonFactory) {
+        this.numberClient = (NumberClient) singletonFactory.getOrRegisterSingleton(
+            NumberClient.class
+        );
+        this.openSeriesKeys = new Set<String>();
+    }
 
     /**
      * @description Test-visible constructor for dependency injection during testing.
@@ -36,6 +39,7 @@ public virtual class NumberSyncService {
     @TestVisible
     private NumberSyncService(NumberClient mockNumberClient) {
         this.numberClient = mockNumberClient;
+        this.openSeriesKeys = new Set<String>();
     }
 
     /**
@@ -116,7 +120,8 @@ public virtual class NumberSyncService {
     }
 
     /**
-     * @description Gets the local assignments for a given account.
+     * @description Gets the local assignments for a given account that are in use.
+     * An assignment is considered "in use" if it is linked to an Activation via an Activation_Assignment_Junction__c record.
      * @param acc The account to get the local assignments for.
      * @return A map of local assignments, keyed by phone number.
      */
@@ -125,9 +130,21 @@ public virtual class NumberSyncService {
         
         Map<String, Account_Phone_Number_Assignment__c> localAssignmentsMap = new Map<String, Account_Phone_Number_Assignment__c>();
 
+        String logMessage = 'Found ' + listOfAccountPhoneNumberAssignments.size() + ' local assignments';
+        if (acc != null) {
+            logMessage += ' for account: ' + acc.Id;
+        }
+        Logger.logInfo(logMessage);
+
         for (Account_Phone_Number_Assignment__c assignment : listOfAccountPhoneNumberAssignments) {
             if (String.isNotBlank(assignment.Phone_Number__c)) {
-                localAssignmentsMap.put(assignment.Phone_Number__c.toLowerCase(), assignment); // Key by lowercase phone number for case-insensitivity
+                String phoneNumber = assignment.Phone_Number__c;
+                if (phoneNumber.length() == 8) {
+                    phoneNumber = '45' + phoneNumber;
+                    Logger.logInfo('Local phone number ' + assignment.Phone_Number__c + ' has 8 digits, prepending with 45 to get ' + phoneNumber);
+                }
+                localAssignmentsMap.put(phoneNumber.toLowerCase(), assignment); // Key by lowercase phone number for case-insensitivity
+                Logger.logInfo('Found new local number: ' + phoneNumber);
             }
         }
         return localAssignmentsMap;
@@ -149,14 +166,13 @@ public virtual class NumberSyncService {
         }
 
         // 2. Get OpenPhoneNumberSeries metadata
-        Set<String> openSeriesKeys = new Set<String>();
         for (OpenPhoneNumberSeries__mdt opsMeta : getOpenPhoneNumberSeriesMetadata()) {
             // Create a unique key for comparison, e.g., "P_EKC"
              if (String.isNotBlank(opsMeta.number_group__c) && String.isNotBlank(opsMeta.number_location__c)) {
-                openSeriesKeys.add(opsMeta.number_group__c.toUpperCase() + '_' + opsMeta.number_location__c.toUpperCase());
+                this.openSeriesKeys.add(opsMeta.number_group__c.toUpperCase() + '_' + opsMeta.number_location__c.toUpperCase());
             }
         }
-        Logger.logInfo('Open Series Keys from CMD: ' + openSeriesKeys);
+        Logger.logInfo('Open Series Keys from CMD: ' + this.openSeriesKeys);
 
         List<String> defaultStatuses = new List<String>{
             SFConstants.ASSIGNED_AVAILABLE,
@@ -199,9 +215,15 @@ public virtual class NumberSyncService {
                 if (details != null && details.data != null) {
                     for (NumberClientResponseDTO.NumberData numberData : details.data) {
                         if (String.isNotBlank(numberData.Id)) {
+                            Logger.logInfo('Found new remote number: ' + numberData.Id);
+                            String remotePhoneNumber = numberData.Id;
+                            if (remotePhoneNumber.length() == 8) {
+                                remotePhoneNumber = '45' + remotePhoneNumber;
+                                Logger.logInfo('Remote phone number ' + numberData.Id + ' has 8 digits, prepending with 45 to get ' + remotePhoneNumber);
+                            }
                             // Key by lowercase phone number for case-insensitivity
                             remoteAssignmentsMap.put(
-                                numberData.Id.toLowerCase(),
+                                remotePhoneNumber.toLowerCase(),
                                 new RemoteAssignmentWrapper(numberData, seriesRecord.Id)
                             );
 
@@ -235,78 +257,143 @@ public virtual class NumberSyncService {
         List<Account_Phone_Number_Assignment__c> toUpdate = new List<Account_Phone_Number_Assignment__c>();
         List<Account_Phone_Number_Assignment__c> toDelete = new List<Account_Phone_Number_Assignment__c>();
 
-        // Iterate through remote assignments to find new or changed records
-        for (String remoteKey : remoteAssignments.keySet()) { // remoteKey is already lowercased
+        Set<String> localKeys = localAssignments.keySet();
+        Set<String> remoteKeys = remoteAssignments.keySet();
+
+        Set<String> keysToCreate = new Set<String>(remoteKeys);
+        keysToCreate.removeAll(localKeys);
+
+        Set<String> keysToUpdate = new Set<String>(remoteKeys);
+        keysToUpdate.retainAll(localKeys);
+
+        Set<String> keysToDelete = new Set<String>(localKeys);
+        keysToDelete.removeAll(remoteKeys);
+
+        Logger.logInfo('Assignments to create: ' + keysToCreate.size());
+        Logger.logInfo('Assignments to update: ' + keysToUpdate.size());
+        Logger.logInfo('Assignments to delete: ' + keysToDelete.size());
+
+        // Before creating, check if any of these phone numbers already exist in the database
+        if (!keysToCreate.isEmpty()) {
+            Set<String> phoneNumbersToCreate = new Set<String>();
+            for (String key : keysToCreate) {
+                phoneNumbersToCreate.add(remoteAssignments.get(key).numberData.phoneNumber);
+            }
+
+            List<Account_Phone_Number_Assignment__c> existingAssignments = [
+                SELECT Phone_Number__c FROM Account_Phone_Number_Assignment__c WHERE Phone_Number__c IN :phoneNumbersToCreate
+            ];
+
+            Set<String> existingPhoneNumbers = new Set<String>();
+            for (Account_Phone_Number_Assignment__c existingAssignment : existingAssignments) {
+                existingPhoneNumbers.add(existingAssignment.Phone_Number__c.toLowerCase());
+            }
+
+            Set<String> keysToCreateFiltered = new Set<String>();
+            for (String key : keysToCreate) {
+                String phoneNumber = remoteAssignments.get(key).numberData.phoneNumber.toLowerCase();
+                if (existingPhoneNumbers.contains(phoneNumber)) {
+                    Logger.logError('NumberSyncService', 'Attempted to create a duplicate phone number assignment for ' + phoneNumber + '. This number already exists in the system.');
+                } else {
+                    keysToCreateFiltered.add(key);
+                }
+            }
+            keysToCreate = keysToCreateFiltered;
+        }
+
+
+        // Iterate through remote assignments to find new records
+        for (String remoteKey : keysToCreate) {
             RemoteAssignmentWrapper wrapper = remoteAssignments.get(remoteKey);
             NumberClientResponseDTO.NumberData remoteData = wrapper.numberData;
             Id parentSeriesIdForRemote = wrapper.parentSeriesId;
 
-            Account_Phone_Number_Assignment__c localRecord = localAssignments.get(remoteKey);
+            Account_Phone_Number_Assignment__c newAssignment = new Account_Phone_Number_Assignment__c();
 
-            if (localRecord == null) {
-                // New record: create it
-                Account_Phone_Number_Assignment__c newAssignment = new Account_Phone_Number_Assignment__c();
+            newAssignment.Phone_Number__c = remoteData.phoneNumber; // Store with original casing
+            newAssignment.CTN_Number_Status__c = remoteData.numberStatus;
+            newAssignment.Account_Phone_Number_Series__c = parentSeriesIdForRemote; // Set Master-Detail relationship
+            newAssignment.Phone_Number_Reservation_Status__c = 'SUCCESS';
 
-                newAssignment.Phone_Number__c = remoteData.phoneNumber; // Store with original casing
-                newAssignment.CTN_Number_Status__c = remoteData.numberStatus;
-                newAssignment.Account_Phone_Number_Series__c = parentSeriesIdForRemote; // Set Master-Detail relationship
+            if(acc != null) {
+                newAssignment.Account__c = acc.Id;
+            }
+            
+            toCreate.add(newAssignment);
+            Logger.logInfo('Queued for creation: Phone=' + remoteData.phoneNumber + ', Status=' + remoteData.numberStatus + ', SeriesId=' + parentSeriesIdForRemote);
+        }
 
-                if(acc != null) {
-                    newAssignment.Account__c = acc.Id;
-                }
-                // TODO: Map other fields from remoteData to newAssignment if necessary
-                // e.g., newAssignment.Phone_Number_user__c = remoteData.someUserField;
-                // e.g., newAssignment.Account__c = determineAccountIdLogic();
-                // For now, only core fields are mapped.
-                
+        // Iterate through existing assignments to check for updates
+        for (String key : keysToUpdate) {
+            RemoteAssignmentWrapper wrapper = remoteAssignments.get(key);
+            NumberClientResponseDTO.NumberData remoteData = wrapper.numberData;
+            Account_Phone_Number_Assignment__c localRecord = localAssignments.get(key);
+            
+            boolean changed = false;
 
-                toCreate.add(newAssignment);
-                Logger.logInfo('To Create: Id/Phone=' + remoteData.Id + ', Status=' + remoteData.numberStatus + ', SeriesId=' + parentSeriesIdForRemote);
+            // If the local assignment had an error, clear it and set status to success
+            if (localRecord.Phone_Number_Reservation_Error__c != null) {
+                localRecord.Phone_Number_Reservation_Error__c = null;
+                localRecord.Phone_Number_Reservation_Status__c = 'SUCCESS';
+                changed = true;
+            }
 
-            } else {
-                // Existing record: check for changes
-                boolean changed = false;
+            if (localRecord.CTN_Number_Status__c != remoteData.numberStatus) {
+                localRecord.CTN_Number_Status__c = remoteData.numberStatus;
+                changed = true;
+            }
 
-                // Compare CTN_Number_Status__c
-                if (localRecord.CTN_Number_Status__c != remoteData.numberStatus) {
-                    localRecord.CTN_Number_Status__c = remoteData.numberStatus;
-                    changed = true;
-                }
-
-                // TODO: Compare other relevant fields from remoteData and update localRecord if changed.
-                // Example:
-                // if (localRecord.Phone_Number_user__c != remoteData.someUserField) {
-                //    localRecord.Phone_Number_user__c = remoteData.someUserField;
-                //    changed = true;
-                // }
-
-                // Note: The parentSeriesId (Account_Phone_Number_Series__c) for an existing localRecord
-                // is generally not expected to change based on remote data for the *same phone number*.
-                // If a phone number were to move series, it might appear as a delete from old series
-                // and an add to new series, depending on how NumberService reports it.
-                // We are not updating localRecord.Account_Phone_Number_Series__c here.
-
-                if (changed) {
-                    toUpdate.add(localRecord);
-                    Logger.logInfo('To Update: Id/Phone=' + localRecord.Phone_Number__c + ', NewStatus=' + localRecord.CTN_Number_Status__c);
-                }
+            if (changed) {
+                toUpdate.add(localRecord);
+                Logger.logInfo('Queued for update: Phone=' + localRecord.Phone_Number__c);
             }
         }
 
         // Iterate through local assignments to find records for deletion
-        for (String localKey : localAssignments.keySet()) { // localKey is lowercased Phone_Number__c
-            if (!remoteAssignments.containsKey(localKey)) {
+        if (!keysToDelete.isEmpty()) {
+            Set<Id> assignmentIdsToCheck = new Set<Id>();
+            for (String key : keysToDelete) {
+                assignmentIdsToCheck.add(localAssignments.get(key).Id);
+            }
+
+            List<Activation_Assignment_Junction__c> inUseJunctions = ActivationAssignmentJunctionSelector.getByAssignmentIds(assignmentIdsToCheck);
+            Set<Id> inUseAssignmentIds = new Set<Id>();
+            for (Activation_Assignment_Junction__c junction : inUseJunctions) {
+                inUseAssignmentIds.add(junction.Account_Phone_Number_Assignment__c);
+            }
+
+            for (String localKey : keysToDelete) {
                 Account_Phone_Number_Assignment__c assignmentToDelete = localAssignments.get(localKey);
+
+                boolean isOpenSeriesReserved = false;
+                if (assignmentToDelete.Account_Phone_Number_Series__c != null &&
+                    assignmentToDelete.Account_Phone_Number_Series__r.Number_Group__c != null &&
+                    assignmentToDelete.Account_Phone_Number_Series__r.Number_Location__c != null) {
+                    
+                    String seriesKey = assignmentToDelete.Account_Phone_Number_Series__r.Number_Group__c.toUpperCase() + '_' +
+                                       assignmentToDelete.Account_Phone_Number_Series__r.Number_Location__c.toUpperCase();
+
+                    if (this.openSeriesKeys.contains(seriesKey) && assignmentToDelete.CTN_Number_Status__c == 'AR') {
+                        isOpenSeriesReserved = true;
+                    }
+                }
                 
-                //we should not delete the local assignment if for some reason the number is assigned to a user via e.g., an 
-                //activation line, we should instead throw an error and then figure out why this has been done   
-                if(!String.isBlank(assignmentToDelete.Phone_Number_user__c)){
-                    Logger.logError('NumberSyncService', 'The local phonenumber assignement ' + assignmentToDelete.Phone_Number__c +
-                    ' is assigned to user ' + assignmentToDelete.Phone_Number_user__c + ' but is not registered in Fokus.');
+                boolean isInUse = inUseAssignmentIds.contains(assignmentToDelete.Id);
+
+                if (isInUse) {
+                    // New requirement: set an error
+                    assignmentToDelete.Phone_Number_Reservation_Error__c = '[NSS001] Phone number is assigned to line but does not exist in the customer list of numbers';
+                    toUpdate.add(assignmentToDelete);
+                    Logger.logError('NumberSyncService', 'Assignment ' + assignmentToDelete.Phone_Number__c + ' is in use but not found remotely. Setting error.');
+                }
+                else if (isOpenSeriesReserved) {
+                    // This rule remains: just preserve it, do nothing.
+                    Logger.logInfo('Assignment ' + assignmentToDelete.Phone_Number__c + ' is an open series AR assignment and is preserved from deletion.');
                 }
                 else {
+                    // Not in use and not open series AR, so delete it.
                     toDelete.add(assignmentToDelete);
-                    Logger.logInfo('To Delete: Id/Phone=' + assignmentToDelete.Phone_Number__c + ', Id=' + assignmentToDelete.Id);
+                    Logger.logInfo('Queued for deletion: Phone=' + assignmentToDelete.Phone_Number__c + ', Id=' + assignmentToDelete.Id);
                 }
             }
         }

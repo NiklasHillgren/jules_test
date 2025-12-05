@@ -2,7 +2,7 @@
  * The NumberSeriesRefreshAction class is an invocable action used by the Phone_Number_Series_Refresh flow.
  * It is responsible for refreshing the phone number series for a given account.
  *  -----------------------------------------------------------------------------
- *  Developer            Date            Description
+ *  Developer               Date            Description
  *  -----------------------------------------------------------------------------
  *  Kenneth Houkjær         27/07/2025      Initial version
  *
@@ -34,15 +34,15 @@ public with sharing class NumberSeriesRefreshAction {
             outputVarsList.add(outputVars);
         }
         return outputVarsList;
-	}
+    }
     
-	public class InputVariables {
-		@InvocableVariable
-		public Account inputAccount;
-	}
+    public class InputVariables {
+        @InvocableVariable
+        public Account inputAccount;
+    }
 
-	public class OutputVariables {
-		@InvocableVariable
-		public Boolean outputIsSuccess;
-	}
+    public class OutputVariables {
+        @InvocableVariable
+        public Boolean outputIsSuccess;
+    }
 }

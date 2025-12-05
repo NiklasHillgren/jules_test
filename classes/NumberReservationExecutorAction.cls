@@ -17,7 +17,7 @@ public with sharing class NumberReservationExecutorAction {
      * @param inputVariables A list of InputVariables objects, each containing a list of phone number assignments and a chunk size.
      * @return A list of OutputVariables objects, each containing the list of published events.
      */
-	@InvocableMethod(category='Number' label='Get the numbers for phone series' description='Fetch numbers with numberclient with data request information provided by the number serie.')
+    @InvocableMethod(category='Number' label='Get the numbers for phone series' description='Fetch numbers with numberclient with data request information provided by the number serie.')
     public static List<OutputVariables> reservePhoneNumberAssignments(List<InputVariables> inputVariables) {        
         OutputVariables output = new OutputVariables();
         
@@ -26,21 +26,25 @@ public with sharing class NumberReservationExecutorAction {
             
             List<List<String>> chunkedPhoneNumberAssignments = (List<List<String>>) orgUtils.chunkListOfStrings(vars.chunkSize, vars.phoneNumberAssignments, List<List<String>>.class);
             
-            List<EventExecutor__e> eventExecutors = new List<EventExecutor__e>();
+            List<EventExecutor__e> outputEventExecutors = new List<EventExecutor__e>();
+            
             for(List<String> phoneNumberAssignmentList : chunkedPhoneNumberAssignments){
+                List<EventExecutor__e> eventExecutors = new List<EventExecutor__e>();
+
                 EventExecutor__e executor = new EventExecutor__e();
-				executor.Executor__c = SFConstants.NUMBER_RESERVATION_EXECUTOR_HANDLER;
+                executor.Executor__c = SFConstants.NUMBER_RESERVATION_EXECUTOR_HANDLER;
                 
                 NumberReservationExecutorHandler.parameters params = new NumberReservationExecutorHandler.parameters();
                 params.assignmentIds = new Set<String>(phoneNumberAssignmentList);
                 executor.Parameters__c = JSON.serialize(params);
                 
                 eventExecutors.add(executor);
-            }
+                outputEventExecutors.add(executor);
+
+                EventBus.publish(eventExecutors);
+            }            
             
-            EventBus.publish(eventExecutors);
-            
-            output.publishedEvents = eventExecutors;
+            output.publishedEvents = outputEventExecutors;
         }catch(Exception ex){
             Logger.logError(ex);
             Logger.emit();
@@ -48,20 +52,20 @@ public with sharing class NumberReservationExecutorAction {
         }
         
         return new List<OutputVariables>{output};
-	}
+    }
     
-	public class InputVariables {
+    public class InputVariables {
         @InvocableVariable
         public Integer chunkSize;
-		@InvocableVariable
-		public List<String> phoneNumberAssignments;
-	}
+        @InvocableVariable
+        public List<String> phoneNumberAssignments;
+    }
 
-	public class OutputVariables {
+    public class OutputVariables {
         @InvocableVariable
         public List<EventExecutor__e> publishedEvents;
         
         @InvocableVariable
         public Boolean isSuccess;
-	}
+    }
 }

@@ -1,3 +1,15 @@
+/**
+ * @description This class is a selector for the Activation__c object.
+ * It provides methods to query for Activation__c records based on different criteria.
+ *  -----------------------------------------------------------------------------
+ *  Developer				Date			Description
+ *  -----------------------------------------------------------------------------
+ *  ???						???				Initial version.
+ *  Kirstine Nielsen        2025-08-21		Add getActivationsById(Set<Id> activationIdSet) method.
+ *
+ * @author ???
+ * @date ???
+ */
 public with sharing class ActivationSelector {
 	public static final String RECORD_TYPE_HOME_OFFICE_ACTIVATION = 'Home_office_activation';
 
@@ -32,6 +44,23 @@ public with sharing class ActivationSelector {
 			FROM Activation__c
 			WHERE Case__c =: caseId
 			LIMIT 1
+		];
+	}
+
+	/**
+	 * @description Get Activations by Ids.
+	 * 
+	 * @param Set<Id> activationIdSet
+	 * @return List<Activation__c> list of Activations
+	 */
+	public static List<Activation__c> getActivationsById(Set<Id> activationIdSet) {
+		return [
+			SELECT 
+				Id, 
+				Case_Account_ID__c,
+				Case__r.Type
+			FROM Activation__c
+			WHERE Id IN :activationIdSet
 		];
 	}
 

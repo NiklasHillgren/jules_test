@@ -93,7 +93,7 @@ public virtual with sharing class NumberClient extends HTTPClient {
      * @throws HTTPException if the API returns an error status (400, 404, 406, 500)
      */
     public virtual NumberClientResponseDTO.NumberDetail reserveNumberDetailByMsisdnAndCVR(String msisdn, String accountCVR, String productType) {
-        Logger.logInfo(String.format('reserveNumberDetailByMsisdn( {0} )', new List<Object>{msisdn}));
+        Logger.logInfo(String.format('reserveNumberDetailByMsisdnAndCVR( {0} )', new List<Object>{msisdn}));
 
         String endPoint = String.format(ENDPOINT_RESERVE_NUMBER_BY_MSISDN, new List<Object>{ msisdn });
 

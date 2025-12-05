@@ -82,6 +82,13 @@ public virtual class HTTPClient {
     protected HTTPClient() {
     }
 
+    /*
+     * Override this to provide different httpHeaders in each request
+     */
+    protected virtual Map<String, String> getDefaultHeaders() {
+        return HTTPClient.defaultHeaders;
+    }
+
     /**
      * @description Omnibus callout method. This is the primary method for
      * making a REST callout. Most of the other methods in this class serve
@@ -101,28 +108,33 @@ public virtual class HTTPClient {
         String body,
         Map<String, String> additionalHeaders
     ) {
-        Logger.logInfo(String.format('makeApiCall( {0}, {1}, {2}, {3}, {4} )', new List<Object>{ method, path, query, body, additionalHeaders }));
+        Logger.logInfo(
+            String.format(
+                'makeApiCall( {0}, {1}, {2}, {3}, {4} )',
+                new List<Object>{ method, path, query, body, additionalHeaders }
+            )
+        );
 
         if (method == HttpVerb.PATCH) {
             method = HttpVerb.POST;
             query += '?_HttpMethod=PATCH';
         }
-        
+
         HttpRequest request = new HttpRequest();
         if (method == HttpVerb.DEL) {
             request.setMethod('DELETE');
         } else {
             request.setMethod(String.valueOf(method));
         }
-        
-        Map<String, String> requestHeaders = HTTPClient.defaultHeaders.clone();
 
-        if(additionalHeaders != null && !additionalHeaders.isEmpty() ){
-            for(String header : additionalHeaders.keySet()){
+        Map<String, String> requestHeaders = getDefaultHeaders().clone();
+
+        if (additionalHeaders != null && !additionalHeaders.isEmpty()) {
+            for (String header : additionalHeaders.keySet()) {
                 requestHeaders.put(header, additionalHeaders.get(header));
             }
         }
-        
+
         for (String header : requestHeaders.keySet()) {
             request.setHeader(header, requestHeaders.get(header));
         }
@@ -138,13 +150,14 @@ public virtual class HTTPClient {
 
         Long startExecution = System.now().getTime();
         HttpResponse response = http.send(request);
+
         Long responseTime = System.now().getTime() - startExecution;
 
         String myLog = getHTTPLog(response, request, requestHeaders, responseTime);
-        
+
         Integer totalSize = myLog.length();
 
-        if(myLog.length() > 100000){
+        if (myLog.length() > 100000) {
             myLog = myLog.substring(0, 100000);
         }
 
@@ -153,39 +166,44 @@ public virtual class HTTPClient {
         return response;
     }
 
-    private String getHTTPLog(HttpResponse response, HttpRequest request, Map<String, String> requestHeaders, Long responseTime){
+    private String getHTTPLog(
+        HttpResponse response,
+        HttpRequest request,
+        Map<String, String> requestHeaders,
+        Long responseTime
+    ) {
         JSONGenerator gen = JSON.createGenerator(false);
         gen.writeStartObject();
         gen.writeFieldName('HTTP_Callout');
         gen.writeStartObject();
         gen.writeStringField('calloutTimeInMs', responseTime.toString());
-        
+
         gen.writeFieldName('request');
         gen.writeStartObject();
         gen.writeStringField('method', request.getMethod());
         gen.writeStringField('endpoint', request.getEndpoint());
         gen.writeFieldName('headers');
         gen.writeStartObject();
-        for(String key : requestHeaders.keySet()){
+        for (String key : requestHeaders.keySet()) {
             gen.writeStringField(key, requestHeaders.get(key));
         }
         gen.writeEndObject();
         gen.writeStringField('body', request.getBody());
-        gen.writeStringField('compressed', ''+request.getCompressed());
+        gen.writeStringField('compressed', '' + request.getCompressed());
         gen.writeEndObject();
-        
+
         gen.writeFieldName('response');
         gen.writeStartObject();
         gen.writeStringField('statusCode', response.getStatusCode().toString());
         gen.writeStringField('status', response.getStatus());
-        
+
         gen.writeFieldName('headers');
         gen.writeStartObject();
-        for(String key : response.getHeaderKeys() ){
+        for (String key : response.getHeaderKeys()) {
             gen.writeStringField(key, response.getHeader(key));
         }
         gen.writeEndObject();
-        gen.writeStringField('bodySize', ''+response.getBody().length());
+        gen.writeStringField('bodySize', '' + response.getBody().length());
         gen.writeStringField('body', response.getBody());
         gen.writeEndObject();
         gen.writeEndObject();
@@ -421,19 +439,39 @@ public virtual class HTTPClient {
      * @throws HTTPException if the response indicates an error status code
      */
     public HttpResponse handleHttpResponse(HttpResponse response) {
-        switch on response.getStatusCode() {
-            when 200, 201, 204 {
-                return response;
-            }
-            when 400, 403, 404, 406 {
-                throw new HTTPException(response);
-            }
-            when 500 {
-                throw new HTTPException(response);
-            }
-            when else {
-                throw new HTTPException(response);
-            }
+        Integer responseStatusCode = response.getStatusCode();
+        if (HTTPConstants.SUCCESS_RESPONSE_2XX.contains(responseStatusCode)) {
+            return response;
+        } else if (HTTPConstants.CLIENT_ERROR_RESPONSE_4XX.contains(responseStatusCode)) {
+            throw new HTTPException(response);
+        } else if (HTTPConstants.SERVER_ERROR_RESPONSE_5XX.contains(responseStatusCode)) {
+            throw new HTTPException(response);
+        } else {
+            Logger.logInfo('Status code was not mapped.');
+            throw new HTTPException(response);
+        }
+    }
+
+    /**
+     * Handles an HTTP response by processing its body content and converting it to the target type.
+     *
+     * @param response the HTTP response containing the body to be processed
+     * @param targetType the desired type to convert the processed response into
+     * @return the converted response object of the specified target type
+     * @throws HTTPException if the response body cannot be parsed
+     */
+    public Object handleHttpResponse(HttpResponse response, Type targetType) {
+        handleHttpResponse(response);
+
+        return parseResponse(response.getBody(), targetType);
+    }
+
+    // Helper method to parse JSON responses
+    private Object parseResponse(String json, Type targetType) {
+        try {
+            return System.JSON.deserialize(json, targetType);
+        } catch (System.JSONException e) {
+            throw new HTTPException('Error parsing response: ' + e.getMessage());
         }
     }
 
@@ -441,7 +479,7 @@ public virtual class HTTPClient {
      * Converts a map of parameters into a URL query string format.
      * Each key-value pair in the map becomes a query parameter in the form 'key=value'.
      * Multiple parameters are joined with '&' characters, starting with '?'.
-     * 
+     *
      * @param params A map containing parameter names as keys and their corresponding values
      * @return A string representing the query parameters, prefixed with '?' character
      *
@@ -451,7 +489,7 @@ public virtual class HTTPClient {
 
         String queryParams = '';
 
-        if(params == null || params.isEmpty()){
+        if (params == null || params.isEmpty()) {
             return queryParams;
         }
 

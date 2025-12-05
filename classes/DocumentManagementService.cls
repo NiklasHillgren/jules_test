@@ -115,7 +115,6 @@ public with sharing class DocumentManagementService {
 
             if (newVersion.DocumentManagementIsStored__c && newVersion.DocumentManagementInitDate__c != null) {
                 if (newVersion.DocumentManagementInitDate__c != oldVersion.DocumentManagementInitDate__c) {
-                    if()
                     EventExecutor__e executor = new EventExecutor__e(
                         Executor__c = 'DocumentManagementUploadExecutorHandler',
                         Parameters__c = '{"contentVersionId":"' + newVersion.Id + '"}'
@@ -147,11 +146,10 @@ public with sharing class DocumentManagementService {
             }
 
             if(parentId != null){
-                return parentId;
+                break;
             }
         }
 
-        //Should only reach this point if parentId is null
         return parentId;
     }
 

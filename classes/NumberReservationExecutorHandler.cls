@@ -134,7 +134,7 @@ public with sharing class NumberReservationExecutorHandler implements IEventExec
             retryEventExecutor.LastEventExecutorUuid__c = event.EventUuid;
             retryEventExecutor.LastEventExecutorReplayId__c = event.ReplayId;
             
-        	EventBus.publish(retryEventExecutor);
+            EventBus.publish(retryEventExecutor);
         }
     }
 
@@ -237,8 +237,8 @@ public with sharing class NumberReservationExecutorHandler implements IEventExec
                 Phone_Number__c,
                 Phone_Number_Reservation_Status__c,
                 Phone_Number_Reservation_Error__c,
-            	CTN_Number_Status__c,
-            	Account__r.cvr__c,
+                CTN_Number_Status__c,
+                Account__r.cvr__c,
                 Account_Phone_Number_Series__r.Product_Type__c
             FROM Account_Phone_Number_Assignment__c
             WHERE Id  IN : assignmentIds

@@ -6,9 +6,10 @@ public with sharing class SFConstants {
     public static final String DEFAULT_OPENSERIES_PRODUCTTYPE = 'GSM';
 
     //NUMBER RESERVATION EXECUTORS
-    public static final String NUMBER_ACTIVATION_LINES_EXECUTOR_HANDLER = 'NumberActivationLinesExecutorHandler';
+    public static final String NUMBER_ACTIVATION_LINES_EXECUTOR_HANDLER = 'NumberActivationLinesExecutorHandler';  // TO BE DELETED
     public static final String NUMBER_ASSIGNMENT_RESET_EXECUTOR_HANDLER = 'NumberAssignmentResetExecutorHandler';
     public static final String NUMBER_RESERVATION_EXECUTOR_HANDLER = 'NumberReservationExecutorHandler';
+    public static final String NUMBER_CASE_EXECUTOR_HANDLER = 'NumberCaseExecutorHandler';
 
     //NUMBER RESERVATION CTN STATUS
     public static final String ASSIGNED_AVAILABLE = 'AA';
@@ -19,4 +20,6 @@ public with sharing class SFConstants {
     //SHARED CONSTANTS
     public static final String SUCCESS = 'Success';
     public static final String ERROR = 'Error';
+    public static final STring INPROGRESS = 'INPROGRESS';
+    
 }

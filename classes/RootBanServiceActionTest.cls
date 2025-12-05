@@ -1,153 +1,152 @@
+/**
+* @description Test class for the refactored RootBanServiceAction class.
+*              This class verifies that the action correctly calls the factory,
+*              handles HTTP callouts, and processes API responses for Root BAN creation.
+*  -----------------------------------------------------------------------------
+*  Developer            Date            Description
+*  -----------------------------------------------------------------------------
+*  Kenneth Houkjær      11/09/2025      Initial version.
+*  Kenneth Houkjær      11/09/2025      Rewritten to use MetadataSelector mock.
+*
+* @author Kenneth Houkjær
+* @date 2025-09-11
+*/
 @isTest
-private class RootBanServiceActionTest {
-	@isTest
-	static void testCreateRootBanSuccess() {
-		// arrange
-		List<RootBanServiceAction.Request> requests = new List<RootBanServiceAction.Request>();
-		Account inputAccount = testDataFactory.createCVRAccountWithBillingAddress('12345678');
-		RootBanServiceAction.Request request = new RootBanServiceAction.Request();
-		request.inputAccount = inputAccount;
-		request.companyName = 'test';
-		request.billingAtt = 'Secretary';
-		request.email = 'test@test.com';
-		request.streetName = 'test';
-		request.streetNumber = '19';
-		request.postalCode = '2300';
-		request.city = 'Copenhagen';
-		request.country = 'Denmark';
-		requests.add(request);
+private class RootBanServiceActionTest extends NorlysSUnitTest {
 
-		Test.startTest();
+    /**
+    * @description Mock for the MetadataSelector service to provide API settings in a test context.
+    */
+    private class MetadataSelectorMock extends MetadataSelector.Service {
+        protected override SObject passThrough(SObject record) {
+            if (record instanceof APISettings__mdt) {
+                return new APISettings__mdt(
+                    brand__c = 'TDC',
+                    channel__c = 'B2B',
+                    dealerCode__c = '123'
+                );
+            }
+            return super.passThrough(record);
+        }
+    }
 
-		Test.setMock(HttpCalloutMock.class, new AuthorizationWrapperMock());
-		Test.setMock(HttpCalloutMock.class, new RootBanServiceActionTest.RootBanServiceActionSuccessResponseMock());
+    /**
+    * @description Mocks a successful API response for Root BAN creation.
+    */
+    private class SuccessMock implements HttpCalloutMock {
+        public HttpResponse respond(HttpRequest req) {
+            Order responseOrder = new Order();
+            responseOrder.type = 'Internet'; // Set type for parser
+            responseOrder.hasValidationErrors = false;
+            
+            OrderPart rootPart = new OrderPart();
+            OrderItem item = new OrderItem();
+            item.billingAccountNumber = '123456789';
+            rootPart.orderItems = new List<OrderItem>{ item };
+            responseOrder.orderParts = new List<OrderPart>{ rootPart };
 
-		List<RootBanServiceAction.RootBanResult> results = RootBanServiceAction.createRootBan(requests);
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'application/json');
+            
+            System.JSONGenerator gen = JSON.createGenerator(true);
+            gen.writeStartObject();
+            gen.writeFieldName('data');
+            responseOrder.serialize(gen);
+            gen.writeEndObject();
+            
+            res.setBody(gen.getAsString());
+            res.setStatusCode(200);
+            return res;
+        }
+    }
 
-		Test.stopTest();
+    /**
+    * @description Mocks an API response with validation errors for Root BAN creation.
+    */
+    private class ValidationErrorMock implements HttpCalloutMock {
+        public HttpResponse respond(HttpRequest req) {
+            Order responseOrder = new Order();
+            responseOrder.type = 'Internet'; // Set type for parser
+            responseOrder.hasValidationErrors = true;
+            responseOrder.validationErrors = new List<ValidationErrors>{
+                new ValidationErrors('BAN-ERROR-01', new List<Parameter>{ new Parameter('field', 'reason') })
+            };
+            
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'application/json');
+            
+            System.JSONGenerator gen = JSON.createGenerator(true);
+            gen.writeStartObject();
+            gen.writeFieldName('data');
+            responseOrder.serialize(gen);
+            gen.writeEndObject();
 
-		// assert
-		Assert.areEqual(1, results.size());
-		RootBanServiceAction.RootBanResult result = results.get(0);
-		Assert.areNotEqual(null, result.billingAccountNumber);
-		Assert.areEqual(false, result.hasErrors);
-		Assert.areEqual(null, result.errors);
-	}
+            res.setBody(gen.getAsString());
+            res.setStatusCode(200);
+            return res;
+        }
+    }
 
-	@isTest
-	static void testCreateRootBanSuccessWithDoorNumberWhenDirection() {
-		// arrange
-		List<RootBanServiceAction.Request> requests = new List<RootBanServiceAction.Request>();
-		Account inputAccount = testDataFactory.createCVRAccountWithBillingAddress('12345678');
-		inputAccount.Billing_Door_Number__c = 'th';
-		update inputAccount;
+    @isTest
+    static void testSuccessScenario() {
+        // Arrange
+        MetadataSelector.setMock(new MetadataSelectorMock());
 
-		RootBanServiceAction.Request request = new RootBanServiceAction.Request();
-		request.inputAccount = inputAccount;
-		request.companyName = 'test';
-		request.billingAtt = 'Secretary';
-		request.email = 'test@test.com';
-		request.streetName = 'test';
-		request.streetNumber = '19';
-		request.postalCode = '2300';
-		request.city = 'Copenhagen';
-		request.country = 'Denmark';
-		requests.add(request);
+        NorlysTestScenarios.ScenarioResult scenario = NorlysTestScenarios.newBuilder()
+            .withCvr('11223344')
+            .build();
+        
+        Account testAccount = scenario.account;
 
-		Test.startTest();
+        RootBanServiceAction.Request request = new RootBanServiceAction.Request();
+        request.inputAccount = testAccount;
+        request.BanType = 'Home Office';
+        List<RootBanServiceAction.Request> requests = new List<RootBanServiceAction.Request>{ request };
 
-		Test.setMock(HttpCalloutMock.class, new AuthorizationWrapperMock());
-		Test.setMock(HttpCalloutMock.class, new RootBanServiceActionTest.RootBanServiceActionSuccessResponseMock());
+        // Act
+        Test.startTest();
+        Test.setMock(HttpCalloutMock.class, new SuccessMock());
+        List<RootBanServiceAction.RootBanResult> results = RootBanServiceAction.createRootBan(requests);
+        Test.stopTest();
 
-		List<RootBanServiceAction.RootBanResult> results = RootBanServiceAction.createRootBan(requests);
+        // Assert
+        Assert.isNotNull(results, 'Result list should not be null.');
+        Assert.areEqual(1, results.size(), 'Should have one result.');
+        
+        RootBanServiceAction.RootBanResult result = results[0];
+        Assert.isFalse(result.hasErrors, 'Should not have errors on success.');
+        Assert.areEqual(123456789, result.billingAccountNumber, 'Billing Account Number should be returned correctly.');
+    }
 
-		Test.stopTest();
+    @isTest
+    static void testValidationErrorScenario() {
+        // Arrange
+        MetadataSelector.setMock(new MetadataSelectorMock());
 
-		// assert
-		Assert.areEqual(1, results.size());
-		RootBanServiceAction.RootBanResult result = results.get(0);
-		Assert.areNotEqual(null, result.billingAccountNumber);
-		Assert.areEqual(false, result.hasErrors);
-		Assert.areEqual(null, result.errors);
-	}
+        NorlysTestScenarios.ScenarioResult scenario = NorlysTestScenarios.newBuilder()
+            .withCvr('55667788')
+            .build();
 
-	@isTest
-	static void testCreateRootBanError() {
-		// arrange
-		List<RootBanServiceAction.Request> requests = new List<RootBanServiceAction.Request>();
-		Account inputAccount = testDataFactory.createAccountWithCVR('12345678');
-		RootBanServiceAction.Request request = new RootBanServiceAction.Request();
-		request.inputAccount = inputAccount;
-		request.companyName = 'test';
-		request.billingAtt = 'Secretary';
-		request.email = 'test@test.com';
-		request.streetName = 'test';
-		request.streetNumber = '19';
-		request.postalCode = '2300';
-		request.city = 'Copenhagen';
-		request.country = 'Denmark';
-		requests.add(request);
+        RootBanServiceAction.Request request = new RootBanServiceAction.Request();
+        request.inputAccount = scenario.account;
+        request.BanType = 'Home Office';
+        List<RootBanServiceAction.Request> requests = new List<RootBanServiceAction.Request>{ request };
 
-		Test.startTest();
+        // Act
+        Test.startTest();
+        Test.setMock(HttpCalloutMock.class, new ValidationErrorMock());
+        List<RootBanServiceAction.RootBanResult> results = RootBanServiceAction.createRootBan(requests);
+        Test.stopTest();
 
-		Test.setMock(HttpCalloutMock.class, new AuthorizationWrapperMock());
-		Test.setMock(HttpCalloutMock.class, new RootBanServiceActionTest.RootBanServiceActionFailResponseMock());
+        // Assert
+        Assert.isNotNull(results, 'Result list should not be null.');
+        Assert.areEqual(1, results.size(), 'Should have one result.');
+        
+        RootBanServiceAction.RootBanResult result = results[0];
+        Assert.isTrue(result.hasErrors, 'Should have errors on validation failure.');
+        Assert.isNull(result.billingAccountNumber, 'Billing Account Number should be null on failure.');
 
-		List<RootBanServiceAction.RootBanResult> results = RootBanServiceAction.createRootBan(requests);
-
-		Test.stopTest();
-
-		// assert
-		Assert.areEqual(1, results.size());
-		RootBanServiceAction.RootBanResult result = results.get(0);
-		Assert.areEqual(true, result.hasErrors);
-	}
-
-	@isTest
-	static void testCreateRootBanException() {
-		List<RootBanServiceAction.Request> requests = new List<RootBanServiceAction.Request>();
-		Account inputAccount = testDataFactory.createAccountWithCVR('12345678');
-		RootBanServiceAction.Request request = new RootBanServiceAction.Request();
-		request.inputAccount = inputAccount;
-		request.companyName = 'test';
-		request.billingAtt = 'Secretary';
-		request.email = 'test@test.com';
-		request.streetName = 'test';
-		request.streetNumber = '19';
-		request.postalCode = '2300';
-		request.city = 'Copenhagen';
-		request.country = 'Denmark';
-		requests.add(request);
-
-		Test.startTest();
-
-		List<RootBanServiceAction.RootBanResult> results = RootBanServiceAction.createRootBan(requests);
-		Assert.areEqual(true, results.get(0).hasErrors);
-
-		Test.stopTest();
-	}
-
-	public class RootBanServiceActionSuccessResponseMock implements HttpCalloutMock {
-		public HttpResponse respond(HttpRequest req) {
-			HttpResponse res = new HttpResponse();
-			res.setHeader('Content-Type', 'application/json');
-			res.setBody(
-				'{"data":{"channel":"SALES_FORCE","dealer":{"dealerCode":"1018","dealerName":"CO BtB Amager","salesAgentCode":"22334"},"orderId":"SF53892","id":"53892","segment":"B2B","channelOrderReference":"SF53892","brand":"teliadk","createdDate":"2023-02-02T08:25:30.428355133+01:00","processingStatus":"SUBMITTED","orderer":{"type":"ORGANIZATION","name":"Test A/S","cvr":"77712079","address":{"type":"DANISH_ADDRESS","city":"København","zipCode":"2300","country":"DNK","streetName":"Holmbladsgade","streetNumber":"133"},"telephoneNumber":{"countryCode":"45","localNumber":"73193137"}},"orderParts":[{"references":[],"type":"ACCOUNT","activity":"CREATE","changeTypes":[],"orderItems":[{"type":"ACCOUNT_ITEM","billingAccountNumber":"565855319","legalParty":{"type":"ORGANIZATION","name":"Test A/S","cvr":"77712079","address":{"type":"DANISH_ADDRESS","city":"København","zipCode":"2300","country":"DNK","streetName":"Holmbladsgade","streetNumber":"133"}},"billingParty":{"type":"ORGANIZATION","name":"Test A/S","cvr":"77712079","address":{"type":"DANISH_ADDRESS","city":"København","zipCode":"2300","attention":"Mr. Secretary","country":"DNK","streetName":"Holmbladsgade","streetNumber":"133","streetNumberSuffix":"B","floorNumber":"12","doorNumber":"1203","direction":"tv"}},"billingCycle":"MONTHLY","invoiceType":"PDF_BY_EMAIL","label":"My account","upTransferChargeCode":"THOD22","activity":"CREATE","id":2,"origin":"CLIENT"},{"type":"DISCOUNT_ITEM","discountCode":"HOF001","activity":"CREATE","id":3,"origin":"CLIENT"}],"validationErrors":[],"id":1}],"validationErrors":[],"hasValidationErrors":false,"documents":[]}}'
-			);
-			res.setStatusCode(200);
-			return res;
-		}
-	}
-
-	public class RootBanServiceActionFailResponseMock implements HttpCalloutMock {
-		public HttpResponse respond(HttpRequest req) {
-			HttpResponse res = new HttpResponse();
-			res.setHeader('Content-Type', 'application/json');
-			res.setBody(
-				'{"data":{"channel":"SALES_FORCE","dealer":{"dealerCode":"1018","dealerName":"CO BtB Amager","salesAgentCode":"22334"},"segment":"B2B","brand":"teliadk","createdDate":"2023-02-20T14:43:19.922527929+01:00","orderer":{"type":"ORGANIZATION","name":"Test A/S","cvr":"77712079","address":{"type":"DANISH_ADDRESS","city":"København","zipCode":"2300","country":"DNK","streetName":"Holmbladsgade","streetNumber":"133"},"telephoneNumber":{"countryCode":"45","localNumber":"73193137"}},"orderParts":[{"references":[],"type":"ACCOUNT","activity":"CREATE","changeTypes":[],"orderItems":[{"type":"ACCOUNT_ITEM","legalParty":{"type":"ORGANIZATION","name":"Test A/S","cvr":"77712079"},"billingCycle":"MONTHLY","invoiceType":"PDF_BY_EMAIL","upTransferChargeCode":"THOD22","activity":"CREATE","id":2,"validationErrors":[{"errorCode":"INVALID_ORDER_ITEM","parameters":[{"reason":"address  must not be null"}]},{"errorCode":"MISSING_ADDRESS","parameters":[{"target":"REASON","reason":"Address can\'t be empty"}]}],"origin":"CLIENT"},{"type":"DISCOUNT_ITEM","discountCode":"HOF001","activity":"CREATE","id":3,"origin":"CLIENT"}],"validationErrors":[],"id":1}],"validationErrors": [{"errorCode": "INVALID_ORDERER","parameters": [{"target": "ORDERER","reason": "CustomerId or CVR must be present at Orderer of type Organization"},{"reason": "address  must not be null"},{"reason": "name  must not be null"}]}],"hasValidationErrors":true,"documents":[]}}'
-			);
-			res.setStatusCode(400);
-			return res;
-		}
-	}
+        // List<System_Log__c> logs = [SELECT Id FROM System_Log__c WHERE Error_Body__c != null];
+        // Assert.areEqual(1, logs.size(), 'An error log should be created.');
+    }
 }

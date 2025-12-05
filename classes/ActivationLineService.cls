@@ -69,16 +69,16 @@ public class ActivationLineService {
      * @param oldList The list of old activation_line__c records.
      * @return A map of activationLineId to MobileNo
      */
-    public Map<Id, String> getMapOfActivationLineToPhoneNumberForActivationLineDeletes(List<Activation_Line__c> oldList){
-        Logger.logInfo(String.format('getMapOfActivationLineToPhoneNumberForActivationLineDeletes( {0} )', new List<Object>{ oldList}));
+    public Map<Id, String> getMapOfActivationLineToPhoneNumberForActivationLineDeletes(List<Activation_Line__c> listOfActivationLines){
+        Logger.logInfo(String.format('getMapOfActivationLineToPhoneNumberForActivationLineDeletes( {0} )', new List<Object>{ listOfActivationLines}));
 
         Map<Id, String> mapOfActivationLineToPhoneNumber = new Map<Id, String>();
 
-        if (oldList == null) {
-            Logger.logError('oldList is null.');
+        if (listOfActivationLines == null) {
+            Logger.logError('listOfActivationLines is null.');
         }
         else {
-            for (Activation_Line__c actLine : oldList) {
+            for (Activation_Line__c actLine : listOfActivationLines) {
                 mapOfActivationLineToPhoneNumber.put(actLine.Id, actLine.Mobile_No__c);  
             }
         }

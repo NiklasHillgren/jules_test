@@ -35,12 +35,12 @@ public with sharing class EventExecutorService {
 
         //One queueable for each platform event the queueable is executed and started by Salesforce core
         for (EventExecutor__e eventToExecute : executors) {
-            if(eventToExecute.RetryCount__c > 5){
-                Logger.logInfo('RetryCount__c is bigger than 5 we will halt!');
-                continue;
-            }
-
             try{
+                if(eventToExecute.RetryCount__c > 5){
+                    Logger.logInfo('RetryCount__c is bigger than 5 we will halt!');
+                    continue;
+                }
+
                 EventExecutorQueueable queueableExecutor = new EventExecutorQueueable();
                 queueableExecutor.setEventToExecute(eventToExecute);
                 

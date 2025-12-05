@@ -76,11 +76,20 @@ public with sharing class DocumentManagementUploadExecutorHandler implements IEv
                 //We can end up here if we get a DML exception - it's not funny....
                 exThrown = ex;
             }
-        }
+        
+        }        
 
-        //If we havn't set DocumentManagementStoreId__c something has gone wrong...
-        if (toBeUpdated.DocumentManagementStoreId__c == null) {
-            throw new EventExecutorRetryException(exThrown);
+        //TODO - is it possible to fail grazefully in the framework i.e. allow an update and also throw the retry exception?
+        if ( toBeUpdated.DocumentManagementStoreId__c == null ) {
+            EventExecutor__e retryEventExecutor = new EventExecutor__e();
+            retryEventExecutor.Parameters__c = event.Parameters__c;
+            retryEventExecutor.Executor__c = event.Executor__c;
+            retryEventExecutor.RetryCount__c = event.RetryCount__c + 1; //THIS IS VERY IMPORTANT!
+            retryEventExecutor.LastEventExecutorException__c = exThrown.getMessage();
+            retryEventExecutor.LastEventExecutorUuid__c = event.EventUuid;
+            retryEventExecutor.LastEventExecutorReplayId__c = event.ReplayId;
+ 
+            EventBus.publish(retryEventExecutor);
         }
     }
 

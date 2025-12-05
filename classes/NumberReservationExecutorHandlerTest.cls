@@ -26,7 +26,7 @@ public class NumberReservationExecutorHandlerTest {
 
         Account_Phone_Number_Series__c series1 = new Account_Phone_Number_Series__c(
             Account__c = acc.Id,
-            Product_Type__c = 'FIX',
+            Product_Type__c = 'GSM',
             Number_Group__c = 'P',
             Number_Location__c = 'EKC'
         );
@@ -34,7 +34,7 @@ public class NumberReservationExecutorHandlerTest {
             Account__c = acc.Id,
             Product_Type__c = 'GSM',
             Number_Group__c = 'P',
-            Number_Location__c = 'EKC'
+            Number_Location__c = 'SAL'
         );
         Account_Phone_Number_Series__c series3 = new Account_Phone_Number_Series__c(
             Account__c = accWithoutAssignment.Id,

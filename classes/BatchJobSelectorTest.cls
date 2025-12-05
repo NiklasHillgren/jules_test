@@ -3,8 +3,9 @@ private class BatchJobSelectorTest {
     @isTest
     static void testGetActiveBatchJobSettings() {
         
+        BatchJobSelector b = new BatchJobSelector();
         Test.startTest();
-        List<Batch_Job_Settings__mdt> settings = BatchJobSelector.getActiveBatchJobSettings();
+        List<Batch_Job_Settings__mdt> settings = b.getActiveBatchJobSettingsImpl();
         Test.stopTest();
 
         System.assert(settings != null, 'Settings list should not be null');
@@ -20,12 +21,14 @@ private class BatchJobSelectorTest {
 
     @isTest
     static void testGetCronTriggersByJobName() {
+        BatchJobSelector b = new BatchJobSelector();
+
         Test.startTest();
         BatchTestJob testJob = new BatchTestJob();
         testJob.schedule();
         Test.stopTest();
 
-        List<CronTrigger> triggers = BatchJobSelector.getCronTriggersByJobName('BatchTestJob');
+        List<CronTrigger> triggers = b.getCronTriggersByJobNameImpl('BatchTestJob');
 
         System.assert(triggers != null, 'Triggers list should not be null');
         System.assertEquals(1, triggers.size(), 'Should find one trigger for the test job');

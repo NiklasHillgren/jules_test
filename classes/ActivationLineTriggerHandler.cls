@@ -37,7 +37,7 @@ public class ActivationLineTriggerHandler extends TriggerHandler{
     public override void beforeDelete() {
         Map<Id, String> mapOfActivationLineToPhoneNumberForActivationLineDeletes = activationLineService.getMapOfActivationLineToPhoneNumberForActivationLineDeletes(triggerOld);
 
-        NumberClientService numberClientService = new NumberClientService();
-        numberClientService.resetPhoneNumberAssignments(25, mapOfActivationLineToPhoneNumberForActivationLineDeletes);
+        NumberService numberService = new NumberService();
+        //numberService.resetPhoneNumberAssignments(25, mapOfActivationLineToPhoneNumberForActivationLineDeletes);
     }  
 }

@@ -9,9 +9,9 @@ public without sharing class Activation_Create {
 		List<AggregateResult> quoteLines = new List<AggregateResult>();
 		String caseId = '';
 		List<Id> recordId = new List<Id>{requestDAO.get(0).recordId};
-		System.debug('recordId = ' + recordId);
+		Logger.logInfo('Activation_Create.Activation_Create: recordId ' + recordId);
 		Map<String, Case> caseByProductType = mapCaseByProductType(requestDAO.get(0).cases);
-		System.debug('caseByProductType = ' + caseByProductType);
+		Logger.logInfo('Activation_Create.Activation_Create: caseByProductType ' + caseByProductType);
 		
 		try {
 			List<SBQQ__Quote__c> quotes = [
@@ -21,8 +21,8 @@ public without sharing class Activation_Create {
 				LIMIT 1
 			];
 			caseId = quotes.get(0).SBQQ__Opportunity2__r.Case__c;
-			System.debug('caseId = ' + caseId);
-			System.debug('Print Quote List ' + quotes.get(0));
+			Logger.logInfo('Activation_Create.Activation_Create: caseId ' + caseId);
+			Logger.logInfo('Activation_Create.Activation_Create: Quote List ' + quotes.get(0));
 			
 			if (quotes.size() > 0) {
 				for (AggregateResult quoteLine : [
@@ -39,7 +39,7 @@ public without sharing class Activation_Create {
 			}
 			
 			if (quoteLines.size() > 0) {
-				system.debug('quoteLines Found');
+				Logger.logInfo('Activation_Create.Activation_Create: quoteLines.size() > 0');
 				for (AggregateResult ql : quoteLines) {
 					String caseProductType = String.valueOf(ql.get('Delivery_Product_Group__c'));	
 					String caseType = caseByProductType.get(caseProductType).Type;			
@@ -60,8 +60,7 @@ public without sharing class Activation_Create {
 			
 			// Creating and executing batch (Activation_Create_Iterable)
 			if (activationCreateList != null) {
-				calculateActivationProgressValue(activationCreateList, 'New', quotes.get(0).Id);
-				System.debug('activationCreateList = ' + activationCreateList);
+				Logger.logInfo('Activation_Create.Activation_Create: activationCreateList ' + activationCreateList);
 				insert activationCreateList;
 				Activation_Create_Iterable ProcessBatch = new Activation_Create_Iterable();
 				ProcessBatch.recordId = recordId;
@@ -69,6 +68,7 @@ public without sharing class Activation_Create {
 			}
 
 		} catch (Exception e) {
+			Logger.logError('Activation_Create.Activation_Create: Error Occured while creating activations ', e);
 			System.debug('### Error Occured while creating activations : ' + e.getMessage() + ' LineNumber: ' + e.getLineNumber());
 			System_Log__c logerror = new System_Log__c(
 				Origin__c = 'Apex',
@@ -77,51 +77,10 @@ public without sharing class Activation_Create {
 			);
 			insert logerror;
 		}
+		
+       	Logger.emit();
+	}	
 	
-	
-	
-	}
-	
-	/**
-	 * Helper method used to calculate the value of Activation_progress__c on Activation__c.
-	 * Priority of values:
-	 * 1. Special Handling
-	 * 2. UC Specification
-	 * 3. Onboarding Portal
-	 */
-	@TestVisible
-	private static void calculateActivationProgressValue(List<Activation__c> activations, String activationType, Id quoteId) {
-		Boolean isSpecialHandling =
-			[
-				SELECT COUNT()
-				FROM SBQQ__QuoteLine__c
-				WHERE SBQQ__Quote__c = :quoteId AND (product_group__c IN ('ACE', 'ACE Cloud') OR Telia_Product_Code__c = 'FIX2MOBIL')
-			] > 0;
-		Boolean isUCSpecification = [SELECT COUNT() FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c = :quoteId AND product_group__c = 'TPX'] > 0;
-		Boolean isOnboardingPortal =
-			[SELECT COUNT() FROM SBQQ__Quote__c WHERE Id = :quoteId AND SBQQ__Account__r.Owner.UserRole.Name IN ('Managed Accounts', 'Business Accounts')] > 0;
-		String activationProgress = null;
-		if (isSpecialHandling) {
-			activationProgress = 'Special Handling';
-		} else if (isUCSpecification) {
-			activationProgress = 'UC Specification';
-		} else if (isOnboardingPortal) {
-			activationProgress = 'Onboarding Portal';
-		} else {
-			activationProgress = null; // Let default be handled by default setting of Picklist
-		}
-
-		for (Activation__c theActivation : activations) {
-			if (
-				!String.isBlank(activationProgress) &&
-				!String.isBlank(theActivation.Type__c) &&
-				theActivation.Type__c.equalsIgnoreCase(activationType) &&
-				theActivation.Name == 'Voice - New'
-			) {
-				theActivation.Activation_Progress__c = activationProgress;
-			}
-		}
-	}
 	private static Map<String, Case> mapCaseByProductType(List<Case> cases) {
 		Map<String, Case> csByProductType = new Map<String, Case>();
 		for(Case cs: cases) {

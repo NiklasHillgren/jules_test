@@ -228,7 +228,7 @@ public without sharing class Logger {
      * @param messageContent message to be written
      */
     public static void logError(Object messageContent) {
-        log(LoggingLevel.ERROR, messageContent);
+        log(LoggingLevel.ERROR, '' + messageContent);
     }
 
     /**
@@ -299,7 +299,7 @@ public without sharing class Logger {
             LogRecord log = new LogRecord();
             log.setLogLevel(level);
             log.setLocation(trace);
-            log.setLogMessage(messageContent);
+            log.setLogMessage(messageContent);  
 
             logEntries.add(log);
         }
@@ -394,7 +394,7 @@ public without sharing class Logger {
         // Check if we are logging an exception solely and just reuse that one as the stack.
         if (messageContent instanceof Exception) {
             LoggerStackTrace stack = new LoggerStackTrace((Exception) messageContent);
-            logMessage = ((Exception) messageContent).toString() + ' :: ' + stack.ParsedStackTraceString;
+            logMessage += ' :: ' + stack.ParsedStackTraceString;
         }
 
         // Strip newlines and trim

@@ -5,7 +5,7 @@
  *  Developer            Date            Description
  *  -----------------------------------------------------------------------------
  *  Sergio Pedro         18/03/2025      Initial version
- * 
+ *
  * @author Sergio Pedro
  * @date 18/03/2025
  */
@@ -14,7 +14,7 @@ public without sharing class OrgUtils {
     static final private String COMPANY_SF_SYSTEM_USER_DEVELOPERNAME = 'CompanySFSystemUser';
     @TestVisible
     static final private Cache.OrgPartition orgConfig = Cache.Org.getPartition('NorlysConfiguration');
-    
+
     /**
      * Method that will return the indication of the org being a sandbox or an production org
      * @return `Boolean` result of the assessment of the type of org
@@ -22,14 +22,14 @@ public without sharing class OrgUtils {
     public static Boolean isSandbox() {
         return [SELECT IsSandbox, Id FROM Organization LIMIT 1].IsSandbox;
     }
-    
+
     /**
      * MEthod that generates a GUID to be used in integrations
      * @return  `String` String with the Guid generated
      */
     public static String generateGUID() {
         String guid = UUID.randomUUID().toString();
-        
+
         return guid;
     }
 
@@ -39,44 +39,46 @@ public without sharing class OrgUtils {
      * are running in a sandbox.
      * @return String username of Company SF System User name held in custom metadata
      */
-	public static String getUsernameForCompanySFSystemUser() {
+    public static String getUsernameForCompanySFSystemUser() {
         String username = getCompanySettingsConfigurationValueByDeveloperName(COMPANY_SF_SYSTEM_USER_DEVELOPERNAME);
 
-        // we need to determine if the org is sandbox 
+        // we need to determine if the org is sandbox
         String sandboxName = DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName();
         if (!String.isEmpty(sandboxName)) {
             username += '.' + sandboxName;
         }
         return username;
-	}
+    }
 
     /**
      * Get the Configuration_Value__c from the Company_Settings__mdt that matches the developerName
      * @param developerName Developer name of the Company_Settings__mdt record
      * @return configuration value matching the developer name passed in
      */
-	public static String getCompanySettingsConfigurationValueByDeveloperName(String developerName) {
-        if(!developerName.isAlphanumeric()) {
+    public static String getCompanySettingsConfigurationValueByDeveloperName(String developerName) {
+        if (!developerName.isAlphanumeric()) {
             Logger.logError('Configuration names must be alpha-numeric only');
         }
 
-        if(orgConfig.contains(developerName.replaceAll('_', ''))) {
+        if (orgConfig.contains(developerName.replaceAll('_', ''))) {
             Logger.logInfo('Configuration value found in cache');
-            return (String)orgConfig.get(developerName.replaceAll('_', ''));
+            return (String) orgConfig.get(developerName.replaceAll('_', ''));
         }
 
         Company_Settings__mdt companySettingsRecord = Company_Settings__mdt.getInstance(developerName);
         String configurationValue = '';
         if (companySettingsRecord != null) {
-            configurationValue = companySettingsRecord.Configuration_Value__c == null ? '' : companySettingsRecord.Configuration_Value__c;
-            
+            configurationValue = companySettingsRecord.Configuration_Value__c == null
+                ? ''
+                : companySettingsRecord.Configuration_Value__c;
+
             orgConfig.put(developerName.replaceAll('_', ''), configurationValue);
             Logger.logInfo('Configuration value found in custom metadata and added to cache');
         } else {
             Logger.logWarning('No record found for developerName: ' + developerName);
         }
         return configurationValue;
-	}
+    }
 
     /**
      * Clears the organization configuration cache.
@@ -95,50 +97,81 @@ public without sharing class OrgUtils {
      * @param listToChunk The list to be chunked.
      * @return A list of lists of objects.
      */
-    public static List<List<Object>> chunkList(Integer chunkSize,  List<Object> listToChunk){
+    public static List<List<Object>> chunkList(Integer chunkSize, List<Object> listToChunk) {
         List<List<Object>> chunkedLists = new List<List<Object>>();
-        
+
         if (!listToChunk.isEmpty()) {
             chunkedLists.add(new List<Object>());
             Integer partition = 0;
             for (Object obj : listToChunk) {
-              if (chunkedLists[partition].size() == chunkSize) {
-                partition++;
-                chunkedLists.add(new List<Object>());
-              }
-              chunkedLists[partition].add(obj);
+                if (chunkedLists[partition].size() == chunkSize) {
+                    partition++;
+                    chunkedLists.add(new List<Object>());
+                }
+                chunkedLists[partition].add(obj);
             }
         }
-        
+
         return chunkedLists;
     }
 
-     /**
+    /**
      * Chunks a list of objects into a list of lists of objects with a specified size.
      * @param chunkSize The size of each chunk.
      * @param listToChunk The list to be chunked.
      * @param destType The type of the destination list.
      * @return A list of lists of objects, where each inner list has a maximum size of chunkSize.
      */
-    public static List<List<Object>> chunkListOfStrings(Integer chunkSize,  List<Object> listToChunk, Type destType){
+    public static List<List<Object>> chunkListOfStrings(Integer chunkSize, List<Object> listToChunk, Type destType) {
         List<List<Object>> chunkedLists = (List<List<Object>>) destType.newInstance();
-        
+
         List<Object> bluePrintList = listToChunk.clone();
         bluePrintList.clear();
         chunkedLists.add(bluePrintList.clone());
 
         Integer partition = 0;
         for (Object obj : listToChunk) {
-          // Create a new partition when we fill one up
-          if (chunkedLists[partition].size() == chunkSize) {
-            partition++;
-            chunkedLists.add(bluePrintList.clone());
-          }
-          // Add object to current partition
-          chunkedLists[partition].add(obj);
+            // Create a new partition when we fill one up
+            if (chunkedLists[partition].size() == chunkSize) {
+                partition++;
+                chunkedLists.add(bluePrintList.clone());
+            }
+            // Add object to current partition
+            chunkedLists[partition].add(obj);
         }
-        
-        return chunkedLists;
-	}
 
+        return chunkedLists;
+    }
+
+    /**
+     * Removes Apex reserved keywords from JSON strings
+     *
+     * This method processes JSON strings containing properties that has reserved keywords.
+     *
+     * @param jsonString The JSON string containing potentially suffixed reserved keywords
+     * @param isRequest Whether this is a jsonString used in a request body.
+     *                    - true: the jsonString is a part of a HTTPRequest body that is going to be sent to a service
+     *                    - false: the jsonString is a part of a HTTPRequest body that has been returned from a service call
+     * @return Processed JSON string with reserved keyword suffixes removed
+     *
+     * Example 1:
+     * Input:  {"value_x": "hello world"}, true
+     * Output: {"value": "hello world"}
+     *
+     * Example 2:
+     * Input:  {"value": "hello world"}, false
+     * Output: {"value_x": "hello world"}
+     */
+    public static String escapeApexReservedKeywords(String jsonString, Boolean isRequest) {
+        DataWeave.Script reservedKeywordScript = new DataWeaveScriptResource.ReservedKeyword();
+
+        DataWeave.Result result = reservedKeywordScript.execute(
+            new Map<String, Object>{
+                'payload' => jsonString,
+                'isRequest' => isRequest
+            }
+        );
+
+        return result.getValueAsString();
+    }
 }

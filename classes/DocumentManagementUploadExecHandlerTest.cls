@@ -49,9 +49,10 @@ public with sharing class DocumentManagementUploadExecHandlerTest {
         MethodSpy createDocument = documentManagementServiceMock.spyOn('createDocument');
         createDocument.whenCalledWith(Argument.any()).thenReturn(respDoc);
 
+        DocumentManagementUploadExecutorHandler handler = new DocumentManagementUploadExecutorHandler();
+        
         // Act
         Test.startTest();
-        DocumentManagementUploadExecutorHandler handler = new DocumentManagementUploadExecutorHandler();
         handler.execute(new EventExecutor__e(Parameters__c = parametersJson, RetryCount__c = 3));
         Test.stopTest();
 

@@ -39,8 +39,47 @@ public class NorlysTestMocks {
             return this;
         }
 
+        public NumberClientMockBuilder withFailureOnUnreserve(Exception ex) {
+            this.mockProvider.spyOn('unreserveNumberDetailByMsisdn').throwsException(ex);
+            return this;
+        }
+
         public NumberClient build() {
             return (NumberClient) this.mockProvider.stub;
+        }
+
+        public NumberClientMockBuilder withConditionalFailureOnReserve(Set<String> numbersToFail) {
+            this.mockProvider.spyOn('reserveNumberDetailByMsisdnAndCVR')
+                .behaves(new ConditionalFailureBehavior(numbersToFail));
+            return this;
+        }
+    }
+
+    /**
+     * @description A custom SpyBehavior that throws an exception for specific input values
+     *              and returns a success response for all other inputs.
+     */
+    private class ConditionalFailureBehavior implements MethodSpy.SpyBehavior {
+        private Set<String> numbersToFail;
+
+        public ConditionalFailureBehavior(Set<String> numbersToFail) {
+            this.numbersToFail = numbersToFail;
+        }
+
+        public Object execute(List<Object> params) {
+            String msisdn = (String)params[0];
+
+            if (msisdn != null && numbersToFail.contains(msisdn)) {
+                // Simulate a failure response from the API.
+                throw new CalloutException('Simulated API failure for number: ' + msisdn);
+            }
+
+            // Simulate a success response for all other numbers.
+            NumberClientResponseDTO.NumberDetail numberDetail = new NumberClientResponseDTO.NumberDetail();
+            numberDetail.data = new NumberClientResponseDTO.NumberData();
+            // The mock response needs an ID, let's use the msisdn.
+            numberDetail.data.id = '+45' + msisdn; 
+            return numberDetail;
         }
     }
 

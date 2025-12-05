@@ -20,6 +20,17 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ * 
+ *  NORLYS THE FOLLOWING ARE CHANGES INTRODUCED BY NORLYS
+ *
+ *  Developer            Date            Description
+ *  -----------------------------------------------------------------------------
+ *  Niklas Hillgren      21/10/2025      Subqueries can now return multiple fields
+ *  Niklas Hillgren      21/10/2025      Utilizing Logger to log all queries
+ * 
+ * @author Niklas Hillgren
+ * @version 1.0
+ * @since 21/10/2025
  */
 public class Query {
     public static final String VERSION = '2.0.0-pre';
@@ -106,8 +117,6 @@ public class Query {
     public Query selectFields(List<Schema.SObjectField> fields) {
         List<String> fieldStrings = new List<String>();
         for (Schema.SObjectField field : fields) {
-            Logger.logInfo(JSON.serialize(field));
-            Logger.logInfo('fields added: ' + field.getDescribe().getName());
             fieldStrings.add(field.getDescribe().getName());
         }
         return selectFields(fieldStrings);
@@ -1453,14 +1462,14 @@ public class Query {
 
     public Query addSubquery(String relationshipName,
             Set<String> fieldSet) {
-        addChildRelationship(relationshipName).selectFields(fields);
+        addChildRelationship(relationshipName).selectFields(fieldSet);
 
         return this;
     }
 
     public Query addSubquery(String relationshipName,
             List<String> fieldList) {
-        addChildRelationship(relationshipName).selectFields(fields);
+        addChildRelationship(relationshipName).selectFields(fieldList);
 
         return this;
     }
@@ -1583,20 +1592,20 @@ public class Query {
 
     public List<SObject> toSObjectList() {
         String queryString = formQueryString();
-
-        Logger.logInfo('Query: ' + queryString);
-
+        Logger.logInfo(queryString);
         return Database.query(queryString);
     }
 
     public List<AggregateResult> aggregate() {
         String queryString = formQueryString();
+        Logger.logInfo(queryString);
         return Database.query(queryString);
     }
 
     public Integer countQuery() {
         count('');
         String queryString = formQueryString();
+        Logger.logInfo(queryString);
         return Database.countQuery(queryString);
     }
 
@@ -1612,6 +1621,7 @@ public class Query {
 
     public Database.QueryLocator getQueryLocator() {
         String queryString = formQueryString();
+        Logger.logInfo(queryString);
         return Database.getQueryLocator(queryString);
     }
 

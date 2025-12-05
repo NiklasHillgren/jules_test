@@ -5,13 +5,13 @@
  *  Developer            Date            Description
  *  -----------------------------------------------------------------------------
  *  Sergio Pedro         18/03/2025      Initial version
+ *  Niklas Hillgren      18/03/2025      Added test for escapeApexReservedKeywords
  * 
  * @author Sergio Pedro
  * @date 18/03/2025
  */
 @IsTest
 private class OrgUtilsTest {
-
     @IsTest
     public static void testIsSandbox_NoInput_Success() {
         // Set the organization to a sandbox environment
@@ -100,5 +100,34 @@ private class OrgUtilsTest {
 
         // Verify that the cache has been cleared
         System.assertEquals(null, OrgUtils.orgConfig.get(OrgUtils.COMPANY_SF_SYSTEM_USER_DEVELOPERNAME), 'Cache should be cleared');
+    }
+    
+    @IsTest
+    public static void test_escapeApexReservedKeywords_ingoing() {
+        String jsonString = '{"type":[{"boolean":"boolean "},{"currency":"class"}]}';
+
+        jsonString = OrgUtils.escapeApexReservedKeywords(jsonString, false);
+
+        System.debug(jsonString);
+        //Test that we only replace the nested properties!
+        Assert.isTrue(jsonString.contains('boolean '));
+        Assert.isTrue(jsonString.contains('boolean_x'));
+        Assert.isTrue(jsonString.contains('currency_x'));
+        Assert.isFalse(jsonString.contains('class_x'));
+    }
+    
+    @IsTest
+    public static void test_escapeApexReservedKeywords_outgoing() {
+        String jsonString = '{"type":[{"boolean_x":"boolean "},{"currency_x":"class"}]}';
+
+        jsonString = OrgUtils.escapeApexReservedKeywords(jsonString, true);
+
+        System.debug(jsonString);
+        //Test that we only replace properties!
+        Assert.isTrue(jsonString.contains('type'));
+        Assert.isTrue(jsonString.contains('class'));
+        Assert.isFalse(jsonString.contains('boolean_x'));
+        Assert.isFalse(jsonString.contains('currency_x'));
+        Assert.isFalse(jsonString.contains('class_x'));
     }
 }

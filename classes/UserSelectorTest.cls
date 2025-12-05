@@ -9,7 +9,7 @@ public with sharing class UserSelectorTest {
 		insert account; */
 
 		Test.startTest();
-		User u = UserSelector.getById(usr.Id);
+		User u = new UserSelector().getById(usr.Id);
 		Test.stopTest();
 
 		Assert.isNotNull(u, 'A user should be returned');
@@ -21,35 +21,10 @@ public with sharing class UserSelectorTest {
 		User usr = testDataFactory.createUser('standt', prof.Id);
 
 		Test.startTest();
-		User notUser = UserSelector.getById(StringUtils.makeRandomStringNoNumerics(10));
+		User notUser = new UserSelector().getById(StringUtils.makeRandomStringNoNumerics(10));
 		Test.stopTest();
 
 		Assert.isNull(notUser, 'A user should not be returned');
 	}
 
-	@IsTest
-	private static void getActiveUserByAliasSuccess() {
-		String alias = 'MyAlias';
-		Profile prof = ProfileSelector.getProfileByProfileName(ProfileConstants.SYSTEM_ADMINISTRATOR);
-		User usr = testDataFactory.createUser(alias, prof.Id);
-
-		Test.startTest();
-		User u = UserSelector.getActiveUserByAlias(alias);
-		Test.stopTest();
-
-		Assert.isNotNull(u, 'A user should be returned');
-	}
-
-	@IsTest
-	private static void getActiveUserByAliasNotFound() {
-		String alias = 'MyAlias';
-		Profile prof = ProfileSelector.getProfileByProfileName(ProfileConstants.SYSTEM_ADMINISTRATOR);
-		User usr = testDataFactory.createUser(alias, prof.Id);
-
-		Test.startTest();
-		User u = UserSelector.getActiveUserByAlias(StringUtils.makeRandomStringNoNumerics(10));
-		Test.stopTest();
-
-		Assert.isNull(u, 'A user should not be returned');
-	}
 }

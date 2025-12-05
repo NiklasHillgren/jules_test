@@ -1,6 +1,6 @@
 /**
  * @description An interface for a factory that creates batch job instances.
- * This is used to allow for dependency injection in tests.
+ * This is used to allow for dependency  injection in tests.
  * @author Kenneth Houkjaer
  */
 public interface IBatchJobFactory {
