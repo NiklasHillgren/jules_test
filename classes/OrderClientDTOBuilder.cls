@@ -626,31 +626,44 @@ public with sharing class OrderClientDTOBuilder {
         private String posDealerId;
         private String posSalesAgentId;
 
+        /**
+         * name of the dealer like 'BtC Amager'.
+         */
         public DealerBuilder withDealerName(String dealerName) {
             this.dealerName = dealerName;
             return this;
         }
-
+        /**
+         * code of the dealer like '1018'.
+         */
         public DealerBuilder withDealerCode(String dealerCode) {
             this.dealerCode = dealerCode;
             return this;
         }
-
+        /**
+         * shall contain sales agent code (as handled by DealerAdmin), so far not used.
+         */
         public DealerBuilder withSalesAgentCode(String salesAgentCode) {
             this.salesAgentCode = salesAgentCode;
             return this;
         }
-
+        /**
+         * Name of the sales representative.
+         */
         public DealerBuilder withSalesAgentName(String salesAgentName) {
             this.salesAgentName = salesAgentName;
             return this;
         }
-
+        /**
+         * id of the dealer in ODOO
+         */
         public DealerBuilder withPosDealerId(String posDealerId) {
             this.posDealerId = posDealerId;
             return this;
         }
-
+        /**
+         * id of the sales agent in ODOO
+         */
         public DealerBuilder withPosSalesAgentId(String posSalesAgentId) {
             this.posSalesAgentId = posSalesAgentId;
             return this;
@@ -743,11 +756,16 @@ public with sharing class OrderClientDTOBuilder {
         private String url;
         private String documentType;
 
+        /**
+         * Type of document, enum comes from DocumentAPI (located in components.schemas.Document.properties.type)
+         */
         public DocumentBuilder withDocumentType(String documentType) {
             this.documentType = documentType;
             return this;
         }
-
+        /**
+         * URL the document is located at
+         */
         public DocumentBuilder withUrl(String url) {
             this.url = url;
             return this;
@@ -1028,7 +1046,9 @@ public with sharing class OrderClientDTOBuilder {
             this.lastMileAccessPointAddressBuilder = lastMileAccessPointAddressBuilder;
             return this;
         }
-
+        /**
+         * Length of the distance from existing local line termination point to customer's premises.
+         */
         public FixedNetDetailsBuilder withDiggingDistance(Integer diggingDistance) {
             this.diggingDistance = diggingDistance;
             return this;
@@ -1138,17 +1158,23 @@ public with sharing class OrderClientDTOBuilder {
             this.doItYourselfContactNumber = doItYourselfContactNumber;
             return this;
         }
-
+        /**
+         * Tells the provider that there is already a broadband connection, but it is not yours and you need to terminate it to create your own broadband connection.
+         */
         public FixedNetDetailsBuilder withProviderReuseOfAddress(String providerReuseOfAddress) {
             this.providerReuseOfAddress = providerReuseOfAddress;
             return this;
         }
-
+        /**
+         * Reference number of customer within current provider.
+         */
         public FixedNetDetailsBuilder withProviderAoCustomerRefNumber(String providerAoCustomerRefNumber) {
             this.providerAoCustomerRefNumber = providerAoCustomerRefNumber;
             return this;
         }
-
+        /**
+         * Name of the current connectivity provider.
+         */
         public FixedNetDetailsBuilder withCurrentProviderName(String currentProviderName) {
             this.currentProviderName = currentProviderName;
             return this;
@@ -1443,6 +1469,9 @@ public with sharing class OrderClientDTOBuilder {
         private DateTime dispatchDate;
         private DateTime preferredSendDate;
 
+        /**
+         * Unique identifier of hardware delivery.
+         */
         public HardwareDeliveryBuilder withId(Integer id) {
             this.id = id;
             return this;
@@ -1457,7 +1486,9 @@ public with sharing class OrderClientDTOBuilder {
             this.billingPartyRoleBuilder = billingPartyRoleBuilder;
             return this;
         }
-
+        /**
+         * String identifier of delivery method.
+         */
         public HardwareDeliveryBuilder withDeliveryMethod(String deliveryMethod) {
             this.deliveryMethod = deliveryMethod;
             return this;
@@ -1474,7 +1505,9 @@ public with sharing class OrderClientDTOBuilder {
             this.preferredContactMethod = preferredContactMethod;
             return this;
         }
-
+        /**
+         * Date time with timezone according to ISO-8601. Timestamp of when the hardware has been sent out from warehouse.
+         */
         public HardwareDeliveryBuilder withDispatchDate(DateTime dispatchDate) {
             this.dispatchDate = dispatchDate;
             return this;
@@ -2452,46 +2485,66 @@ public with sharing class OrderClientDTOBuilder {
         private Boolean newDivaFlow;
         private Boolean isSubOrder;
 
+        /**
+         * Whether the order is confirmed or approved.
+         */
         public OrderFlagsBuilder withOrderConfirmed(Boolean orderConfirmed) {
             this.orderConfirmed = orderConfirmed;
             return this;
         }
 
+        /**
+         * If customer agrees with terms and conditions. Must be true :)
+         */
         public OrderFlagsBuilder withTermsAccepted(Boolean termsAccepted) {
             this.termsAccepted = termsAccepted;
             return this;
         }
-
+        /**
+         * If the CPR check failed.
+         */
         public OrderFlagsBuilder withCprCheckFailed(Boolean cprCheckFailed) {
             this.cprCheckFailed = cprCheckFailed;
             return this;
         }
-
+        /**
+         * When the credit check failed.
+         */
         public OrderFlagsBuilder withCreditCheckFailed(Boolean creditCheckFailed) {
             this.creditCheckFailed = creditCheckFailed;
             return this;
         }
-
+        /**
+         * Customer shall confirm the order as sales agent made it on their behalf.
+         */
         public OrderFlagsBuilder withNeedsConfirmation(Boolean needsConfirmation) {
             this.needsConfirmation = needsConfirmation;
             return this;
         }
-
+        /**
+         * If there is any membership to be checked (voucher number or so)
+         */
         public OrderFlagsBuilder withMembershipCheck(Boolean membershipCheck) {
             this.membershipCheck = membershipCheck;
             return this;
         }
-
+        /**
+         * The order is missing mandatory information
+         */
         public OrderFlagsBuilder withDirty(Boolean dirty) {
             this.dirty = dirty;
             return this;
         }
-
+        /**
+         * Shall the backend send communication
+         */
         public OrderFlagsBuilder withDoCommunication(Boolean doCommunication) {
             this.doCommunication = doCommunication;
             return this;
         }
-
+        /**
+         * Shall the backend send request for hardware shipment
+         */
         public OrderFlagsBuilder withDoLogistics(Boolean doLogistics) {
             this.doLogistics = doLogistics;
             return this;
@@ -2501,62 +2554,86 @@ public with sharing class OrderClientDTOBuilder {
             this.addCharge = addCharge;
             return this;
         }
-
+        /**
+         * Order has been created via new POS
+         */
         public OrderFlagsBuilder withPosFlow(Boolean posFlow) {
             this.posFlow = posFlow;
             return this;
         }
-
+        /**
+         * If order represents Home Office order
+         */
         public OrderFlagsBuilder withHomeOfficeOrder(Boolean homeOfficeOrder) {
             this.homeOfficeOrder = homeOfficeOrder;
             return this;
         }
-
+        /**
+         * If draft order should be created during shopping cart submission
+         */
         public OrderFlagsBuilder withCreateDraftOrder(Boolean createDraftOrder) {
             this.createDraftOrder = createDraftOrder;
             return this;
         }
-
+        /**
+         * If order follows manual signing flow
+         */
         public OrderFlagsBuilder withManualSigning(Boolean manualSigning) {
             this.manualSigning = manualSigning;
             return this;
         }
-
+        /**
+         * If order is from Tango and has only SIM AdditionalProductItems
+         */
         public OrderFlagsBuilder withSimOnly(Boolean simOnly) {
             this.simOnly = simOnly;
             return this;
         }
-
+        /**
+         * If order is from Tango and has at least one upfront payment on any HardwarePaymentItem
+         */
         public OrderFlagsBuilder withHasUpfrontPayment(Boolean hasUpfrontPayment) {
             this.hasUpfrontPayment = hasUpfrontPayment;
             return this;
         }
-
+        /**
+         * If order is from Tango and has at least one down payment on any HardwarePaymentItem
+         */
         public OrderFlagsBuilder withTfFinancingNeeded(Boolean tfFinancingNeeded) {
             this.tfFinancingNeeded = tfFinancingNeeded;
             return this;
         }
-
+        /**
+         * If order is from Tango and order was sold in shop
+         */
         public OrderFlagsBuilder withPhysicalIdPreidentified(Boolean physicalIdPreidentified) {
             this.physicalIdPreidentified = physicalIdPreidentified;
             return this;
         }
-
+        /**
+         * If order is from Tango and order was sold in external store
+         */
         public OrderFlagsBuilder withShopSales(Boolean shopSales) {
             this.shopSales = shopSales;
             return this;
         }
-
+        /**
+         * If order is already expired.
+         */
         public OrderFlagsBuilder withOrderExpired(Boolean orderExpired) {
             this.orderExpired = orderExpired;
             return this;
         }
-
+        /**
+         * Go with the new DIVA flow.
+         */
         public OrderFlagsBuilder withNewDivaFlow(Boolean newDivaFlow) {
             this.newDivaFlow = newDivaFlow;
             return this;
         }
-
+        /**
+         * If order is a sub order. Applies to return orders.
+         */
         public OrderFlagsBuilder withIsSubOrder(Boolean isSubOrder) {
             this.isSubOrder = isSubOrder;
             return this;
@@ -3577,7 +3654,9 @@ public with sharing class OrderClientDTOBuilder {
         public PortingDetailsItemBuilder() {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.PORTING_DETAILS_ITEM);
         }
-
+        /**
+         * Id of a network operator where the number is currently registered. Also known as number owner.
+         */
         public PortingDetailsItemBuilder withNetworkOperatorId(String networkOperatorId) {
             this.networkOperatorId = networkOperatorId;
             return this;
@@ -3587,32 +3666,44 @@ public with sharing class OrderClientDTOBuilder {
             this.donorSimNumber = donorSimNumber;
             return this;
         }
-
+        /**
+         * Location of document within Norlys domain.
+         */
         public PortingDetailsItemBuilder withPoaDocumentUrl(String poaDocumentUrl) {
             this.poaDocumentUrl = poaDocumentUrl;
             return this;
         }
-
+        /**
+         * Indicates whether electronic Power of Attorney can be used.
+         */
         public PortingDetailsItemBuilder withDigitalPoaAllowed(Boolean digitalPoaAllowed) {
             this.digitalPoaAllowed = digitalPoaAllowed;
             return this;
         }
-
+        /**
+         * Indicates whether the POA shall be signed via manual flow.
+         */
         public PortingDetailsItemBuilder withPowerOfAttorneyManualHandling(Boolean powerOfAttorneyManualHandling) {
             this.powerOfAttorneyManualHandling = powerOfAttorneyManualHandling;
             return this;
         }
-
+        /**
+         * date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public PortingDetailsItemBuilder withEarliestPortingDate(Date earliestPortingDate) {
             this.earliestPortingDate = earliestPortingDate;
             return this;
         }
-
+        /**
+         * true if customer wishes to be ported in after end of commitment at the current operator. Use instead of earliestPortingDate.
+         */
         public PortingDetailsItemBuilder withPortAfterCommitment(Boolean portAfterCommitment) {
             this.portAfterCommitment = portAfterCommitment;
             return this;
         }
-
+        /**
+         * The date at which the porting is planned. Date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public PortingDetailsItemBuilder withActualPortingDate(Date actualPortingDate) {
             this.actualPortingDate = actualPortingDate;
             return this;
@@ -4156,47 +4247,64 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Link to task for manual handling of the orderPart.
+         */
         public OrderPartBuilder withTaskUrl(String taskUrl) {
             this.taskUrl = taskUrl;
             return this;
         }
-
+        /**
+         * Sum of all one time fees, charges, and additional product one time price (like hardware price).
+         */
         public OrderPartBuilder withPartTotalAmountBuilder(AmountBuilder partTotalAmountBuilder) {
             this.partTotalAmountBuilder = partTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of hardware amount.
+         */
         public OrderPartBuilder withHardwareTotalAmountBuilder(AmountBuilder hardwareTotalAmountBuilder) {
             this.hardwareTotalAmountBuilder = hardwareTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of product amount.
+         */
         public OrderPartBuilder withProductTotalAmountBuilder(AmountBuilder productTotalAmountBuilder) {
             this.productTotalAmountBuilder = productTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * All services recurring prices.
+         */
         private OrderPartBuilder withServicesRecurringTotalAmountBuilder(
             AmountBuilder servicesRecurringTotalAmountBuilder
         ) {
             this.servicesRecurringTotalAmountBuilder = servicesRecurringTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of hardware upfront amount (to be paid immediately).
+         */
         public OrderPartBuilder withHardwareTotalUpfrontPaymentAmountBuilder(
             PaymentAmountBuilder hardwareTotalUpfrontPaymentAmountBuilder
         ) {
             this.hardwareTotalUpfrontPaymentAmountBuilder = hardwareTotalUpfrontPaymentAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of product upfront amount (to be paid immediately).
+         */
         public OrderPartBuilder withProductTotalUpfrontPaymentAmountBuilder(
             PaymentAmountBuilder productTotalUpfrontPaymentAmountBuilder
         ) {
             this.productTotalUpfrontPaymentAmountBuilder = productTotalUpfrontPaymentAmountBuilder;
             return this;
         }
-
+        /**
+         * All hardware installment recurring payments per month.
+         */
         public OrderPartBuilder withJardwareRecurringTotalPaymentAmountBuilder(
             PaymentAmountBuilder hardwareRecurringTotalPaymentAmountBuilder
         ) {
@@ -4307,6 +4415,9 @@ public with sharing class OrderClientDTOBuilder {
         private Object value;
         private String from_x;
 
+        /**
+         * Operation to do
+         */
         public OrderPatchRequestBuilder withOperation(OrderClientDTOEnums.OpEnum op) {
             this.op = op;
             return this;
@@ -4427,56 +4538,79 @@ public with sharing class OrderClientDTOBuilder {
         private DealerBuilder dealerBuilder;
         private PartyRoleBuilder ordererPartyRoleBuilder;
 
+        /**
+         * Id from internal order database, is numeric value and starting from 10000.
+         */
         public OrderV10Builder withId(String id) {
             this.id = id;
             return this;
         }
-
+        /**
+         * Can be BPM orderID like 'BPMT0153200309110744' or just Order Id from OrderManager '99089093'.
+         */
         public OrderV10Builder withOrderId(String orderId) {
             this.orderId = orderId;
             return this;
         }
-
+        /**
+         * Parent order id if this order is a return of another order.
+         */
         public OrderV10Builder withParentOrderId(String parentOrderId) {
             this.parentOrderId = parentOrderId;
             return this;
         }
-
+        /**
+         * Order identifier provided by the channel.
+         */
         public OrderV10Builder withChannelOrderReference(String channelOrderReference) {
             this.channelOrderReference = channelOrderReference;
             return this;
         }
-
+        /**
+         * Implementation case Id coming from SalesForce channel.
+         */
         public OrderV10Builder withImplementationCaseId(String implementationCaseId) {
             this.implementationCaseId = implementationCaseId;
             return this;
         }
-
+        /**
+         * Bpm order id returned from CoPE services.
+         */
         public OrderV10Builder withBpmOrderId(String bpmOrderId) {
             this.bpmOrderId = bpmOrderId;
             return this;
         }
-
+        /**
+         * NOOS order id.
+         */
         public OrderV10Builder withNoosOrderId(String noosOrderId) {
             this.noosOrderId = noosOrderId;
             return this;
         }
-
+        /**
+         * Token used for verification of the identity of the person making the order.
+         */
         public OrderV10Builder withMitIdVerificationToken(String mitIdVerificationToken) {
             this.mitIdVerificationToken = mitIdVerificationToken;
             return this;
         }
-
+        /**
+         * Identifier of the batch the order is being processed in.
+         */
         public OrderV10Builder withBatchId(String batchId) {
             this.batchId = batchId;
             return this;
         }
-
+        /**
+         * must be entered in the 'brand' header and is then placed on the order.
+         */
         public OrderV10Builder withBrand(OrderClientDTOEnums.Brand brand) {
             this.brand = brand;
             return this;
         }
-
+        /**
+         * Identifying what channel the order is made in, e.g. SALES_FORCE, TANGO, SELF_SERVICE ...
+         */
         public OrderV10Builder withChannel(String channel) {
             this.channel = channel;
             return this;
@@ -4492,16 +4626,23 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Date time with timezone according to ISO-8601.
+         */
         public OrderV10Builder withCreatedDate(DateTime createdDate) {
             this.createdDate = createdDate;
             return this;
         }
-
+        /**
+         * Date time with timezone according to ISO-8601. Timestamp of when the order has been completed or cancelled.
+         */
         public OrderV10Builder withCompletedDate(DateTime completedDate) {
             this.completedDate = completedDate;
             return this;
         }
-
+        /**
+         * Identifier of the person making this order.
+         */
         public OrderV10Builder withCreatedBy(String createdBy) {
             this.createdBy = createdBy;
             return this;
@@ -4563,45 +4704,62 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Link to task for order manual handling.
+         */
         public OrderV10Builder withTaskUrl(String taskUrl) {
             this.taskUrl = taskUrl;
             return this;
         }
-
+        /**
+         * Sum of all one time fees, charges, and additional product one time price (like hardware price).
+         */
         public OrderV10Builder withOrderTotalBuilder(AmountBuilder orderTotalAmountBuilder) {
             this.orderTotalAmountBuilder = orderTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of all one time fees, charges, and additional product one time price (like hardware price.
+         */
         public OrderV10Builder withOrderMinimumPriceAmountBuilder(AmountBuilder orderMinimumPriceAmountBuilder) {
             this.orderMinimumPriceAmountBuilder = orderMinimumPriceAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of hardware amount to be paid.
+         */
         public OrderV10Builder withHardwareTotalAmountBuilder(AmountBuilder hardwareTotalAmountBuilder) {
             this.hardwareTotalAmountBuilder = hardwareTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of hardware upfront amount (to be paid immediately).
+         */
         public OrderV10Builder withHardwareTotalUpfrontPaymentAmountBuilder(
             PaymentAmountBuilder hardwareTotalUpfrontPaymentAmountBuilder
         ) {
             this.hardwareTotalUpfrontPaymentAmountBuilder = hardwareTotalUpfrontPaymentAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of product amount.
+         */
         public OrderV10Builder withProductTotalAmountBuilder(AmountBuilder productTotalAmountBuilder) {
             this.productTotalAmountBuilder = productTotalAmountBuilder;
             return this;
         }
-
+        /**
+         * Sum of product upfront amount (to be paid immediately).
+         */
         public OrderV10Builder withProductTotalUpfrontPaymentAmountBuilder(
             PaymentAmountBuilder productTotalUpfrontPaymentAmountBuilder
         ) {
             this.productTotalUpfrontPaymentAmountBuilder = productTotalUpfrontPaymentAmountBuilder;
             return this;
         }
-
+        /**
+         * All services recurring prices.
+         */
         public OrderV10Builder withServicesRecurringTotalAmountBuilder(
             AmountBuilder servicesRecurringTotalAmountBuilder
         ) {
@@ -5372,36 +5530,51 @@ public with sharing class OrderClientDTOBuilder {
         private String alternateSmdpFqdn;
         private Boolean waiveSimSwapFee;
 
+        /**
+         * Type of sim card.
+         */
         public SimDetailsBuilder withSimType(OrderClientDTOEnums.SimDetailsSimTypeEnum simType) {
             this.simType = simType;
             return this;
         }
-
+        /**
+         * ICC.
+         */
         public SimDetailsBuilder withIcc(String icc) {
             this.icc = icc;
             return this;
         }
-
+        /**
+         * IMSI.
+         */
         public SimDetailsBuilder withImsi(String imsi) {
             this.imsi = imsi;
             return this;
         }
-
+        /**
+         * Icc to be replaced
+         */
         public SimDetailsBuilder withOldIcc(String oldIcc) {
             this.oldIcc = oldIcc;
             return this;
         }
-
+        /**
+         * IMSI to be replaced
+         */
         public SimDetailsBuilder withOldImsi(String oldImsi) {
             this.oldImsi = oldImsi;
             return this;
         }
-
+        /**
+         * new EID.
+         */
         public SimDetailsBuilder withEid(String eid) {
             this.eid = eid;
             return this;
         }
-
+        /**
+         * new IMEI.
+         */
         public SimDetailsBuilder withImei(String imei) {
             this.imei = imei;
             return this;
@@ -5411,7 +5584,9 @@ public with sharing class OrderClientDTOBuilder {
             this.bindDeviceType = bindDeviceType;
             return this;
         }
-
+        /**
+         * Name of the device to be binded.
+         */
         public SimDetailsBuilder withBindDeviceName(String bindDeviceName) {
             this.bindDeviceName = bindDeviceName;
             return this;
@@ -5421,7 +5596,9 @@ public with sharing class OrderClientDTOBuilder {
             this.alternateSmdpFqdn = alternateSmdpFqdn;
             return this;
         }
-
+        /**
+         * Indicates whether to apply the sim swap fee.
+         */
         public SimDetailsBuilder withWaiveSimSwapFee(Boolean waiveSimSwapFee) {
             this.waiveSimSwapFee = waiveSimSwapFee;
             return this;
