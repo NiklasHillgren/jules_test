@@ -24,6 +24,7 @@ public class OrderClientDTOBuilderTest {
 
     @IsTest
     static void VTPX_SubscriptionsWith10Products() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderV10Builder orderBuilder = new OrderClientDTOBuilder.OrderV10Builder();
         orderBuilder.withBrand(OrderClientDTOEnums.Brand.TELIADK)
             .withChannel('SALES_FORCE')
@@ -1374,12 +1375,23 @@ public class OrderClientDTOBuilderTest {
             )
             .withSegment(OrderClientDTOEnums.OrderV10SegmentEnum.B2B)
             .withCreatedBy('redacted.mailadress@example.com');
-
+        
+        // ACT
         OrderClientDTO.OrderV10 order = orderBuilder.build();
+
+        // ASSERT
+        Assert.isNotNull(order, 'The built order should not be null.');
+        Assert.areEqual(OrderClientDTOEnums.Brand.TELIADK, order.brand, 'Brand should be TELIADK.');
+        Assert.areEqual('SALES_FORCE', order.channel, 'Channel should be SALES_FORCE.');
+        Assert.areEqual('redacted.mailadress@example.com', order.createdBy, 'CreatedBy should match.');
+        Assert.isNotNull(order.dealer, 'Dealer should not be null.');
+        Assert.areEqual('60301', order.dealer.dealerCode, 'Dealer code should match.');
+        Assert.areEqual('Niklas', order.dealer.dealerName, 'Dealer name should match.');
     }
 
     @IsTest
     static void VTPX_SubscriptionActivationWithNumberPorting() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderV10Builder orderBuilder = new OrderClientDTOBuilder.OrderV10Builder();
         orderBuilder.withBrand(OrderClientDTOEnums.Brand.TELIADK)
             .withChannel('SALES_FORCE')
@@ -1497,9 +1509,11 @@ public class OrderClientDTOBuilderTest {
             )
             .withSegment(OrderClientDTOEnums.OrderV10SegmentEnum.B2B)
             .withCreatedBy('redacted.mailadress@example.com');
-
+        
+        // ACT
         OrderClientDTO.OrderV10 order = orderBuilder.build();
 
+        // ASSERT
         Assert.areEqual(order.createdBy, 'redacted.mailadress@example.com');
         Assert.areEqual(
             order.orderParts.get(0).orderParts.get(0).orderItems.get(0).type,
@@ -1509,6 +1523,7 @@ public class OrderClientDTOBuilderTest {
 
     @IsTest
     static void VTPX_SubscriptionForNewNumber() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderV10Builder orderBuilder = new OrderClientDTOBuilder.OrderV10Builder();
         orderBuilder.withBrand(OrderClientDTOEnums.Brand.TELIADK)
             .withChannel('WEBSHOP')
@@ -1784,8 +1799,10 @@ public class OrderClientDTOBuilderTest {
                     )
             );
 
+        // ACT
         OrderClientDTO.OrderV10 order = orderBuilder.build();
 
+        // ASSERT
         Assert.areEqual(
             order.orderParts.get(0).orderParts.get(0).orderItems.get(0).type,
             OrderClientDTOEnums.OrderItemTypeEnum.SUBSCRIPTION_ITEM
@@ -1794,6 +1811,7 @@ public class OrderClientDTOBuilderTest {
 
     @IsTest
     static void VTPX_SubscriptionWithPhysicalSim() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderV10Builder orderBuilder = new OrderClientDTOBuilder.OrderV10Builder();
         orderBuilder.withChannel('SALES_FORCE')
             .withDealerBuilder(new OrderClientDTOBuilder.DealerBuilder().withDealerCode('2306'))
@@ -1941,8 +1959,10 @@ public class OrderClientDTOBuilderTest {
                     )
             );
 
+        // ACT
         OrderClientDTO.OrderV10 order = orderBuilder.build();
 
+        // ASSERT
         Assert.areEqual(
             order.orderParts.get(0).orderParts.get(0).orderItems.get(0).type,
             OrderClientDTOEnums.OrderItemTypeEnum.SUBSCRIPTION_ITEM
@@ -1952,13 +1972,20 @@ public class OrderClientDTOBuilderTest {
     // Test builder pattern initialization
     @isTest
     static void testBaseAddressBuilderInitialization() {
-        OrderClientDTOBuilder.AddressBuilder baseBuilder = new OrderClientDTOBuilder.AddressBuilder();
+        // ARRANGE
+        OrderClientDTOBuilder.AddressBuilder baseBuilder;
+
+        // ACT
+        baseBuilder = new OrderClientDTOBuilder.AddressBuilder();
+
+        // ASSERT
         Assert.isTrue(baseBuilder != null, 'Base builder should not be null');
     }
 
     // Test fluent interface methods
     @isTest
     static void testFluentInterfaceMethods() {
+        // ARRANGE
         OrderClientDTOBuilder.AddressBuilder builder = new OrderClientDTOBuilder.AddressBuilder()
             .withCoName('Test Company')
             .withCity('San Francisco')
@@ -1966,8 +1993,10 @@ public class OrderClientDTOBuilderTest {
             .withCountry('USA')
             .withAttention('John Doe');
 
+        // ACT
         OrderClientDTO.Address address = builder.build();
 
+        // ASSERT
         Assert.areEqual('Test Company', address.coName, 'Company name should match');
         Assert.areEqual('San Francisco', address.city, 'City should match');
         Assert.areEqual('94101', address.zipCode, 'Zip code should match');
@@ -1978,13 +2007,16 @@ public class OrderClientDTOBuilderTest {
     // Test OrderClientDTOBuilder.UnstructuredAddressBuilder
     @isTest
     static void testUnstructuredAddressBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.UnstructuredAddressBuilder unstructuredBuilder = new OrderClientDTOBuilder.UnstructuredAddressBuilder()
             .withAddress1('123 Main St')
             .withAddress2('Suite 456')
             .withAddress3('Building A');
 
+        // ACT
         OrderClientDTO.UnstructuredAddress unstructuredAddress = (OrderClientDTO.UnstructuredAddress) unstructuredBuilder.build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.AddressTypeEnum.UNSTRUCTURED_ADDRESS,
             unstructuredAddress.addressType,
@@ -1998,6 +2030,7 @@ public class OrderClientDTOBuilderTest {
     // Test DanishAddressBuilder
     @isTest
     static void testDanishAddressBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.DanishAddressBuilder danishBuilder = new OrderClientDTOBuilder.DanishAddressBuilder()
             .withStreetName('Øster Voldgade')
             .withStreetNumber('4')
@@ -2007,8 +2040,10 @@ public class OrderClientDTOBuilderTest {
             .withLocality('København K')
             .withStreetNumberSuffix('b');
 
+        // ACT
         OrderClientDTO.DanishAddress danishAddress = (OrderClientDTO.DanishAddress) danishBuilder.build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.AddressTypeEnum.DANISH_ADDRESS,
             danishAddress.addressType,
@@ -2025,28 +2060,35 @@ public class OrderClientDTOBuilderTest {
     // Test builder chain validation
     @isTest
     static void testBuilderChainValidation() {
+        // ARRANGE
         OrderClientDTOBuilder.AddressBuilder builder = new OrderClientDTOBuilder.AddressBuilder();
-
-        // Verify fluent interface maintains state
         String testValue = 'Test Value';
+
+        // ACT
         builder.withCoName(testValue);
         OrderClientDTO.Address address = builder.build();
+
+        // ASSERT
         Assert.areEqual(testValue, address.coName, 'Builder chain should maintain state');
     }
 
     // Test null handling
     @isTest
     static void testNullHandling() {
+        // ARRANGE
         OrderClientDTOBuilder.AddressBuilder builder = new OrderClientDTOBuilder.AddressBuilder();
+
+        // ACT
         OrderClientDTO.Address address = builder.build();
 
-        // Verify no NullPointerException occurs
+        // ASSERT
         Assert.isTrue(address != null, 'Address should not be null');
     }
 
     // Test AmountBuilder
     @isTest
     static void testAmountBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.AmountBuilder builder = new OrderClientDTOBuilder.AmountBuilder()
             .withAmount(TEST_AMOUNT)
             .withVAT(TEST_VAT)
@@ -2054,8 +2096,10 @@ public class OrderClientDTOBuilderTest {
             .withCatalogAmount(TEST_AMOUNT)
             .withCatalogVat(TEST_VAT);
 
+        // ACT
         OrderClientDTO.Amount amount = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_AMOUNT, amount.amount);
         Assert.areEqual(TEST_VAT, amount.vat);
         Assert.areEqual(OrderClientDTOEnums.AmountCurrencyEnum.DKK, amount.currency_x);
@@ -2066,6 +2110,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testAmountBuilderWithDiscount() {
+        // ARRANGE
         OrderClientDTOBuilder.DiscountBuilder discountBuilder = new OrderClientDTOBuilder.DiscountBuilder()
             .withAmount(TEST_AMOUNT)
             .withPercentage(TEST_PERCENTAGE)
@@ -2079,8 +2124,10 @@ public class OrderClientDTOBuilderTest {
             .withCatalogVat(TEST_VAT)
             .withDiscountBuilder(discountBuilder);
 
+        // ACT
         OrderClientDTO.Amount amount = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_AMOUNT, amount.amount);
         Assert.areEqual(TEST_VAT, amount.vat);
         Assert.areEqual(OrderClientDTOEnums.AmountCurrencyEnum.DKK, amount.currency_x);
@@ -2092,13 +2139,16 @@ public class OrderClientDTOBuilderTest {
     // Test BankBuilder
     @isTest
     static void testBankBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.BankBuilder builder = new OrderClientDTOBuilder.BankBuilder()
             .withAccountNumber(TEST_STRING)
             .withBranch(TEST_STRING)
             .withName(TEST_STRING);
 
+        // ACT
         OrderClientDTO.Bank bank = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_STRING, bank.accountNumber);
         Assert.areEqual(TEST_STRING, bank.branch);
         Assert.areEqual(TEST_STRING, bank.name);
@@ -2107,13 +2157,16 @@ public class OrderClientDTOBuilderTest {
     // Test BankAccountBuilder
     @isTest
     static void testBankAccountBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.BankAccountBuilder builder = new OrderClientDTOBuilder.BankAccountBuilder()
             .withBankName(TEST_STRING)
             .withBankBranchCode(TEST_STRING)
             .withAccountNumber(TEST_STRING);
 
+        // ACT
         OrderClientDTO.BankAccount account = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_STRING, account.bankName);
         Assert.areEqual(TEST_STRING, account.bankBranchCode);
         Assert.areEqual(TEST_STRING, account.accountNumber);
@@ -2122,12 +2175,15 @@ public class OrderClientDTOBuilderTest {
     // Test ChangeActivationDateOrderPatchBuilder
     @isTest
     static void testChangeActivationDateOrderPatchBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.ChangeActivationDateOrderPatchBuilder builder = new OrderClientDTOBuilder.ChangeActivationDateOrderPatchBuilder()
             .withNewActivationDate(TEST_DATE)
             .withTeliaCircuitId(TEST_STRING);
 
+        // ACT
         OrderClientDTO.ChangeActivationDateOrderPatch patch = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_DATE, patch.newActivationDate);
         Assert.areEqual(TEST_STRING, patch.teliaCircuitId);
     }
@@ -2135,14 +2191,16 @@ public class OrderClientDTOBuilderTest {
     // Test ConsentBuilder
     @isTest
     static void testConsentBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.PhysicalIdentificationBuilder physicalBuilder = new OrderClientDTOBuilder.PhysicalIdentificationBuilder(); // Assuming this exists
-
         OrderClientDTOBuilder.ConsentBuilder builder = new OrderClientDTOBuilder.ConsentBuilder()
             .withWrittenConsentGiven(true)
             .withConsentByIdPhysicalIdentificationBuilder(physicalBuilder);
 
+        // ACT
         OrderClientDTO.Consent myConsent = builder.build();
 
+        // ASSERT
         Assert.areEqual(true, myConsent.writtenConsentGiven);
         Assert.isNotNull(myConsent.consentById);
     }
@@ -2150,14 +2208,17 @@ public class OrderClientDTOBuilderTest {
     // Test CreditCardBuilder
     @isTest
     static void testCreditCardBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.CreditCardBuilder builder = new OrderClientDTOBuilder.CreditCardBuilder()
             .withName(TEST_STRING)
             .withMaskedPan(TEST_STRING)
             .withToken(TEST_STRING)
             .withExpirationDate(TEST_DATE);
 
+        // ACT
         OrderClientDTO.CreditCard card = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_STRING, card.name);
         Assert.areEqual(TEST_STRING, card.maskedPan);
         Assert.areEqual(TEST_STRING, card.token);
@@ -2167,6 +2228,7 @@ public class OrderClientDTOBuilderTest {
     // Test CreditEvaluationDetailsBuilder
     @isTest
     static void testCreditEvaluationDetailsBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.CreditEvaluationDetailsBuilder builder = new OrderClientDTOBuilder.CreditEvaluationDetailsBuilder()
             .withEmploymentType(OrderClientDTOEnums.CreditEvaluationDetailsEmploymentTypeEnum.EMPLOYEE)
             .withResidentialStatus(OrderClientDTOEnums.CreditEvaluationDetailsResidentialStatusEnum.RENTING)
@@ -2174,8 +2236,10 @@ public class OrderClientDTOBuilderTest {
             .withCreditLimit(TEST_AMOUNT)
             .withCreditClass(TEST_STRING);
 
+        // ACT
         OrderClientDTO.CreditEvaluationDetails details = builder.build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.CreditEvaluationDetailsEmploymentTypeEnum.EMPLOYEE,
             details.employmentType
@@ -2192,6 +2256,7 @@ public class OrderClientDTOBuilderTest {
     // Test DealerBuilder
     @isTest
     static void testDealerBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.DealerBuilder builder = new OrderClientDTOBuilder.DealerBuilder()
             .withDealerName(TEST_STRING)
             .withDealerCode(TEST_STRING)
@@ -2200,8 +2265,10 @@ public class OrderClientDTOBuilderTest {
             .withPosDealerId(TEST_STRING)
             .withPosSalesAgentId(TEST_STRING);
 
+        // ACT
         OrderClientDTO.Dealer dealer = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_STRING, dealer.dealerName);
         Assert.areEqual(TEST_STRING, dealer.dealerCode);
         Assert.areEqual(TEST_STRING, dealer.salesAgentCode);
@@ -2213,6 +2280,7 @@ public class OrderClientDTOBuilderTest {
     // Test DiscountBuilder
     @isTest
     static void testDiscountBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.DiscountBuilder builder = new OrderClientDTOBuilder.DiscountBuilder()
             .withAmount(TEST_AMOUNT)
             .withVAT(TEST_VAT)
@@ -2220,8 +2288,10 @@ public class OrderClientDTOBuilderTest {
             .withComment(TEST_STRING)
             .withReason(TEST_STRING);
 
+        // ACT
         OrderClientDTO.Discount discount = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_AMOUNT, discount.amount);
         Assert.areEqual(TEST_VAT, discount.vat);
         Assert.areEqual(TEST_PERCENTAGE, discount.percentage);
@@ -2231,12 +2301,15 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testDocumentBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.DocumentBuilder builder = new OrderClientDTOBuilder.DocumentBuilder()
             .withDocumentType(TEST_STRING)
             .withUrl(TEST_STRING);
 
+        // ACT
         OrderClientDTO.Document doc = builder.build();
 
+        // ASSERT
         Assert.areEqual(TEST_STRING, doc.documentType);
         Assert.areEqual(TEST_STRING, doc.url);
     }
@@ -2290,13 +2363,14 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testErrorResponseBuilder() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.ErrorResponseBuilder builder = new OrderClientDTOBuilder.ErrorResponseBuilder()
             .withErrorContentBuilder(new OrderClientDTOBuilder.ErrorContentBuilder());
 
+        // ACT
         OrderClientDTO.ErrorResponse response = builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areNotEqual(null, response.error);
     }
 
@@ -2365,7 +2439,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testFixedNetFlagsBuilder() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.FixedNetFlagsBuilder builder = new OrderClientDTOBuilder.FixedNetFlagsBuilder()
             .withSkipStateEvent(true)
             .withSkipCpeTechnician(false)
@@ -2385,9 +2459,10 @@ public class OrderClientDTOBuilderTest {
             .withProviderChangeAccountNumberMissing(false)
             .withCustomerRequestsChangeProvider(true);
 
+        // ACT
         OrderClientDTO.FixedNetFlags flags = builder.build();
 
-        // Assert
+        // ASSERT
         Assert.isTrue(flags.skipStateEvent);
         Assert.isFalse(flags.skipCpeTechnician);
         Assert.isTrue(flags.skipIp);
@@ -2396,14 +2471,15 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testForwardingSettingBuilder() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.ForwardingSettingBuilder builder = new OrderClientDTOBuilder.ForwardingSettingBuilder()
             .withEnabled(true)
             .withTargetNumber('+1234567890');
 
+        // ACT
         OrderClientDTO.ForwardingSetting setting = builder.build();
 
-        // Assert
+        // ASSERT
         Assert.isTrue(setting.enabled);
         Assert.areEqual('+1234567890', setting.targetNumber);
     }
@@ -2442,24 +2518,26 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testBuildersWithNullValues() {
+        // ARRANGE
         // Test DownPaymentPlanBuilder with null values
         OrderClientDTOBuilder.DownPaymentPlanBuilder dpBuilder = new OrderClientDTOBuilder.DownPaymentPlanBuilder()
             .withDownPaymentType(null)
             .withCreditProvider(null)
             .withNumberOfInstallments(null);
-
-        OrderClientDTO.DownPaymentPlan dpPlan = dpBuilder.build();
-        Assert.isNull(dpPlan.downPaymentType);
-        Assert.isNull(dpPlan.creditProvider);
-        Assert.isNull(dpPlan.numberOfInstallments);
-
         // Test ErrorContentBuilder with null values
         OrderClientDTOBuilder.ErrorContentBuilder ecBuilder = new OrderClientDTOBuilder.ErrorContentBuilder()
             .withCode(null)
             .withMessage(null)
             .withErrorParameterListBuilder(null);
 
+        // ACT
+        OrderClientDTO.DownPaymentPlan dpPlan = dpBuilder.build();
         OrderClientDTO.ErrorContent ec = ecBuilder.build();
+
+        // ASSERT
+        Assert.isNull(dpPlan.downPaymentType);
+        Assert.isNull(dpPlan.creditProvider);
+        Assert.isNull(dpPlan.numberOfInstallments);
         Assert.isNull(ec.code);
         Assert.isNull(ec.message);
         Assert.isNull(ec.parameters);
@@ -2467,6 +2545,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     public static void testHardwarePaymentConfigurationPatchBuilder() {
+        // ARRANGE
         // Create builders needed for testing
         OrderClientDTOBuilder.PaymentAmountBuilder totalAmountBuilder = new OrderClientDTOBuilder.PaymentAmountBuilder()
             .withAmount(1000.00)
@@ -2491,9 +2570,11 @@ public class OrderClientDTOBuilderTest {
             .withDiscount(discountBuilder)
             .withNumberOfInstallments(12);
 
+        // ACT
         // Build the configuration
         OrderClientDTO.HardwarePaymentConfigurationPatch config = builder.build();
 
+        // ASSERT
         // Verify all properties
         Assert.areEqual(
             OrderClientDTOEnums.PaymentType.EXTERNAL_PAYMENT_SERVICE,
@@ -2521,6 +2602,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     public static void testHomeOfficeOrderPatchBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.PersonBuilder legalPartyBuilder = (OrderClientDTOBuilder.PersonBuilder) new OrderClientDTOBuilder.PersonBuilder()
             .withFirstName('John')
             .withLastName('Doe')
@@ -2553,8 +2635,10 @@ public class OrderClientDTOBuilderTest {
             .withVendor('VENDOR123')
             .withEmployeeId('EMP123');
 
+        // ACT
         OrderClientDTO.HomeOfficeOrderPatch orderPatch = builder.build();
 
+        // ASSERT
         Assert.areEqual(legalPartyBuilder.build().email, orderPatch.legalParty.email, 'Legal Party should match');
         Assert.areEqual(billingPartyBuilder.build().email, orderPatch.billingParty.email, 'Billing Party should match');
         Assert.areEqual(
@@ -2573,6 +2657,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     public static void testInstallationAddressBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.InstallationAddressBuilder builder = new OrderClientDTOBuilder.InstallationAddressBuilder()
             .withPostalAddressBuilder(new OrderClientDTOBuilder.AddressBuilder().withCity('CITY'))
             .withStreetCode('STREET456')
@@ -2582,8 +2667,10 @@ public class OrderClientDTOBuilderTest {
             .withKvhx('KVHX456')
             .withAddressRefId('ADDR456');
 
+        // ACT
         OrderClientDTO.InstallationAddress address = builder.build();
 
+        // ASSERT
         Assert.areEqual('CITY', address.postalAddress.CITY, 'Postal Address should match');
         Assert.areEqual('STREET456', address.streetCode, 'Street Code should match');
         Assert.areEqual('MUN456', address.municipalityCode, 'Municipality Code should match');
@@ -2595,13 +2682,16 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     public static void testIpConfigurationBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.IpConfigurationBuilder builder = new OrderClientDTOBuilder.IpConfigurationBuilder()
             .withIp('192.168.1.1')
             .withNetmask('255.255.255.0')
             .withDefaultGateway('192.168.1.254');
 
+        // ACT
         OrderClientDTO.IpConfiguration config = builder.build();
 
+        // ASSERT
         Assert.areEqual('192.168.1.1', config.ip, 'IP should match');
         Assert.areEqual('255.255.255.0', config.netmask, 'Netmask should match');
         Assert.areEqual('192.168.1.254', config.defaultGateway, 'Default Gateway should match');
@@ -2609,14 +2699,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     public static void testMarketingConsentBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.MarketingConsentBuilder builder = new OrderClientDTOBuilder.MarketingConsentBuilder()
             .withLeadSourceId('LEAD123')
             .withDirectMarketing(true)
             .withTracking(false)
             .withUrl('https://example.com');
 
+        // ACT
         OrderClientDTO.MarketingConsents consent = builder.build();
 
+        // ASSERT
         Assert.areEqual('LEAD123', consent.leadSourceId, 'Lead Source Id should match');
         Assert.isTrue(consent.directMarketing, 'Direct Marketing should be true');
         Assert.isFalse(consent.tracking, 'Tracking should be false');
@@ -2625,6 +2718,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testNetworkConfigurationBuilder_BasicProperties() {
+        // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withCpeName('Test_CPE')
             .withQosProfileName('Standard_QoS')
@@ -2657,8 +2751,10 @@ public class OrderClientDTOBuilderTest {
             .withDhcpDnsSecondary('withDhcpDnsSecondary')
             .withSnmpCommunity('withSnmpCommunity');
 
+        // ACT
         OrderClientDTO.NetworkConfiguration config = builder.build();
 
+        // ASSERT
         Assert.areEqual('Test_CPE', config.cpeName);
         Assert.areEqual('Standard_QoS', config.qosProfileName);
         Assert.areEqual('Default_VRF', config.vrfName);
@@ -2666,14 +2762,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testNetworkConfigurationBuilder_NetworkProperties() {
+        // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withLinkIpNetworkIp('192.168.1.1')
             .withLinkIpNetworkNetmask('255.255.255.0')
             .withLanIpAddressIp('10.0.0.1')
             .withLanIpAddressNetmask('255.255.255.0');
 
+        // ACT
         OrderClientDTO.NetworkConfiguration config = builder.build();
 
+        // ASSERT
         Assert.areEqual('192.168.1.1', config.linkIpNetworkIp);
         Assert.areEqual('255.255.255.0', config.linkIpNetworkNetmask);
         Assert.areEqual('10.0.0.1', config.lanIpAddressIp);
@@ -2682,19 +2781,22 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testErrorParameterBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.ErrorParameterBuilder builder = new OrderClientDTOBuilder.ErrorParameterBuilder();
 
+        // ACT
         builder.withName('name');
         builder.withValue('value');
-
         OrderClientDTO.ErrorParameter result = builder.build();
 
+        // ASSERT
         Assert.areEqual('name', result.name);
         Assert.areEqual('value', result.value);
     }
 
     @isTest
     static void testNetworkConfigurationBuilder_DHCPProperties() {
+        // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withDhcpAddressRange('192.168.1.100-192.168.1.200')
             .withDhcpLeaseTime('86400')
@@ -2702,8 +2804,10 @@ public class OrderClientDTOBuilderTest {
             .withDhcpWinsPrimary('192.168.1.10')
             .withDhcpWinsSecondary('192.168.1.11');
 
+        // ACT
         OrderClientDTO.NetworkConfiguration config = builder.build();
 
+        // ASSERT
         Assert.areEqual('192.168.1.100-192.168.1.200', config.dhcpAddressRange);
         Assert.areEqual('86400', config.dhcpLeaseTime);
         Assert.areEqual('test.local', config.dhcpDomainName);
@@ -2713,13 +2817,16 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testNoAnswerForwardingSettingBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.NoAnswerForwardingSettingBuilder builder = new OrderClientDTOBuilder.NoAnswerForwardingSettingBuilder()
             .withEnabled(true)
             .withTargetNumber('+1234567890')
             .withDelay(30);
 
+        // ACT
         OrderClientDTO.NoAnswerForwardingSetting setting = builder.build();
 
+        // ASSERT
         Assert.isTrue(setting.enabled);
         Assert.areEqual('+1234567890', setting.targetNumber);
         Assert.areEqual(30, setting.delay);
@@ -2727,13 +2834,16 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testNotificationRecipientBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.NotificationRecipientBuilder builder = new OrderClientDTOBuilder.NotificationRecipientBuilder()
             .withRole(OrderClientDTOEnums.NotificationRecipientRoleEnum.CUSTOMER)
             .withEmail('test@example.com')
             .withTelephoneNumber('+9876543210');
 
+        // ACT
         OrderClientDTO.NotificationRecipient recipient = builder.build();
 
+        // ASSERT
         Assert.areEqual(OrderClientDTOEnums.NotificationRecipientRoleEnum.CUSTOMER, recipient.role);
         Assert.areEqual('test@example.com', recipient.email);
         Assert.areEqual('+9876543210', recipient.telephoneNumber);
@@ -2741,6 +2851,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOfferingBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.AmountBuilder amountBuilder = new OrderClientDTOBuilder.AmountBuilder()
             .withCurrency(OrderClientDTOEnums.AmountCurrencyEnum.DKK)
             .withAmount(99.99);
@@ -2754,8 +2865,10 @@ public class OrderClientDTOBuilderTest {
             .withProductOfferingId('withProductOfferingId')
             .withMonthlyPriceAmountBuilder(amountBuilder);
 
+        // ACT
         OrderClientDTO.Offering offering = builder.build();
 
+        // ASSERT
         Assert.areEqual('Premium', offering.priceplan);
         Assert.areEqual('Summer_Sale', offering.campaign);
         Assert.areEqual('10%', offering.discount);
@@ -2765,14 +2878,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testBuilderChain() {
+        // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withCpeName('Test_CPE')
             .withQosProfileName('Standard_QoS');
 
+        // ACT
         // Verify chain works correctly
         Assert.isTrue(builder.withVrfName('Default_VRF') == builder);
-
         OrderClientDTO.NetworkConfiguration config = builder.build();
+        
+        // ASSERT
         Assert.areEqual('Test_CPE', config.cpeName);
         Assert.areEqual('Standard_QoS', config.qosProfileName);
         Assert.areEqual('Default_VRF', config.vrfName);
@@ -2780,12 +2896,15 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testNullValues() {
+        // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withCpeName(null)
             .withQosProfileName('');
 
+        // ACT
         OrderClientDTO.NetworkConfiguration config = builder.build();
 
+        // ASSERT
         Assert.isTrue(config.cpeName == null);
         Assert.areEqual('', config.qosProfileName);
     }
@@ -2793,50 +2912,60 @@ public class OrderClientDTOBuilderTest {
     // OrderAdditionalInfoPatchBuilder Tests
     @isTest
     static void testOrderAdditionalInfoPatchBuilder() {
+        // ARRANGE
         String expectedMemo = 'Test Memo';
-
         OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder builder = new OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder()
             .withOrderMemo(expectedMemo);
 
+        // ACT
         OrderClientDTO.OrderAdditionalInfoPatch result = builder.build();
 
+        // ASSERT
         Assert.areEqual(expectedMemo, result.orderMemo);
     }
 
     @isTest
     static void testOrderAdditionalInfoPatchBuilder_NullInput() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder builder = new OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder()
             .withOrderMemo(null);
 
+        // ACT
         OrderClientDTO.OrderAdditionalInfoPatch result = builder.build();
 
+        // ASSERT
         Assert.isNull(result.orderMemo);
     }
 
     // OrderApprovalBuilder Tests
     @isTest
     static void testOrderApprovalBuilder() {
+        // ARRANGE
         String expectedComment = 'Test Comment';
         String expectedIp = '192.168.1.1';
-
         OrderClientDTOBuilder.OrderApprovalBuilder builder = new OrderClientDTOBuilder.OrderApprovalBuilder()
             .withApprovalComment(expectedComment)
             .withApprovalIp(expectedIp);
 
+        // ACT
         OrderClientDTO.OrderApproval result = builder.build();
 
+        // ASSERT
         Assert.areEqual(expectedComment, result.approvalComment);
         Assert.areEqual(expectedIp, result.approvalIp);
     }
 
     @isTest
     static void testOrderApprovalBuilder_NullInputs() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderApprovalBuilder builder = new OrderClientDTOBuilder.OrderApprovalBuilder()
             .withApprovalComment(null)
             .withApprovalIp(null);
 
+        // ACT
         OrderClientDTO.OrderApproval result = builder.build();
 
+        // ASSERT
         Assert.isNull(result.approvalComment);
         Assert.isNull(result.approvalIp);
     }
@@ -2844,6 +2973,7 @@ public class OrderClientDTOBuilderTest {
     // OrderEventDetailsBuilder Tests
     @isTest
     static void testOrderEventDetailsBuilder_Full() {
+        // ARRANGE
         String category = 'Installation';
         String description = 'New Installation';
         Date startDate = Date.today();
@@ -2851,7 +2981,6 @@ public class OrderClientDTOBuilderTest {
         Integer id = 123;
         String purchaseOrderId = 'PO001';
         String state = 'Pending';
-
         OrderClientDTOBuilder.OrderEventDetailsBuilder builder = new OrderClientDTOBuilder.OrderEventDetailsBuilder()
             .withCategory(category)
             .withDescription(description)
@@ -2868,8 +2997,10 @@ public class OrderClientDTOBuilderTest {
                     .withTechnicianVisitDate(Date.today().addDays(30))
             );
 
+        // ACT
         OrderClientDTO.OrderEventDetails result = builder.build();
 
+        // ASSERT
         Assert.areEqual(category, result.category);
         Assert.areEqual(description, result.description);
         Assert.areEqual(expectedCompletionDate, result.expectedCompletionDate);
@@ -2882,35 +3013,42 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderEventDetailsBuilder_NoTechnician() {
+        // ARRANGE
         String category = 'Installation';
-
         OrderClientDTOBuilder.OrderEventDetailsBuilder builder = new OrderClientDTOBuilder.OrderEventDetailsBuilder()
             .withCategory(category);
 
+        // ACT
         OrderClientDTO.OrderEventDetails result = builder.build();
 
+        // ASSERT
         Assert.areEqual(category, result.category);
         Assert.isNull(result.technicianDetails);
     }
 
     @isTest
     static void testOrderFlagsBuilder() {
+        // ARRANGE
         Boolean expectedOrderConfirmed = true;
         Boolean expectedTermsAccepted = false;
-
         OrderClientDTOBuilder.OrderFlagsBuilder builder = new OrderClientDTOBuilder.OrderFlagsBuilder()
             .withOrderConfirmed(expectedOrderConfirmed)
             .withTermsAccepted(expectedTermsAccepted);
 
+        // ACT
         OrderClientDTO.OrderFlags result = builder.build();
 
+        // ASSERT
         Assert.areEqual(expectedOrderConfirmed, result.orderConfirmed);
         Assert.areEqual(expectedTermsAccepted, result.termsAccepted);
     }
 
     @isTest
     static void testShippingDetailsBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.ShippingDetailsBuilder builder = new OrderClientDTOBuilder.ShippingDetailsBuilder();
+        
+        // ACT
         builder.withToDeliverQuantity(5)
             .withTSFOffering('tsfOffering')
             .withERPTSProduct('erpTsProduct')
@@ -2920,9 +3058,9 @@ public class OrderClientDTOBuilderTest {
             .withDepartment('department')
             .withTrackAndTraceNumber('trackAndTraceNumber')
             .withTrackAndTraceURL('trackAndTraceURL');
-
         OrderClientDTO.ShippingDetails details = builder.build();
 
+        // ASSERT
         Assert.areEqual('tsfOffering', details.tsfOffering);
         Assert.areEqual('erpTsProduct', details.erpTsProduct);
         Assert.areEqual(15, details.hardwareDeliveryId);
@@ -2930,59 +3068,72 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testSerialNumberBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.SerialNumberBuilder builder = new OrderClientDTOBuilder.SerialNumberBuilder();
+        
+        // ACT
         builder.withType('type');
         builder.withValue('value');
-
         OrderClientDTO.SerialNumber serial = builder.build();
 
+        // ASSERT
         Assert.areEqual('type', serial.type);
         Assert.areEqual('value', serial.value);
     }
 
     @isTest
     static void testPhysicalIdentificationBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.PhysicalIdentificationBuilder pysId = new OrderClientDTOBuilder.PhysicalIdentificationBuilder();
+        
+        // ACT
         pysId.withType('type');
         pysId.withValue('value');
-
         OrderClientDTO.PhysicalIdentification result = pysId.build();
 
+        // ASSERT
         Assert.areEqual('type', result.type);
         Assert.areEqual('value', result.value);
     }
 
     @isTest
     static void testPilPaymentBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.PilPaymentBuilder builder = new OrderClientDTOBuilder.PilPaymentBuilder();
 
+        // ACT
         builder.withPaymentId('paymentId');
         builder.withUpdatedAt(Date.today());
         builder.withTotalAmount(10);
         builder.withTotalVat(10);
         builder.withPaymentRoundingError(12);
-
         OrderClientDTO.PilPayment result = builder.build();
 
+        // ASSERT
         Assert.areEqual('paymentId', result.paymentId);
     }
 
     @isTest
     static void testReturnDetailsBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.ReturnDetailsBuilder builder = new OrderClientDTOBuilder.ReturnDetailsBuilder();
+        
+        // ACT
         builder.withReturnQuantity(15);
         builder.withCreditInvoiceNumber('withCreditInvoiceNumber');
         builder.withCreditInvoiceDate(Date.today());
-
         OrderClientDTO.ReturnDetails returns = builder.build();
 
+        // ASSERT
         Assert.areEqual(15, returns.returnQuantity);
     }
 
     @isTest
     static void testSimDetailsBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.SimDetailsBuilder builder = new OrderClientDTOBuilder.SimDetailsBuilder();
 
+        // ACT
         builder.withSimType(OrderClientDTOEnums.SimDetailsSimTypeEnum.MAIN_HARDWARE_SIM);
         builder.withIcc('icc');
         builder.withImsi('imsi');
@@ -2994,9 +3145,9 @@ public class OrderClientDTOBuilderTest {
         builder.withBindDeviceName('bindDeviceName');
         builder.withAlternateSmdpFqdn('alternateSmdpFqdn');
         builder.withWaiveSimSwapFee(true);
-
         OrderClientDTO.SimDetails simDetails = builder.build();
 
+        // ASSERT
         Assert.areEqual('icc', simDetails.icc);
         Assert.areEqual('imsi', simDetails.imsi);
         Assert.areEqual('oldIcc', simDetails.oldIcc);
@@ -3011,14 +3162,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testSubscriptionUserBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.SubscriptionUserBuilder builder = new OrderClientDTOBuilder.SubscriptionUserBuilder();
+        
+        // ACT
         builder.withFirstName('withFirstName');
         builder.withLastName('withLastName');
         builder.withEmail('withEmail');
         builder.withBirthDate(Date.today());
-
         OrderClientDTO.SubscriptionUser subUser = builder.build();
 
+        // ASSERT
         Assert.areEqual('withFirstName', subUser.firstName);
         Assert.areEqual('withLastName', subUser.lastName);
         Assert.areEqual('withEmail', subUser.email);
@@ -3026,6 +3180,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderFlagsBuilder_AllProperties() {
+        // ARRANGE
         OrderClientDTOBuilder.OrderFlagsBuilder builder = new OrderClientDTOBuilder.OrderFlagsBuilder()
             .withOrderConfirmed(true)
             .withTermsAccepted(false)
@@ -3050,8 +3205,10 @@ public class OrderClientDTOBuilderTest {
             .withNewDivaFlow(true)
             .withIsSubOrder(false);
 
+        // ACT
         OrderClientDTO.OrderFlags result = builder.build();
 
+        // ASSERT
         Assert.isTrue(result.orderConfirmed);
         Assert.isFalse(result.termsAccepted);
         Assert.isTrue(result.cprCheckFailed);
@@ -3078,9 +3235,9 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderItemBuilderBasicProperties() {
+        // ARRANGE
         // Create builder instance
         OrderClientDTOBuilder.OrderItemBuilder builder = new OrderClientDTOBuilder.OrderItemBuilder();
-
         // Set properties
         OrderClientDTOEnums.OrderItemTypeEnum testType = OrderClientDTOEnums.OrderItemTypeEnum.ADDITIONAL_PRODUCT_ITEM;
         String testChannelId = 'TEST_CHANNEL_ID';
@@ -3088,16 +3245,17 @@ public class OrderClientDTOBuilderTest {
         OrderClientDTOEnums.OrderItemOriginEnum testOrigin = OrderClientDTOEnums.OrderItemOriginEnum.CLIENT;
         OrderClientDTOEnums.OrderItemActivityEnum testActivity = OrderClientDTOEnums.OrderItemActivityEnum.CREATE;
 
+        // ACT
         // Build object
         builder.withType(testType)
             .withChannelOrderItemId(testChannelId)
             .withId(testId)
             .withOrigin(testOrigin)
             .withActivity(testActivity);
-
         // Get built object
         OrderClientDTO.OrderItem result = builder.build();
 
+        // ASSERT
         // Verify properties
         Assert.areEqual(testType, result.type, 'Type should match');
         Assert.areEqual(testChannelId, result.channelOrderItemId, 'Channel ID should match');
@@ -3108,18 +3266,20 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testCreditWatchItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.CreditWatchItemBuilder builder = new OrderClientDTOBuilder.CreditWatchItemBuilder();
-
         Decimal amount = 100.00;
         Boolean waiveFees = true;
         Date expirationDate = Date.today().addDays(30);
 
+        // ACT
         OrderClientDTO.CreditWatchItem result = (OrderClientDTO.CreditWatchItem) builder
             .withAmount(amount)
             .withWaiveFees(waiveFees)
             .withExpirationDate(expirationDate)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.CREDIT_WATCH_ITEM,
             result.type,
@@ -3132,15 +3292,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testDiscountItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.DiscountItemBuilder builder = new OrderClientDTOBuilder.DiscountItemBuilder();
-
         String discountCode = 'TEST_DISCOUNT';
         String reason = 'Test Reason';
 
+        // ACT
         OrderClientDTO.DiscountItem result = (OrderClientDTO.DiscountItem) builder.withDiscountCode(discountCode)
             .withReason(reason)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.DISCOUNT_ITEM,
             result.type,
@@ -3152,13 +3314,14 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testFeeItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.FeeItemBuilder builder = new OrderClientDTOBuilder.FeeItemBuilder();
-
         OrderClientDTOEnums.FeeItemFeeTypeEnum feeType = OrderClientDTOEnums.FeeItemFeeTypeEnum.ACT_FEE;
         String billingCode = 'TEST_FEE';
         String displayName = 'Test Fee';
         Boolean waived = false;
 
+        // ACT
         OrderClientDTO.FeeItem result = (OrderClientDTO.FeeItem) builder
             .withFeeType(feeType)
             .withBillingCode(billingCode)
@@ -3167,6 +3330,7 @@ public class OrderClientDTOBuilderTest {
             .withRecurring(true)
             .build();
 
+        // ASSERT
         Assert.areEqual(OrderClientDTOEnums.OrderItemTypeEnum.FEE_ITEM, result.type, 'Type should be FEE_ITEM');
         Assert.areEqual(feeType, result.feeType, 'Fee type should match');
         Assert.areEqual(billingCode, result.billingCode, 'Billing code should match');
@@ -3176,16 +3340,18 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testHardwarePaymentItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.HardwarePaymentItemBuilder builder = new OrderClientDTOBuilder.HardwarePaymentItemBuilder();
-
         OrderClientDTOEnums.PaymentType paymentType = OrderClientDTOEnums.PaymentType.INVOICE;
         String purchaseId = 'TEST_PURCHASE';
 
+        // ACT
         OrderClientDTO.HardwarePaymentItem result = (OrderClientDTO.HardwarePaymentItem) builder
             .withPaymentType(paymentType)
             .withPurchaseId(purchaseId)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.HARDWARE_PAYMENT_ITEM,
             result.type,
@@ -3197,16 +3363,18 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testHardwareSwapItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.HardwareSwapItemBuilder builder = new OrderClientDTOBuilder.HardwareSwapItemBuilder();
-
         String shippingStatus = 'IN_TRANSIT';
         String oldSerialNumber = 'ABC123';
 
+        // ACT
         OrderClientDTO.HardwareSwapItem result = (OrderClientDTO.HardwareSwapItem) builder
             .withShippingStatus(shippingStatus)
             .withOldSerialNumber(oldSerialNumber)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.HARDWARE_SWAP_ITEM,
             result.type,
@@ -3218,15 +3386,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testCallForwardingItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.CallForwardingItemBuilder builder = new OrderClientDTOBuilder.CallForwardingItemBuilder();
-
         OrderClientDTOBuilder.ForwardingSettingBuilder forwardingBuilder = new OrderClientDTOBuilder.ForwardingSettingBuilder();
 
+        // ACT
         OrderClientDTO.CallForwardingItem result = (OrderClientDTO.CallForwardingItem) builder.withAllForwardingSettingBuilder(
                 forwardingBuilder
             )
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.CALL_FORWARDING_ITEM,
             result.type,
@@ -3237,15 +3407,17 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testChargeItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.ChargeItemBuilder builder = new OrderClientDTOBuilder.ChargeItemBuilder();
-
         String chargeCode = 'TEST_CHARGE';
         String description = 'Test Charge';
 
+        // ACT
         OrderClientDTO.ChargeItem result = (OrderClientDTO.ChargeItem) builder.withChargeCode(chargeCode)
             .withDescription(description)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.CHARGE_ITEM,
             result.type,
@@ -3257,18 +3429,20 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testConsentItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.ConsentItemBuilder builder = new OrderClientDTOBuilder.ConsentItemBuilder();
-
         String consentId = 'TEST_CONSENT';
         Integer version = 1;
         String state = 'ACTIVE';
 
+        // ACT
         OrderClientDTO.ConsentItem result = (OrderClientDTO.ConsentItem) builder
             .withConsentId(consentId)
             .withVersion(version)
             .withState(state)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.CONSENT_ITEM,
             result.type,
@@ -3281,18 +3455,20 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testAccountItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.AccountItemBuilder builder = new OrderClientDTOBuilder.AccountItemBuilder();
-
         String billingAccountNumber = '123456789';
         OrderClientDTOEnums.AccountItemBillingCycleEnum billingCycle = OrderClientDTOEnums.AccountItemBillingCycleEnum.QUARTERLY;
         OrderClientDTOEnums.AccountItemInvoiceTypeEnum invoiceType = OrderClientDTOEnums.AccountItemInvoiceTypeEnum.PAPER_INVOICE;
 
+        // ACT
         OrderClientDTO.AccountItem result = (OrderClientDTO.AccountItem) builder
             .withBillingAccountNumber(billingAccountNumber)
             .withBillingCycle(billingCycle)
             .withInvoiceType(invoiceType)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.ACCOUNT_ITEM,
             result.type,
@@ -3305,18 +3481,20 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testAdditionalProductItemBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.AdditionalProductItemBuilder builder = new OrderClientDTOBuilder.AdditionalProductItemBuilder();
-
         String productCode = 'TEST_PRODUCT';
         String productName = 'Test Product';
         OrderClientDTOBuilder.AmountBuilder priceAmountBuilder = new OrderClientDTOBuilder.AmountBuilder();
 
+        // ACT
         OrderClientDTO.AdditionalProductItem result = (OrderClientDTO.AdditionalProductItem) builder
             .withProductCode(productCode)
             .withProductName(productName)
             .withUnitPriceAmountBuilder(priceAmountBuilder)
             .build();
 
+        // ASSERT
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.ADDITIONAL_PRODUCT_ITEM,
             result.type,
@@ -3383,13 +3561,14 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testReactivationItemBuilder() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.ReactivationItemBuilder builder = new OrderClientDTOBuilder.ReactivationItemBuilder()
             .withReason('Test Reason');
 
+        // ACT
         OrderClientDTO.ReactivationItem result = (OrderClientDTO.ReactivationItem) builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areNotEqual(null, result, 'Result should not be null');
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.REACTIVATION_ITEM,
@@ -3401,13 +3580,14 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testRegretItemBuilder() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.RegretItemBuilder builder = new OrderClientDTOBuilder.RegretItemBuilder();
+        
+        // ACT
         builder.withEffectiveDate(Date.today());
-
         OrderClientDTO.RegretItem result = (OrderClientDTO.RegretItem) builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areNotEqual(null, result, 'Result should not be null');
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.REGRET_ITEM,
@@ -3419,11 +3599,9 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testSubscriptionItemBuilder() {
-        // Arrange
+        // ARRANGE
         OrderClientDTOBuilder.AmountBuilder mockAmountBuilder = new OrderClientDTOBuilder.AmountBuilder();
         OrderClientDTOBuilder.SubscriptionUserBuilder mockUserBuilder = new OrderClientDTOBuilder.SubscriptionUserBuilder();
-
-        // Act
         OrderClientDTOBuilder.SubscriptionItemBuilder builder = new OrderClientDTOBuilder.SubscriptionItemBuilder()
             .withPublishLevel(OrderClientDTOEnums.SubscriptionItemPublishLevelEnum.ADDRESS_AND_EMAIL)
             .withLabel('Test Label')
@@ -3432,9 +3610,10 @@ public class OrderClientDTOBuilderTest {
             .withRecurringPriceBuilder(mockAmountBuilder)
             .withSubscriptionUserBuilder(mockUserBuilder);
 
+        // ACT
         OrderClientDTO.SubscriptionItem result = (OrderClientDTO.SubscriptionItem) builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areNotEqual(null, result, 'Result should not be null');
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.SUBSCRIPTION_ITEM,
@@ -3449,12 +3628,13 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testSuspensionItemBuilder() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.SuspensionItemBuilder builder = new OrderClientDTOBuilder.SuspensionItemBuilder().withReason('Test Reason');
 
+        // ACT
         OrderClientDTO.SuspensionItem result = (OrderClientDTO.SuspensionItem) builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areNotEqual(null, result, 'Result should not be null');
         Assert.areEqual(
             OrderClientDTOEnums.OrderItemTypeEnum.SUSPENSION_ITEM,
@@ -3493,7 +3673,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testTerminationItemBuilder_NullValues() {
-        // Act
+        // ARRANGE
         OrderClientDTOBuilder.TerminationItemBuilder builder = new OrderClientDTOBuilder.TerminationItemBuilder()
             .withEffectiveDate(null)
             .withReasonCode(null)
@@ -3502,9 +3682,10 @@ public class OrderClientDTOBuilderTest {
             .withShouldTransferToDifferentPool(null)
             .withShouldReReserve(null);
 
+        // ACT
         OrderClientDTO.TerminationItem result = (OrderClientDTO.TerminationItem) builder.build();
 
-        // Assert
+        // ASSERT
         Assert.isTrue(result != null);
         Assert.areEqual(OrderClientDTOEnums.OrderItemTypeEnum.TERMINATION_ITEM, result.type);
         Assert.isTrue(result.effectiveDate == null);
@@ -3517,7 +3698,7 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderPartBuilder_BasicFlow() {
-        // Arrange
+        // ARRANGE
         OrderClientDTOBuilder.OrderPartBuilder builder = new OrderClientDTOBuilder.OrderPartBuilder()
             .withType(OrderClientDTOEnums.OrderPartTypeEnum.ACCOUNT)
             .withActivity(OrderClientDTOEnums.OrderPartActivityEnum.CHANGE)
@@ -3528,10 +3709,10 @@ public class OrderClientDTOBuilderTest {
             .withSplitOrderId('SPLIT001')
             .withTaskUrl('https://test.url');
 
-        // Act
+        // ACT
         OrderClientDTO.OrderPart result = builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areEqual(OrderClientDTOEnums.OrderPartTypeEnum.ACCOUNT, result.type);
         Assert.areEqual(OrderClientDTOEnums.OrderPartActivityEnum.CHANGE, result.activity);
         Assert.areEqual(OrderClientDTOEnums.ProcessingStatus.COMPLETED, result.processingStatus);
@@ -3543,35 +3724,36 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderPartBuilder_ChangeTypesCollection() {
-        // Arrange
+        // ARRANGE
         List<OrderClientDTOEnums.OrderPartChangeTypesEnum> expectedChanges = new List<OrderClientDTOEnums.OrderPartChangeTypesEnum>{
             OrderClientDTOEnums.OrderPartChangeTypesEnum.ADDITIONAL_PRODUCTS,
             OrderClientDTOEnums.OrderPartChangeTypesEnum.CALL_FORWARDING,
             OrderClientDTOEnums.OrderPartChangeTypesEnum.PRICEPLAN
         };
-
-        // Act
         OrderClientDTOBuilder.OrderPartBuilder builder = new OrderClientDTOBuilder.OrderPartBuilder()
             .withChangeType(OrderClientDTOEnums.OrderPartChangeTypesEnum.ADDITIONAL_PRODUCTS)
             .withChangeType(OrderClientDTOEnums.OrderPartChangeTypesEnum.CALL_FORWARDING)
             .withChangeType(OrderClientDTOEnums.OrderPartChangeTypesEnum.PRICEPLAN);
 
+        // ACT
         OrderClientDTO.OrderPart result = builder.build();
 
-        // Assert
+        // ASSERT
         Assert.areEqual(expectedChanges, result.changeTypes);
     }
 
     @isTest
     static void testOrderPartBuilder_NullValues() {
-        // Act
-        OrderClientDTO.OrderPart result = new OrderClientDTOBuilder.OrderPartBuilder()
+        // ARRANGE
+        OrderClientDTOBuilder.OrderPartBuilder builder = new OrderClientDTOBuilder.OrderPartBuilder()
             .withType(null)
             .withActivity(null)
-            .withProcessingStatus(null)
-            .build();
+            .withProcessingStatus(null);
+        
+        // ACT
+        OrderClientDTO.OrderPart result = builder.build();
 
-        // Assert
+        // ASSERT
         Assert.isTrue(result != null);
         Assert.isTrue(result.type == null);
         Assert.isTrue(result.activity == null);
@@ -3581,49 +3763,61 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderPartReferenceBuilder() {
+        // ARRANGE
         // Test valid construction
-
         OrderClientDTOBuilder.OrderPartReferenceBuilder referenceBuilder = new OrderClientDTOBuilder.OrderPartReferenceBuilder();
-
+        
+        // ACT
         OrderCLientDTO.OrderPartReference reference = referenceBuilder.withType(
                 OrderClientDTOEnums.OrderPartReferenceTypeEnum.ORIGINAL_ORDER_ID
             )
             .withValue('TEST123')
             .build();
 
+        // ASSERT
         Assert.areEqual(OrderClientDTOEnums.OrderPartReferenceTypeEnum.ORIGINAL_ORDER_ID, reference.type);
         Assert.areEqual('TEST123', reference.value);
 
+        // ACT
         // Test null values
         reference = new OrderClientDTOBuilder.OrderPartReferenceBuilder().withType(null).withValue(null).build();
 
+        // ASSERT
         Assert.isNull(reference.type);
         Assert.isNull(reference.value);
     }
 
     @isTest
     static void testOrderPatchRequestBuilder() {
+        // ARRANGE
         // Test valid construction
-        OrderClientDTO.OrderPatchRequest request = new OrderClientDTOBuilder.OrderPatchRequestBuilder()
+        OrderClientDTOBuilder.OrderPatchRequestBuilder builder = new OrderClientDTOBuilder.OrderPatchRequestBuilder()
             .withOperation(OrderClientDTOEnums.OpEnum.ADD)
             .withPath('/test/path')
             .withValue('testValue')
-            .withFromValue('fromValue')
-            .build();
+            .withFromValue('fromValue');
 
+        // ACT
+        OrderClientDTO.OrderPatchRequest request = builder.build();
+
+        // ASSERT
         Assert.areEqual(OrderClientDTOEnums.OpEnum.ADD, request.op);
         Assert.areEqual('/test/path', request.path);
         Assert.areEqual('testValue', request.value);
         Assert.areEqual('fromValue', request.from_x);
 
+        // ARRANGE
         // Test null values
-        request = new OrderClientDTOBuilder.OrderPatchRequestBuilder()
+        builder = new OrderClientDTOBuilder.OrderPatchRequestBuilder()
             .withOperation(null)
             .withPath(null)
             .withValue(null)
-            .withFromValue(null)
-            .build();
+            .withFromValue(null);
 
+        // ACT
+        request = builder.build();
+
+        // ASSERT
         Assert.isNull(request.op);
         Assert.isNull(request.path);
         Assert.isNull(request.value);
@@ -3632,24 +3826,32 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderSourceBuilder() {
+        // ARRANGE
         // Test valid construction
-        OrderClientDTO.OrderSource source = new OrderClientDTOBuilder.OrderSourceBuilder()
+        OrderClientDTOBuilder.OrderSourceBuilder builder = new OrderClientDTOBuilder.OrderSourceBuilder()
             .withIpAddress('192.168.1.1')
             .withPort(8080)
-            .withCaptureTimeStamp(System.now())
-            .build();
+            .withCaptureTimeStamp(System.now());
+        
+        // ACT
+        OrderClientDTO.OrderSource source = builder.build();
 
+        // ASSERT
         Assert.areEqual('192.168.1.1', source.ipAddress);
         Assert.areEqual(8080, source.port);
         Assert.areNotEqual(null, source.captureTimeStamp);
 
+        // ARRANGE
         // Test null values
-        source = new OrderClientDTOBuilder.OrderSourceBuilder()
+        builder = new OrderClientDTOBuilder.OrderSourceBuilder()
             .withIpAddress(null)
             .withPort(null)
-            .withCaptureTimeStamp(null)
-            .build();
+            .withCaptureTimeStamp(null);
 
+        // ACT
+        source = builder.build();
+
+        // ASSERT
         Assert.isNull(source.ipAddress);
         Assert.isNull(source.port);
         Assert.isNull(source.captureTimeStamp);
@@ -3657,8 +3859,9 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderV10Builder_BasicFields() {
+        // ARRANGE
         // Test basic fields
-        OrderClientDTO.OrderV10 order = new OrderClientDTOBuilder.OrderV10Builder()
+        OrderClientDTOBuilder.OrderV10Builder builder = new OrderClientDTOBuilder.OrderV10Builder()
             .withId('ID001')
             .withOrderId('ORD001')
             .withParentOrderId('PORD001')
@@ -3681,9 +3884,12 @@ public class OrderClientDTOBuilderTest {
             .withConfirmationUrl('http://confirm.url')
             .withDocumentsUrl('http://docs.url')
             .withPaymentId('PAY001')
-            .withContextId(123)
-            .build();
+            .withContextId(123);
 
+        // ACT
+        OrderClientDTO.OrderV10 order = builder.build();
+
+        // ASSERT
         Assert.areEqual('ID001', order.id);
         Assert.areEqual('ORD001', order.orderId);
         Assert.areEqual('PORD001', order.parentOrderId);
@@ -3711,17 +3917,21 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderV10Builder_CompositeBuilders() {
+        // ARRANGE
         // Test composite builders
-        OrderClientDTO.OrderV10 order = new OrderClientDTOBuilder.OrderV10Builder()
+        OrderClientDTOBuilder.OrderV10Builder builder = new OrderClientDTOBuilder.OrderV10Builder()
             .withOrderSourceBuilder(
                 new OrderClientDTOBuilder.OrderSourceBuilder()
                     .withIpAddress('192.168.1.1')
                     .withPort(8080)
                     .withCaptureTimeStamp(System.now())
             )
-            .withDealerBuilder(new OrderClientDTOBuilder.DealerBuilder().withDealerName('Test Dealer'))
-            .build();
+            .withDealerBuilder(new OrderClientDTOBuilder.DealerBuilder().withDealerName('Test Dealer'));
 
+        // ACT
+        OrderClientDTO.OrderV10 order = builder.build();
+
+        // ASSERT
         Assert.isNotNull(order.orderSource);
         Assert.areEqual('192.168.1.1', order.orderSource.ipAddress);
         Assert.areEqual(8080, order.orderSource.port);
@@ -3731,19 +3941,28 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testOrderV10Builder_NullValues() {
+        // ARRANGE
         // Test null values
-        OrderClientDTO.OrderV10 order = new OrderClientDTOBuilder.OrderV10Builder().withValidationErrors(null).build();
+        OrderClientDTOBuilder.OrderV10Builder builder = new OrderClientDTOBuilder.OrderV10Builder().withValidationErrors(null);
+        
+        // ACT
+        OrderClientDTO.OrderV10 order = builder.build();
 
+        // ASSERT
         Assert.isNull(order.validationErrors);
 
+        // ARRANGE
         // Test builder chaining with null values
-        order = new OrderClientDTOBuilder.OrderV10Builder()
+        builder = new OrderClientDTOBuilder.OrderV10Builder()
             .withCreditEvaluationDetailsBuilder(null)
             .withNotificationRecipientListBuilder(null)
             .withFlagsBuilder(null)
-            .withOrdererPartyRoleBuilder(null)
-            .build();
+            .withOrdererPartyRoleBuilder(null);
+        
+        // ACT
+        order = builder.build();
 
+        // ASSERT
         Assert.isNull(order.creditEvaluationDetails);
         Assert.isNull(order.notificationRecipients);
         Assert.isNull(order.flags);
@@ -3752,26 +3971,31 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void testTimePeriodBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.TimePeriodBuilder t = new OrderClientDTOBuilder.TimePeriodBuilder();
 
+        // ACT
         t.withAmount(100);
         t.withTimePeriod(OrderClientDTOEnums.TimeUnit.DAY);
-
         OrderClientDTO.TimePeriod p = t.build();
+        
+        // ASSERT
         Assert.areEqual(100, p.amount);
         Assert.areEqual(OrderClientDTOEnums.TimeUnit.DAY, p.unit);
     }
 
     @isTest
     static void testHardwareDetailsBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.HardwareDetailsBuilder b = new OrderClientDTOBuilder.HardwareDetailsBuilder();
 
+        // ACT
         b.withMaterialId('materialId');
         b.withName('name');
         b.withPackageType('packageType');
-
         OrderClientDTO.HardwareDetails d = b.build();
 
+        // ASSERT
         Assert.areEqual('name', d.name);
         Assert.areEqual('materialId', d.materialId);
         Assert.areEqual('packageType', d.packageType);
@@ -3779,12 +4003,16 @@ public class OrderClientDTOBuilderTest {
 
     @isTest
     static void TelephoneNumberBuilder() {
+        // ARRANGE
         OrderClientDTOBuilder.TelephoneNumberBuilder b = new OrderClientDTOBuilder.TelephoneNumberBuilder();
+        
+        // ACT
         b.withPhoneNumber('withPhoneNumber');
         b.withCountryCode('withCountryCode');
         b.withAreaCode('withAreaCode');
-
         OrderClientDTO.TelephoneNumber tel = b.build();
+
+        // ASSERT
         Assert.areEqual('withPhoneNumber', tel.localNumber);
         Assert.areEqual('withCountryCode', tel.countryCode);
         Assert.areEqual('withAreaCode', tel.areaCode);
