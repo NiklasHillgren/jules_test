@@ -1,0 +1,365 @@
+{
+  "ProcessingStatus": {},
+  "Brand": {},
+  "ApplicationId": {},
+  "OrderResponse": {},
+  "OrderCollectionResponse": {
+    "nextLink": "Link to the next page of orders."
+  },
+  "OrderV1_0": {
+    "id": "Id from internal order database, is numeric value and starting from 10000.",
+    "orderId": "Can be BPM orderID like 'BPMT0153200309110744' or just Order Id from OrderManager '99089093'.",
+    "parentOrderId": "Parent order id if this order is a return of another order.",
+    "channelOrderReference": "order identified made by channel.",
+    "implementationCaseId": "Implementation case Id coming from SalesForce channel.",
+    "bpmOrderId": "Bpm order id returned from CoPE services.",
+    "noosOrderId": "NOOS order id.",
+    "mitIdVerificationToken": "Token used for verification of the identity of the person making the order.",
+    "batchId": "Identifier of the batch the order is being processed in.",
+    "brand": "must be entered in the 'brand' header and is then placed on the order.",
+    "channel": "Identifying what channel the order is made in, e.g. SALES_FORCE, TANGO, SELF_SERVICE ...",
+    "createdDate": "Date time with timezone according to ISO-8601.",
+    "completedDate": "Date time with timezone according to ISO-8601. Timestamp of when the order has been completed or cancelled.",
+    "createdBy": "Identifier of the person making this order.",
+    "orderParts": "The order can have multiple order parts not requiring to be on account (e.g. subscription product change or sales of accessories).",
+    "hardwareDeliveries": "Multiple hardware deliveries allow deliveries to multiple locations.",
+    "taskUrl": "Link to task for order manual handling.",
+    "orderTotal": "Sum of all one time fees, charges, and additional product one time price (like hardware price.",
+    "hardwareTotal": "Sum of hardware amount to be paid.",
+    "hardwareTotalUpfront": "Sum of hardware upfront amount (to be paid immediately).",
+    "productTotal": "Sum of product amount.",
+    "productTotalUpfront": "Sum of product upfront amount (to be paid immediately).",
+    "servicesRecurringTotal": "All services recurring prices.",
+    "paymentId": "Id of related payment entity in PaymentIntegrationLayer API.",
+    "documents": "Set of documents",
+    "contextId": "Context id to be used as header for NOOS Orders"
+  },
+  "OrderPatchRequests": {},
+  "OrderPatchRequest": {
+    "op": "Operation to do"
+  },
+  "SplitPaymentPatchRequest": {
+    "totalPaymentAmount": "Total payment amount",
+    "upfrontPaymentAmount": "The amount paid upfront"
+  },
+  "HomeOfficeOrderPatch": {
+    "employeeId": "Id of employee"
+  },
+  "ChangeActivationDateOrderPatch": {
+    "newActivationDate": "New activation date in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "PortingDetailsUpdate": {},
+  "Consent": {},
+  "PhysicalIdentification": {},
+  "OrderSource": {
+    "captureTimeStamp": "Date time with timezone according to ISO-8601. Timestamp of when the order has been completed or cancelled."
+  },
+  "CreditEvaluationDetails": {
+    "creditLimit": "Comes from credit check",
+    "creditClass": "Comes from credit check"
+  },
+  "OrderFlags": {
+    "orderConfirmed": "Whether the order is confirmed or approved.",
+    "termsAccepted": "If customer agrees with terms and conditions. Must be true :)",
+    "cprCheckFailed": "If the CPR check failed.",
+    "creditCheckFailed": "When the credit check failed.",
+    "needsConfirmation": "Customer shall confirm the order as sales agent made it on their behalf.",
+    "membershipCheck": "If there is any membership to be checked (voucher number or so)",
+    "dirty": "The order is missing mandatory information",
+    "doCommunication": "Shall the backend send communication",
+    "doLogistics": "Shall the backend send request for hardware shipment",
+    "posFlow": "Order has been created via new POS",
+    "homeOfficeOrder": "If order represents Home Office order",
+    "createDraftOrder": "If draft order should be created during shopping cart submission",
+    "manualSigning": "If order follows manual signing flow",
+    "simOnly": "If order is from Tango and has only SIM AdditionalProductItems",
+    "hasUpfrontPayment": "If order is from Tango and has at least one upfront payment on any HardwarePaymentItem",
+    "tfFinancingNeeded": "If order is from Tango and has at least one down payment on any HardwarePaymentItem",
+    "physicalIdPreidentified": "If order is from Tango and order was sold in shop",
+    "shopSales": "If order is from Tango and order was sold in external store",
+    "orderExpired": "If order is already expired.",
+    "newDivaFlow": "Go with the new DIVA flow.",
+    "isSubOrder": "If order is a sub order. Applies to return orders."
+  },
+  "HardwareDelivery": {
+    "id": "Unique identifier of hardware delivery.",
+    "deliveryMethod": "String identifier of delivery method.",
+    "dispatchDate": "Date time with timezone according to ISO-8601. Timestamp of when the hardware has been sent out from warehouse."
+  },
+  "Dealer": {
+    "dealerCode": "code of the dealer like '1018'.",
+    "dealerName": "name of the dealer like 'BtC Amager'.",
+    "salesAgentCode": "shall contain sales agent code (as handled by DealerAdmin), so far not used.",
+    "salesAgentName": "Name of the sales representative.",
+    "posDealerId": "id of the dealer in ODOO",
+    "posSalesAgentId": "id of the sales agent in ODOO"
+  },
+  "NotificationRecipient": {},
+  "PartyRole": {},
+  "Person": {
+    "birthday": "Birthday in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "Organization": {},
+  "Address": {
+    "coName": "Name of C/O (in care of) person.",
+    "attention": "Name of person (recipient). Mainly used for organization addresse where recipient is a specific person."
+  },
+  "DanishAddress": {
+    "streetName": "Street name (e.g. Karl Johans Gate)",
+    "streetNumber": "Street number (e.g. 20)",
+    "streetNumberSuffix": "Usually a letter right after the number (A in 10A, B in 15B)",
+    "floorNumber": "Floor number identifying the floor (e.g. 5)",
+    "doorNumber": "Door number identifying the door (e.g. 10)",
+    "direction": "like 'tv' (meaning 'til venstre' -> left)",
+    "locality": "for ex. V is the locality in COPENHAGEN V"
+  },
+  "UnstructuredAddress": {},
+  "InstallationAddress": {
+    "addressRefId": "This attribute is sent to LineInquiryAPI as DawaId. The field in LineInquiryAPI request for this is called addressId."
+  },
+  "TelephoneNumber": {
+    "countryCode": "country code like '45' for Denmark or '372' for Estonia",
+    "areaCode": "local area code",
+    "localNumber": "the actual phone number"
+  },
+  "ValidationError": {},
+  "ValidationErrorParameter": {},
+  "OrderPart": {
+    "references": "Used to refer to existing entities like account or subscription. When ordering new additionalProduct on subscription, place subscription identifier here.",
+    "changeTypes": "a Set of the types of changes contained in the orderpart",
+    "id": "Identifies the element in collection uniquely in whole order. Is assigned by OrderAPI.",
+    "channelOrderPartId": "Intended to identify the element uniquely in whole order. Can be assigned by external services.",
+    "splitOrderId": "Intended to identify the element uniquely in whole order. Is assigned by OrderAPI.",
+    "taskUrl": "Link to task for manual handling of the orderPart.",
+    "partTotal": "Sum of all one time fees, charges, and additional product one time price (like hardware price).",
+    "hardwareTotal": "Sum of hardware amount.",
+    "hardwareTotalUpfront": "Sum of hardware upfront amount (to be paid immediately).",
+    "productTotal": "Sum of product amount.",
+    "productTotalUpfront": "Sum of product upfront amount (to be paid immediately).",
+    "servicesRecurringTotal": "All services recurring prices.",
+    "hardwareRecurringTotal": "All hardware installment recurring payments per month."
+  },
+  "PortingDetailsItem": {
+    "networkOperatorId": "Id of a network operator where the number is currently registered. Also known as number owner.",
+    "poaDocumentUrl": "Location of document within Norlys domain.",
+    "digitalPoaAllowed": "Indicates whether electronic Power of Attorney can be used.",
+    "powerOfAttorneyManualHandling": "Indicates whether the POA shall be signed via manual flow.",
+    "earliestPortingDate": "date in format YYYY-MM-DD (according to ISO 8601).",
+    "portAfterCommitment": "true if customer wishes to be ported in after end of commitment at the current operator. Use instead of earliestPortingDate.",
+    "actualPortingDate": "The date at which the porting is planned. Date in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "OrderPartReference": {},
+  "OrderItem": {
+    "id": "Identifies the element uniquely in whole order. Is assigned by OrderAPI.",
+    "channelOrderItemId": "Intended to identify the element uniquely in whole order. Is assigned by the channel."
+  },
+  "AccountItem": {
+    "billingAccountNumber": "BAN assigned to newly created account during processing.",
+    "billingCycle": "interval of payments",
+    "delayOfPayment": "Delay of payment in days. 0 - 999 values applicable.",
+    "ean": "In case of OIO invoice type the EAN number must be given.",
+    "label": "Serves for naming the account.",
+    "upTransferChargeCode": "Code to define what is paid by the root ban and what is paid by the child ban.",
+    "category": "Category of the account",
+    "productGroup": "Currently home office or business internet, given in addInfo (cope order)"
+  },
+  "FeeItem": {
+    "feeType": "type of fee",
+    "billingCode": "Billing code",
+    "displayName": "Name of the fee",
+    "waived": "Information if the item has been left"
+  },
+  "TerminationItem": {
+    "effectiveDate": "Effective date in format YYYY-MM-DD (according to ISO 8601).",
+    "reasonCode": "Reason code of termination",
+    "retention": "Flag for subscription retention",
+    "waiveTerminationFees": "Flag indicating if fees connected to termination shall be waived.",
+    "shouldTransferToDifferentPool": "Flag indicating if the number should be transferred to a different pool after termination",
+    "shouldReReserve": "Flag indicating if the number should be re-reserved after termination"
+  },
+  "SuspensionItem": {
+    "reason": "Reason of suspension."
+  },
+  "ReactivationItem": {
+    "reason": "Reason of reactivation."
+  },
+  "DiscountItem": {
+    "discountCode": "Discount code as registered in Fokus",
+    "reason": "Reason for the discount"
+  },
+  "RegretItem": {
+    "effectiveDate": "Effective date in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "SubscriptionItem": {
+    "telephoneNumber": "Has to be present when creating a new subscription. When asking for change on an existing subscription put local telephone number to OrderPart reference.",
+    "productType": "Type of the new offering (priceplan). Present only if newOfferingCode is present. (priceplans.xlsx.productType)",
+    "offeringChangeType": "Offering change type. Only for output.",
+    "productCategory": "Can contain TOUCHPOINT.MASTER, TOUCHPOINT.AA AND so on.",
+    "isTransfer": "The subscription is to be transfered to account that has different legal owner than the previous account.",
+    "publishLevel": "publish level (also known as directory listing)",
+    "preferredActivationDate": "Date YYYY-MM-DD (according to ISO 8601) of when the subscription shall be activated.",
+    "realActivationDate": "Date YYYY-MM-DD (according to ISO 8601) of when the subscription was really activated.",
+    "productDeliveryAsap": "Replaces the preferred activation date with installation and activation as soon as possible.",
+    "label": "Label for additional info about subscription",
+    "effectiveMoveDate": "Date YYYY-MM-DD (according to ISO 8601) of when the subscription was really activated.",
+    "billingSystem": "Specifies the billing system on subscription going to NOOS"
+  },
+  "TimePeriod": {},
+  "Bank": {
+    "branch": "branch",
+    "accountNumber": "account number",
+    "name": "name of the bank"
+  },
+  "Offering": {
+    "priceplan": "Priceplan SOC code.",
+    "campaign": "Campaign SOC code.",
+    "discount": "Discount SOC code.",
+    "name": "Name of the whole offering that's to be displayed on web or documents.",
+    "bindingPeriod": "Type of the product (GSM, ...).",
+    "productOfferingId": "Id of the offering as provided by ProductCatalog."
+  },
+  "SubscriptionUser": {
+    "birthDate": "BirthDate in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "CallForwardingItem": {},
+  "ForwardingSetting": {
+    "targetNumber": "Where to forward calls. Parameter is mandatory if enabled is set to true."
+  },
+  "NoAnswerForwardingSetting": {
+    "targetNumber": "Where to forward calls. Parameter is mandatory if enabled is set to true.",
+    "delay": "Delay after which to forward the call. Parameter is mandatory if enabled is set to true."
+  },
+  "SerialNumber": {},
+  "CallWaitItem": {},
+  "AdditionalProductItem": {
+    "productCode": null,
+    "productName": null,
+    "productCategory": "The 'family' or group of additionalproducts. Can be null!",
+    "productCategories": "List of categories from product catalog",
+    "quantity": "quantity of ordered items."
+  },
+  "HardwareSwapItem": {
+    "shippingStatus": "Status of hardware shipping",
+    "oldSerialNumber": "Serial number of old hardware to swap"
+  },
+  "ShippingDetails": {
+    "toDeliverQuantity": "Quantity to deliver.",
+    "tsfOffering": "tsfOffering from ProductCatalog.",
+    "erpTsProduct": "erpTsProduct from ProductCatalog.",
+    "hardwareDeliveryId": "Id of delivery address.",
+    "userName": "UserName label for the piece of hardware",
+    "userId": "UserName label for the piece of hardware",
+    "department": "UserName label for the piece of hardware",
+    "shippingConfirmedDate": "date in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "ReturnDetails": {
+    "returnQuantity": "Quantity to return",
+    "creditInvoiceNumber": "Credit invoice number for returned hardware of this order.",
+    "creditInvoiceDate": "date in format YYYY-MM-DD (according to ISO 8601) when was the credit invoice issued."
+  },
+  "HardwareDetails": {
+    "materialId": "Id of material.",
+    "name": "Name of hardware.",
+    "serialNumbers": "Serial numbers.",
+    "packageType": "Type of package"
+  },
+  "SimDetails": {
+    "simType": "Type of sim card.",
+    "icc": "ICC.",
+    "imsi": "IMSI.",
+    "oldIcc": "Icc to be replaced",
+    "oldImsi": "IMSI to be replaced",
+    "eid": "new EID.",
+    "imei": "new IMEI.",
+    "bindDeviceName": "Name of the device to be binded.",
+    "waiveSimSwapFee": "Indicates whether to apply the sim swap fee."
+  },
+  "FixedNetDetails": {
+    "internalCircuitId": "Internal circuit id identifying the fixed line in Telia systems",
+    "diggingDistance": "Length of the distance from existing local line termination point to customer's premises.",
+    "providerReuseOfAddress": "Tells the provider that there is already a broadband connection, but it is not yours and you need to terminate it to create your own broadband connection.",
+    "providerAoCustomerRefNumber": "Reference number of customer within current provider.",
+    "currentProviderName": "Name of the current connectivity provider."
+  },
+  "OrderEventDetails": {},
+  "TechnicianDetails": {},
+  "FixedNetFlags": {
+    "providerChangeAccountNumberMissing": "AO reference number is required to be captured in order for State Event",
+    "customerRequestsChangeProvider": "When customer wants Telia to do change provider on behalf of customer.(SBBU)"
+  },
+  "NetworkConfiguration": {},
+  "IpConfiguration": {},
+  "ChargeItem": {
+    "chargeCode": "Charge code",
+    "description": "Charge description"
+  },
+  "ConsentItem": {
+    "consentId": "consent identifier",
+    "state": "Whether the consent is 'given', 'unconfirmed' or 'declined'."
+  },
+  "HardwarePaymentItem": {
+    "purchaseId": "id of purchase in PaymentAPI"
+  },
+  "DownPaymentPlan": {},
+  "Amount": {
+    "amount": "amount including VAT",
+    "vat": "VAT amount",
+    "catalogAmount": "original amount including VAT before applying any discount",
+    "catalogVat": "original VAT amount before applying any discount"
+  },
+  "Discount": {
+    "amount": "discount amount including VAT",
+    "vat": "discount VAT amount",
+    "percentage": "percentage discount",
+    "comment": "comment for discount",
+    "reason": "justification of applying discount"
+  },
+  "PaymentAmount": {
+    "amount": "amount including VAT",
+    "vat": "VAT amount",
+    "amountWithoutVat": "amount without VAT"
+  },
+  "PilPayment": {
+    "paymentId": "Id of related payment entity in PaymentIntegrationLayer API",
+    "updatedAt": "Date time with timezone according to ISO-8601",
+    "totalAmount": "Payed amount including VAT",
+    "totalVat": "Payed VAT amount",
+    "paymentRoundingError": "Difference between hardware total upfront amount and payed total amount"
+  },
+  "Document": {
+    "documentType": "Type of document, enum comes from DocumentAPI (located in components.schemas.Document.properties.type)",
+    "url": "URL the document is located at"
+  },
+  "CreditWatchItem": {
+    "amount": "Credit watch amount limit in DKK.",
+    "expirationDate": "Credit watch expiration date in format YYYY-MM-DD (according to ISO 8601)"
+  },
+  "SubscriptionOwnerControlItem": {
+    "nationalUsageAllowance": "NUA - Controls domestic TOP-UP purchase",
+    "roamingCostControl": "RCC - Controls limit settings for roaming",
+    "retailRoaming": "TSRR - Controls roaming TOP-UP purchase",
+    "unlimited": "Indicates whether the costLimit is actually unlimited.",
+    "costLimit": "The cost limit in DKK."
+  },
+  "AccountOwnerControlItem": {
+    "nationalUsageAllowance": "NUA - Controls domestic TOP-UP purchase",
+    "roamingCostControl": "RCC - Controls limit settings for roaming",
+    "retailRoaming": "TSRR - Controls roaming TOP-UP purchase",
+    "unlimited": "Indicates whether the costLimit is actually unlimited.",
+    "costLimit": "The cost limit in DKK."
+  },
+  "PaymentMethodChangeItem": {},
+  "PaymentMethodDetail": {},
+  "CardPaymentMethodDetail": {},
+  "MobilePaymentMethodDetail": {},
+  "PbsPaymentMethodDetail": {},
+  "CreditCard": {
+    "expirationDate": "Date in format YYYY-MM-DD (according to ISO 8601)."
+  },
+  "BankAccount": {},
+  "OrderApproval": {},
+  "MarketingConsents": {},
+  "ErrorResponse": {},
+  "ErrorContent": {},
+  "ErrorParameter": {}
+}
