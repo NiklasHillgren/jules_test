@@ -2813,11 +2813,17 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.DISCOUNT_ITEM);
         }
 
+        /**
+         * Discount code as registered in Fokus
+         */
         public DiscountItemBuilder withDiscountCode(String discountCode) {
             this.discountCode = discountCode;
             return this;
         }
 
+        /**
+         * Reason for the discount
+         */
         public DiscountItemBuilder withReason(String reason) {
             this.reason = reason;
             return this;
@@ -2860,16 +2866,25 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.FEE_ITEM);
         }
 
+        /**
+         * type of fee
+         */
         public FeeItemBuilder withFeeType(OrderClientDTOEnums.FeeItemFeeTypeEnum feeType) {
             this.feeType = feeType;
             return this;
         }
 
+        /**
+         * Billing code
+         */
         public FeeItemBuilder withBillingCode(String billingCode) {
             this.billingCode = billingCode;
             return this;
         }
 
+        /**
+         * Name of the fee
+         */
         public FeeItemBuilder withDisplayName(String displayName) {
             this.displayName = displayName;
             return this;
@@ -2880,6 +2895,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Information if the item has been left
+         */
         public FeeItemBuilder withFeeType(Boolean waived) {
             this.waived = waived;
             return this;
@@ -3272,11 +3290,17 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.ACCOUNT_ITEM);
         }
 
+        /**
+         * BAN assigned to newly created account during processing.
+         */
         public AccountItemBuilder withBillingAccountNumber(String billingAccountNumber) {
             this.billingAccountNumber = billingAccountNumber;
             return this;
         }
 
+        /**
+         * interval of payments
+         */
         public AccountItemBuilder withBillingCycle(OrderClientDTOEnums.AccountItemBillingCycleEnum billingCycle) {
             this.billingCycle = billingCycle;
             return this;
@@ -3287,6 +3311,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Delay of payment in days. 0 - 999 values applicable.
+         */
         public AccountItemBuilder withDelayOfPayment(Integer delayOfPayment) {
             this.delayOfPayment = delayOfPayment;
             return this;
@@ -3302,27 +3329,42 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * In case of OIO invoice type the EAN number must be given.
+         */
         public AccountItemBuilder withEan(String ean) {
             this.ean = ean;
             return this;
         }
 
+        /**
+         * Serves for naming the account.
+         */
         public AccountItemBuilder withLabel(String label) {
             this.label = label;
 
             return this;
         }
 
+        /**
+         * Code to define what is paid by the root ban and what is paid by the child ban.
+         */
         public AccountItemBuilder withUpTransferChargeCode(String upTransferChargeCode) {
             this.upTransferChargeCode = upTransferChargeCode;
             return this;
         }
 
+        /**
+         * Category of the account
+         */
         public AccountItemBuilder withCategory(OrderClientDTOEnums.AccountItemCategoryEnum category) {
             this.category = category;
             return this;
         }
 
+        /**
+         * Currently home office or business internet, given in addInfo (cope order)
+         */
         public AccountItemBuilder withProductGroup(String productGroup) {
             this.productGroup = productGroup;
             return this;
@@ -3778,6 +3820,9 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.REACTIVATION_ITEM);
         }
 
+        /**
+         * Reason of reactivation.
+         */
         public ReactivationItemBuilder withReason(String reason) {
             this.reason = reason;
             return this;
@@ -3813,6 +3858,9 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.REGRET_ITEM);
         }
 
+        /**
+         * Effective date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public RegretItemBuilder withEffectiveDate(Date effectiveDate) {
             this.effectiveDate = effectiveDate;
             return this;
@@ -3872,6 +3920,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Category of telephone number. For mobile it can be for instance SILVER.
+         */
         public SubscriptionItemBuilder withTelephoneNumberCategory(
             OrderClientDTOEnums.SubscriptionItemTelephoneNumberCategoryEnum telephoneNumberCategory
         ) {
@@ -3879,6 +3930,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Defines what directories the subscription is published in.
+         */
         public SubscriptionItemBuilder withPublishLevel(
             OrderClientDTOEnums.SubscriptionItemPublishLevelEnum publishLevel
         ) {
@@ -3891,6 +3945,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Product type.
+         */
         public SubscriptionItemBuilder withProductType(
             OrderClientDTOEnums.SubscriptionItemProductTypeEnum productType
         ) {
@@ -3898,6 +3955,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Type of change on the offering.
+         */
         public SubscriptionItemBuilder withOfferingChangeTypeEnum(
             OrderClientDTOEnums.SubscriptionItemOfferingChangeTypeEnum offeringChangeType
         ) {
@@ -3915,11 +3975,17 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Product category.
+         */
         public SubscriptionItemBuilder withProductCategory(String productCategory) {
             this.productCategory = productCategory;
             return this;
         }
 
+        /**
+         * If subscription is part of a transfer.
+         */
         public SubscriptionItemBuilder withTransfer(Boolean isTransfer) {
             this.isTransfer = isTransfer;
             return this;
@@ -3930,6 +3996,9 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Defines the billing system where the subscription shall be billed
+         */
         public SubscriptionItemBuilder withBillingSystem(
             OrderClientDTOEnums.SubscriptionItemBillingSystemEnum billingSystem
         ) {
@@ -3937,31 +4006,49 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Preferred date of activation. Date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public SubscriptionItemBuilder withPreferredActivationDate(Date preferredActivationDate) {
             this.preferredActivationDate = preferredActivationDate;
             return this;
         }
 
+        /**
+         * Real date of activation. Date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public SubscriptionItemBuilder withRealActivationDate(Date realActivationDate) {
             this.realActivationDate = realActivationDate;
             return this;
         }
 
+        /**
+         * Date when the subscription is moved. Date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public SubscriptionItemBuilder withEffectiveMoveDate(Date effectiveMoveDate) {
             this.effectiveMoveDate = effectiveMoveDate;
             return this;
         }
 
+        /**
+         * Name of subscription given by customer.
+         */
         public SubscriptionItemBuilder withLabel(String label) {
             this.label = label;
             return this;
         }
 
+        /**
+         * Indicates whether the number shall be secret.
+         */
         public SubscriptionItemBuilder withSecret(Boolean secret) {
             this.secret = secret;
             return this;
         }
 
+        /**
+         * Indicates if the product shall be delivered as soon as possible
+         */
         public SubscriptionItemBuilder withProductDeliveryAsap(Boolean productDeliveryAsap) {
             this.productDeliveryAsap = productDeliveryAsap;
             return this;
@@ -4052,6 +4139,9 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.SUSPENSION_ITEM);
         }
 
+        /**
+         * Reason of suspension.
+         */
         public SuspensionItemBuilder withReason(String reason) {
             this.reason = reason;
             return this;
@@ -4092,31 +4182,49 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.TERMINATION_ITEM);
         }
 
+        /**
+         * Effective date in format YYYY-MM-DD (according to ISO 8601).
+         */
         public TerminationItemBuilder withEffectiveDate(Date effectiveDate) {
             this.effectiveDate = effectiveDate;
             return this;
         }
 
+        /**
+         * Reason code of termination
+         */
         public TerminationItemBuilder withReasonCode(OrderClientDTOEnums.TerminationItemReasonCodeEnum reasonCode) {
             this.reasonCode = reasonCode;
             return this;
         }
 
+        /**
+         * Flag for subscription retention
+         */
         public TerminationItemBuilder withRetention(Boolean retention) {
             this.retention = retention;
             return this;
         }
 
+        /**
+         * Flag indicating if fees connected to termination shall be waived.
+         */
         public TerminationItemBuilder withWaiveTerminationFees(Boolean waiveTerminationFees) {
             this.waiveTerminationFees = waiveTerminationFees;
             return this;
         }
 
+        /**
+         * Flag indicating if the number should be transferred to a different pool after termination
+         */
         public TerminationItemBuilder withShouldTransferToDifferentPool(Boolean shouldTransferToDifferentPool) {
             this.shouldTransferToDifferentPool = shouldTransferToDifferentPool;
             return this;
         }
 
+        /**
+         * Flag indicating if the number should be re-reserved after termination
+         */
         public TerminationItemBuilder withShouldReReserve(Boolean shouldReReserve) {
             this.shouldReReserve = shouldReReserve;
             return this;
