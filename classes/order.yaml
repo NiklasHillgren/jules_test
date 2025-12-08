@@ -1,0 +1,3716 @@
+openapi: 3.0.3
+
+info:
+  description: |
+    Ordering Domain API. Versioning is done by media type (more on the topic https://opensource.zalando.com/restful-api-guidelines/#114)
+  version: "1.0.0-oas3"
+  title: Order API
+  contact:
+    email: michael.x.borek@teliacompany.com
+  license:
+    name: Telia.dk
+    url: 'http://www.telia.dk'
+tags:
+  - name: Order
+    description: Order placing and lookup
+
+paths:
+
+  '/customers/{id}/orders':
+    get:
+      tags:
+        - Order
+      summary: Returns orders for given customer ordered by creationDate
+      operationId: getOrdersByCustomerId
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+        - $ref: '#/components/parameters/from-QUERY'
+        - $ref: '#/components/parameters/to-QUERY'
+        - $ref: '#/components/parameters/limit-QUERY'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCollectionResponse'
+        '203':
+          description: Operation partially succeeded, one of the backend systems is down and the response may contain only subset of orders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCollectionResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          203:
+            statusCode: "203"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/customers/{id}/orders'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+          integration.request.querystring.from: method.request.querystring.from
+          integration.request.querystring.to: method.request.querystring.to
+          integration.request.querystring.limit: method.request.querystring.limit
+
+    post:
+      tags:
+        - Order
+      summary: Places order made by existing identified customer.
+      operationId: placeOrdersOfExistingCustomers
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+        - $ref: '#/components/parameters/brand-HEADER'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order Structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid Order Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        description: Order for change or new product
+        required: true
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 201
+          400:
+            statusCode: 400
+          422:
+            statusCode: 422
+          5\d{2}:
+            statusCode: 500
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/customers/{id}/orders'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+          integration.request.header.brand: method.request.header.brand
+
+  '/customers/{id}/orders/validate':
+    post:
+      tags:
+        - Order
+      summary: Endpoint for order validation, without submitting the actual order.
+      operationId: validateOrderOfExistingCustomer
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+        - $ref: '#/components/parameters/brand-HEADER'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order Structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid Order Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        description: Order for change or new product
+        required: true
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 200
+          400:
+            statusCode: 400
+          422:
+            statusCode: 422
+          5\d{2}:
+            statusCode: 500
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/customers/{id}/orders/validate'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+          integration.request.header.brand: method.request.header.brand
+
+  '/accounts/{id}/orders':
+    get:
+      tags:
+        - Order
+      summary: Returns orders for given ban ordered by creationDate
+      operationId: getOrdersByBan
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+        - $ref: '#/components/parameters/from-QUERY'
+        - $ref: '#/components/parameters/to-QUERY'
+        - $ref: '#/components/parameters/limit-QUERY'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCollectionResponse'
+        '203':
+          description: Operation partially succeeded, one of the backend systems is down and the response may contain only subset of orders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCollectionResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          203:
+            statusCode: "203"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/accounts/{id}/orders'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+          integration.request.querystring.from: method.request.querystring.from
+          integration.request.querystring.to: method.request.querystring.to
+          integration.request.querystring.limit: method.request.querystring.limit
+
+
+    post:
+      tags:
+        - Order
+      summary: Places order made by existing identified ban.
+      operationId: placeOrdersOfExistingCustomersByBan
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+        - $ref: '#/components/parameters/brand-HEADER'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order Structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid Order Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        description: Order for change or new product
+        required: true
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 201
+          400:
+            statusCode: 400
+          422:
+            statusCode: 422
+          5\d{2}:
+            statusCode: 500
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/accounts/{id}/orders'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+          integration.request.header.brand: method.request.header.brand
+
+  '/accounts/{id}/orders/validate':
+    post:
+      tags:
+        - Order
+      summary: Endpoint for order validation, without submitting the actual order.
+      operationId: validateOrderOfExistingCustomerByBan
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+        - $ref: '#/components/parameters/brand-HEADER'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order Structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid Order Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        description: Order for change or new product
+        required: true
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 200
+          400:
+            statusCode: 400
+          422:
+            statusCode: 422
+          5\d{2}:
+            statusCode: 500
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/accounts/{id}/orders/validate'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+          integration.request.header.brand: method.request.header.brand
+
+  '/orders':
+    get:
+      tags:
+        - Order
+      summary: Returns orders for given customer ordered by creationDate
+      operationId: searchForOrders
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/order-states-QUERY'
+        - $ref: '#/components/parameters/brands-QUERY'
+        - $ref: '#/components/parameters/ban-QUERY'
+        - $ref: '#/components/parameters/msisdn-QUERY'
+        - $ref: '#/components/parameters/subscription-id-QUERY'
+        - $ref: '#/components/parameters/credit-evaluation-id-QUERY'
+        - $ref: '#/components/parameters/receiver-email-QUERY'
+        - $ref: '#/components/parameters/cpr-QUERY'
+        - $ref: '#/components/parameters/from-QUERY'
+        - $ref: '#/components/parameters/to-QUERY'
+        - $ref: '#/components/parameters/limit-QUERY'
+        - $ref: '#/components/parameters/dealer-code-QUERY'
+        - $ref: '#/components/parameters/sales-agent-id-QUERY'
+        - $ref: '#/components/parameters/next-link-QUERY'
+        - $ref: '#/components/parameters/serial-number-QUERY'
+        - $ref: '#/components/parameters/cvr-QUERY'
+        - $ref: '#/components/parameters/circuit-id-QUERY'
+        - $ref: '#/components/parameters/channel-QUERY'
+        - $ref: '#/components/parameters/created-by-QUERY'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCollectionResponse'
+        '203':
+          description: Operation partially succeeded, one of the backend systems is down and the response may contain only subset of orders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCollectionResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          203:
+            statusCode: "203"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.querystring.order_states: method.request.querystring.order_states
+          integration.request.querystring.brands: method.request.querystring.brands
+          integration.request.querystring.from: method.request.querystring.from
+          integration.request.querystring.to: method.request.querystring.to
+          integration.request.querystring.limit: method.request.querystring.limit
+          integration.request.querystring.cpr: method.request.querystring.cpr
+          integration.request.querystring.ban: method.request.querystring.ban
+          integration.request.querystring.msisdn: method.request.querystring.msisdn
+          integration.request.querystring.subscription_id: method.request.querystring.subscription_id
+          integration.request.querystring.credit_evaluation_id: method.request.querystring.credit_evaluation_id
+          integration.request.querystring.receiver_email: method.request.querystring.receiver_email
+          integration.request.querystring.dealer_code: method.request.querystring.dealer_code
+          integration.request.querystring.sales_agent_id: method.request.querystring.sales_agent_id
+          integration.request.querystring.nextLink: method.request.querystring.nextLink
+          integration.request.querystring.serial_number: method.request.querystring.serial_number
+          integration.request.querystring.cvr: method.request.querystring.cvr
+          integration.request.querystring.circuit_id: method.request.querystring.circuit_id
+          integration.request.querystring.channel: method.request.querystring.channel
+          integration.request.querystring.createdBy: method.request.querystring.createdBy
+
+    post:
+      tags:
+        - Order
+      summary: Places order made by a new customer.
+      operationId: placeOrdersOfNewCustomers
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/brand-HEADER'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order Structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid Order Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        description: order for change or new product
+        required: true
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "201"
+          400:
+            statusCode: "400"
+          422:
+            statusCode: "422"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.header.brand: method.request.header.brand
+
+  '/orders/validate':
+    post:
+      tags:
+        - Order
+      summary: Endpoint for order validation, without submitting the actual order.
+      operationId: validateOrder
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/brand-HEADER'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order Structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid Order Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        description: Order for change or new product
+        required: true
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 200
+          400:
+            statusCode: 400
+          422:
+            statusCode: 422
+          5\d{2}:
+            statusCode: 500
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/validate'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.header.brand: method.request.header.brand
+
+  '/shoppingCart/{id}/submit':
+    post:
+      tags:
+        - Order
+      summary: Submit order in DRAFT processing status.
+      description: Submit order by OrderId which is in DRAFT status, and return it's result.
+      operationId: submitShoppingCart
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "201"
+          404:
+            statusCode: "404"
+          409:
+            statusCode: "409"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/shoppingCart/{id}/submit'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+
+  '/shoppingCart/{id}':
+    get:
+      tags:
+        - Order
+      summary: Get shopping cart order.
+      description: Get shopping cart order in DRAFT processing status.
+      operationId: getShoppingCartById
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/shoppingCart/{id}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+    put:
+      tags:
+        - Order
+      summary: Update shopping cart order.
+      description: Update shopping cart order in DRAFT processing status.
+      operationId: updateShoppingCartById
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: PUT
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/shoppingCart/{id}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+    patch:
+      tags:
+        - Order
+      summary: Patches shopping cart order
+      operationId: patchExistingShoppingCartOrder
+      parameters:
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Shopping cart not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderPatchRequests'
+          application/split-payment-patch-request+json:
+            schema:
+              $ref: '#/components/schemas/SplitPaymentPatchRequest'
+        required: true
+        description: Order carrying fields to patch. Patching of mime-type merge-patch+json follows https://tools.ietf.org/html/rfc7396
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          400:
+            statusCode: "400"
+          404:
+            statusCode: "404"
+        type: http
+        httpMethod: PATCH
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/shoppingCart/{id}'
+        requestParameters:
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+
+  '/shoppingCart':
+    post:
+      tags:
+        - Order
+      summary: Create shopping cart order.
+      description: Create shopping cart order and return result.
+      operationId: createShoppingCart
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/shoppingCart'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+
+  '/orders/{id}':
+    get:
+      tags:
+        - Order
+      summary: Find order by ID
+      description: Whole order identified by order id will be returned.
+      operationId: getOrderById
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/{id}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+
+    patch:
+      tags:
+        - Order
+      summary: Patches presented order fields of existing order. If successful, returns the patched fragments.
+      operationId: patchExistingOrder
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/brand-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/merge-patch+json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+          application/vnd.telia.dk.HomeOfficeOrderPatch-v1.0+json:
+            schema:
+              $ref: '#/components/schemas/HomeOfficeOrderPatch'
+          application/vnd.telia.dk.broadbandorderpatch-v1.0+json:
+            schema:
+              $ref: '#/components/schemas/ChangeActivationDateOrderPatch'
+          application/vnd.telia.dk.hardwarepaymentconfigurationpatch-v1.0+json:
+            schema:
+              $ref: '#/components/schemas/HardwarePaymentConfigurationPatch'
+          application/vnd.telia.dk.orderadditionalinfopatch-v1.0+json:
+            schema:
+              $ref: '#/components/schemas/OrderAdditionalInfoPatch'
+        required: true
+        description: Order carrying fields to patch. Patching of mime-type merge-patch+json follows https://tools.ietf.org/html/rfc7396
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          400:
+            statusCode: "400"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: PATCH
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/{id}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.header.brand: method.request.header.brand
+          integration.request.path.id: method.request.path.id
+
+    put:
+      tags:
+        - Order
+      summary: Replaces existing order in COPE.
+      operationId: replaceExistingOrder
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/brand-HEADER'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderV1_0'
+        required: true
+        description: Order to replace the existing one.
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          400:
+            statusCode: "400"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: PUT
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/{id}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.header.brand: method.request.header.brand
+          integration.request.path.id: method.request.path.id
+
+  '/orders/guid/{guid}':
+    get:
+      tags:
+        - Order
+      summary: Find order by GUID
+      description: Whole order identified by order guid will be returned.
+      operationId: getOrderByGuid
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/guid-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/guid/{guid}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.guid: method.request.path.guid
+
+  '/orders/{id}/porting-details':
+    patch:
+      tags:
+        - Order
+      summary: Updates porting details of the specified order
+      operationId: updatePortingDetails
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/vnd.telia.dk.PortingDetailsUpdate-v1.0+json:
+            schema:
+              $ref: '#/components/schemas/PortingDetailsUpdate'
+        required: true
+        description: Order for which to update porting details
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          400:
+            statusCode: "400"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: PATCH
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/{id}/porting-details'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+
+  '/orders/{id}/approve':
+    post:
+      tags:
+        - Order
+      summary: Approve order.
+      description: Approves order in OrderManager. Whole order identified by order id will be returned.
+      operationId: approveOrderById
+      parameters:
+        - $ref: '#/components/parameters/x-correlation-id-HEADER'
+        - $ref: '#/components/parameters/x-application-id-HEADER'
+        - $ref: '#/components/parameters/application-id-QUERY'
+        - $ref: '#/components/parameters/id-PATH'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order not found
+          content: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderApproval'
+        required: true
+        description: Details of order approval.
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+          5\d{2}:
+            statusCode: "500"
+        type: http
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: '${stageVariables.vpcLinkId}'
+        uri: 'http://${stageVariables.networkLoadbalancer}:9250/api/orders/{id}'
+        requestParameters:
+          integration.request.header.x-correlation-id: method.request.header.x-correlation-id
+          integration.request.header.x-application-id: method.request.header.x-application-id
+          integration.request.path.id: method.request.path.id
+
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+
+components:
+  parameters:
+    x-correlation-id-HEADER:
+      name: x-correlation-id
+      in: header
+      description: Client should provide this tracing header, otherwise it will be created internally
+      required: false
+      schema:
+        type: string
+    x-application-id-HEADER:
+      name: x-application-id
+      in: header
+      description: Client should provide this application-id header to track what application has issued the particular request and adapt the server business logic.
+      required: false
+      schema:
+        $ref: '#/components/schemas/ApplicationId'
+    brand-HEADER:
+      in: header
+      name: brand
+      description: brand identifier
+      schema:
+        $ref: '#/components/schemas/Brand'
+    id-PATH:
+      in: path
+      name: id
+      description: id of accessed resource
+      required: true
+      schema:
+        type: string
+    guid-PATH:
+      in: path
+      name: guid
+      description: GUID of an order
+      required: true
+      schema:
+        type: string
+    application-id-QUERY:
+      name: application_id
+      in: query
+      description: Client should provide this application-id header to track what application has issued the particular request and adapt the server business logic.
+      required: false
+      schema:
+        $ref: '#/components/schemas/ApplicationId'
+    brands-QUERY:
+      in: query
+      name: brands
+      description: comma separated list of brands
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/Brand'
+    receiver-email-QUERY:
+      in: query
+      name: receiver_email
+      description: email address of receiver of handover orders
+      schema:
+        type: string
+    cpr-QUERY:
+      in: query
+      name: cpr
+      description: CPR of the physical person
+      required: true
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 10
+    ban-QUERY:
+      in: query
+      name: ban
+      description: Billing Account Number
+      schema:
+        type: string
+        minLength: 7
+        maxLength: 12
+    msisdn-QUERY:
+      in: query
+      name: msisdn
+      description: msisdn
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 10
+    subscription-id-QUERY:
+      in: query
+      name: subscription_id
+      description: subscription id
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 11
+    credit-evaluation-id-QUERY:
+      in: query
+      name: credit_evaluation_id
+      description: Credit evaluation id
+      schema:
+        type: string
+    order-states-QUERY:
+      in: query
+      name: order_states
+      description: comma separated list of order processing statuses
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/ProcessingStatus'
+    from-QUERY:
+      in: query
+      name: from
+      schema:
+        type: string
+        format: date-time
+        description: specifies lowest order creation date filter
+    to-QUERY:
+      in: query
+      name: to
+      schema:
+        type: string
+        format: date-time
+        description: specifies highest order creation date filter
+    limit-QUERY:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        description: The numbers of items to return
+    dealer-code-QUERY:
+      in: query
+      name: dealer_code
+      schema:
+        type: string
+        description: Dealer code
+    sales-agent-id-QUERY:
+      in: query
+      name: sales_agent_id
+      schema:
+        type: string
+        description: Sales agent ID
+    next-link-QUERY:
+      in: query
+      name: nextLink
+      schema:
+        type: string
+        description: next link param
+    serial-number-QUERY:
+      in: query
+      name: serial_number
+      schema:
+        type: string
+        description: Serial number
+    cvr-QUERY:
+      in: query
+      name: cvr
+      schema:
+        type: string
+        description: cvr
+    circuit-id-QUERY:
+      in: query
+      name: circuit_id
+      schema:
+        type: string
+        description: circuit id
+    channel-QUERY:
+      in: query
+      name: channel
+      schema:
+        type: string
+        description: channel identifier
+    created-by-QUERY:
+      in: query
+      name: createdBy
+      schema:
+        type: string
+        description: Email or other identifier of customer or person who created the order.
+
+  schemas:
+
+    ProcessingStatus:
+      type: string
+      description: Status of whole order (calculated from orderItems)
+      enum:
+        - RECEIVED
+        - SUBMITTED
+        - PROCESSING
+        - FAILED
+        - CANCELLED
+        - COMPLETED
+        - DRAFT
+
+    Brand:
+      type: string
+      description: list of brands
+      enum:
+        - teliadk
+        - callme
+        - mittele
+
+    ApplicationId:
+      type: string
+      description: list of application ids
+      enum:
+        - document-api
+        - DIVA
+        - POINT_OF_SALES
+        - ENTERPRISE_SELF_SERVICE
+        - DK-RPA-BluePrism
+        - SIMPLE_QUEUE_SERVICE
+
+    OrderResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OrderV1_0'
+
+    OrderCollectionResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderV1_0'
+        pageSize:
+          type: integer
+        nextLink:
+          type: string
+          description: Link to the next page of orders.
+
+    OrderV1_0:
+      type: object
+      required:
+        - dealer
+        - segment
+        - channel
+        - orderParts
+      properties:
+        id:
+          type: string
+          description: Id from internal order database, is numeric value and starting from 10000.
+          readOnly: true
+        orderId:
+          type: string
+          description: Can be BPM orderID like 'BPMT0153200309110744' or just Order Id from OrderManager '99089093'.
+          readOnly: true
+        parentOrderId:
+          type: string
+          description: Parent order id if this order is a return of another order.
+        channelOrderReference:
+          type: string
+          description: order identified made by channel.
+        implementationCaseId:
+          type: string
+          description: Implementation case Id coming from SalesForce channel.
+        bpmOrderId:
+          type: string
+          description: Bpm order id returned from CoPE services.
+        noosOrderId:
+          type: string
+          description: NOOS order id.
+        mitIdVerificationToken:
+          type: string
+          description: Token used for verification of the identity of the person making the order.
+        batchId:
+          type: string
+          description: Identifier of the batch the order is being processed in.
+        brand:
+          $ref: '#/components/schemas/Brand'
+          description: must be entered in the 'brand' header and is then placed on the order.
+          readOnly: true
+        channel:
+          type: string
+          description: Identifying what channel the order is made in, e.g. SALES_FORCE, TANGO, SELF_SERVICE ...
+        dealer:
+          $ref: '#/components/schemas/Dealer'
+        segment:
+          type: string
+          enum:
+            - B2C
+            - B2B
+        createdDate:
+          type: string
+          format: date-time
+          description: Date time with timezone according to ISO-8601.
+          readOnly: true
+        completedDate:
+          type: string
+          format: date-time
+          description: Date time with timezone according to ISO-8601. Timestamp of when the order has been completed or cancelled.
+          readOnly: true
+        createdBy:
+          type: string
+          description: 'Identifier of the person making this order.'
+        processingStatus:
+          $ref: '#/components/schemas/ProcessingStatus'
+          readOnly: true
+        processingStatusDetail:
+          type: string
+          readOnly: true
+        creditEvaluationDetails:
+          $ref: '#/components/schemas/CreditEvaluationDetails'
+        notificationRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationRecipient'
+        validationErrors:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        hasValidationErrors:
+          type: boolean
+          readOnly: true
+        flags:
+          $ref: '#/components/schemas/OrderFlags'
+        orderer:
+          $ref: '#/components/schemas/PartyRole'
+        orderParts:
+          type: array
+          description: The order can have multiple order parts not requiring to be on account (e.g. subscription product change or sales of accessories).
+          items:
+            $ref: '#/components/schemas/OrderPart'
+        hardwareDeliveries:
+          type: array
+          description: Multiple hardware deliveries allow deliveries to multiple locations.
+          items:
+            $ref: '#/components/schemas/HardwareDelivery'
+        taskUrl:
+          type: string
+          readOnly: true
+          description: Link to task for order manual handling.
+        orderTotal:
+          $ref: '#/components/schemas/Amount'
+          description: Sum of all one time fees, charges, and additional product one time price (like hardware price.
+        orderMinimumPrice:
+          $ref: '#/components/schemas/Amount'
+        hardwareTotal:
+          $ref: '#/components/schemas/Amount'
+          description: Sum of hardware amount to be paid.
+          deprecated: true
+        hardwareTotalUpfront:
+          $ref: '#/components/schemas/PaymentAmount'
+          description: Sum of hardware upfront amount (to be paid immediately).
+          deprecated: true
+        productTotal:
+          $ref: '#/components/schemas/Amount'
+          description: Sum of product amount.
+        productTotalUpfront:
+          $ref: '#/components/schemas/PaymentAmount'
+          description: Sum of product upfront amount (to be paid immediately).
+        servicesRecurringTotal:
+          $ref: '#/components/schemas/Amount'
+          description: All services recurring prices.
+        orderSource:
+          $ref: '#/components/schemas/OrderSource'
+        confirmationUrl:
+          type: string
+        documentsUrl:
+          type: string
+        paymentId:
+          type: string
+          description: Id of related payment entity in PaymentIntegrationLayer API.
+        payment:
+          $ref: '#/components/schemas/PilPayment'
+        documents:
+          type: array
+          description: Set of documents
+          items:
+            $ref: '#/components/schemas/Document'
+        consents:
+          $ref: '#/components/schemas/MarketingConsents'
+        contextId:
+          type: integer
+          description: Context id to be used as header for NOOS Orders
+
+    OrderPatchRequests:
+      type: array
+      description: List of OrderPatchRequests
+      items:
+        $ref: '#/components/schemas/OrderPatchRequest'
+
+    OrderPatchRequest:
+      type: object
+      properties:
+        op:
+          type: string
+          description: Operation to do
+          enum:
+            - add
+            - remove
+            - replace
+            - move
+            - copy
+        path:
+          type: string
+        value:
+          type: object
+        from:
+          type: string
+
+    SplitPaymentPatchRequest:
+      type: object
+      properties:
+        totalPaymentAmount:
+          description: Total payment amount
+          $ref: '#/components/schemas/PaymentAmount'
+          required: true
+        upfrontPaymentAmount:
+          description: The amount paid upfront
+          $ref: '#/components/schemas/PaymentAmount'
+        downPaymentAmount:
+          description:
+          $ref: '#/components/schemas/PaymentAmount'
+        numberOfInstallments:
+          type: number
+
+    HomeOfficeOrderPatch:
+      type: object
+      properties:
+        legalParty:
+          $ref: '#/components/schemas/Person'
+        billingParty:
+          $ref: '#/components/schemas/Person'
+        installationAddress:
+          $ref: '#/components/schemas/InstallationAddress'
+        recipientParty:
+          $ref: '#/components/schemas/Person'
+        vendor:
+          type: string
+        employeeId:
+          type: string
+          description: Id of employee
+
+    ChangeActivationDateOrderPatch:
+      type: object
+      required:
+        - teliaCircuitId
+        - newActivationDate
+      properties:
+        teliaCircuitId:
+          type: string
+        newActivationDate:
+          type: string
+          format: date
+          description: New activation date in format YYYY-MM-DD (according to ISO 8601).
+
+    PaymentType:
+      type: string
+      enum:
+        - EXTERNAL_PAYMENT_SERVICE
+        - INVOICE
+        - SHOP
+
+    HardwarePaymentConfigurationPatch:
+      type: object
+      properties:
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+        totalPayment:
+          $ref: '#/components/schemas/PaymentAmount'
+        upfrontPayment:
+          $ref: '#/components/schemas/PaymentAmount'
+        downPayment:
+          $ref: '#/components/schemas/PaymentAmount'
+        discount:
+          $ref: '#/components/schemas/Discount'
+        numberOfInstallments:
+            type: number
+
+    OrderAdditionalInfoPatch:
+      type: object
+      properties:
+        orderMemo:
+            type: string
+
+    PortingDetailsUpdate:
+      type: object
+      required:
+        - telephoneNumber
+      properties:
+        telephoneNumber:
+          $ref: '#/components/schemas/TelephoneNumber'
+        donorSimNumber:
+          type: string
+        donorConsent:
+          $ref: '#/components/schemas/Consent'
+        portingProcessConditionsConsent:
+          $ref: '#/components/schemas/Consent'
+
+    Consent:
+      type: object
+      properties:
+        writtenConsentGiven:
+          type: boolean
+          default: false
+        consentById:
+          $ref: '#/components/schemas/PhysicalIdentification'
+
+    PhysicalIdentification:
+      required:
+        - type
+        - value
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+
+    OrderSource:
+      type: object
+      properties:
+        ipAddress:
+          type: string
+        port:
+          type: number
+          format: int32
+        captureTimeStamp:
+          type: string
+          format: date-time
+          description: Date time with timezone according to ISO-8601. Timestamp of when the order has been completed or cancelled.
+
+
+    CreditEvaluationDetails:
+      type: object
+      description: Details of credit evaluation, so that it can be retried.
+      properties:
+        employmentType:
+          type: string
+          enum:
+            - EMPLOYEE
+            - HOMEMAKERS
+            - RETIRED
+            - SELF_EMPLOYED
+            - STUDENT
+            - UNEMPLOYED
+            - OTHER
+            - UNKNOWN
+        residentialStatus:
+          type: string
+          enum:
+            - COOPERATIVE
+            - CONDOMINIUM
+            - LIVING_HOME
+            - RENTING
+            - OTHER
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        creditLimit:
+          type: number
+          format: decimal
+          description: Comes from credit check
+        creditClass:
+          type: string
+          description: Comes from credit check
+
+    OrderFlags:
+      type: object
+      description: Container for various order related flags.
+      properties:
+        orderConfirmed:
+          type: boolean
+          description: Whether the order is confirmed or approved.
+        termsAccepted:
+          type: boolean
+          description: If customer agrees with terms and conditions. Must be true :)
+        cprCheckFailed:
+          type: boolean
+          description: If the CPR check failed.
+        creditCheckFailed:
+          type: boolean
+          description: When the credit check failed.
+        needsConfirmation:
+          type: boolean
+          description: Customer shall confirm the order as sales agent made it on their behalf.
+        membershipCheck:
+          type: boolean
+          description: If there is any membership to be checked (voucher number or so)
+        dirty:
+          type: boolean
+          description: The order is missing mandatory information
+        doCommunication:
+          type: boolean
+          description: Shall the backend send communication
+        doLogistics:
+          type: boolean
+          description: Shall the backend send request for hardware shipment
+        addCharge:
+          type: boolean
+        posFlow:
+          type: boolean
+          description: Order has been created via new POS
+        homeOfficeOrder:
+          type: boolean
+          description: If order represents Home Office order
+        createDraftOrder:
+          type: boolean
+          description: If draft order should be created during shopping cart submission
+        manualSigning:
+          type: boolean
+          description: If order follows manual signing flow
+        simOnly:
+          type: boolean
+          description: If order is from Tango and has only SIM AdditionalProductItems
+        hasUpfrontPayment:
+          type: boolean
+          description: If order is from Tango and has at least one upfront payment on any HardwarePaymentItem
+        tfFinancingNeeded:
+          type: boolean
+          description: If order is from Tango and has at least one down payment on any HardwarePaymentItem
+        physicalIdPreidentified:
+          type: boolean
+          description: If order is from Tango and order was sold in shop
+        shopSales:
+          type: boolean
+          description: If order is from Tango and order was sold in external store
+        orderExpired:
+          type: boolean
+          description: If order is already expired.
+        newDivaFlow:
+          type: boolean
+          description: Go with the new DIVA flow.
+        isSubOrder:
+          type: boolean
+          description: If order is a sub order. Applies to return orders.
+
+    HardwareDelivery:
+      type: object
+      description: Specifies delivery details for related hardware items on the order.
+      required:
+        - id
+        - recipientParty
+        - deliveryPrice
+        - deliveryMethod
+        - preferredContactMethod
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of hardware delivery.
+        recipientParty:
+          $ref: '#/components/schemas/PartyRole'
+        billingParty:
+          $ref: '#/components/schemas/PartyRole'
+        deliveryMethod:
+          type: string
+          description: String identifier of delivery method.
+        deliveryPrice:
+          $ref: '#/components/schemas/Amount'
+        preferredContactMethod:
+          type: string
+          enum:
+            - PHONE
+            - EMAIL
+        dispatchDate:
+          type: string
+          format: date-time
+          description: Date time with timezone according to ISO-8601. Timestamp of when the hardware has been sent out from warehouse.
+          readOnly: true
+        prefferedSendDate:
+          type: string
+          format: date-time
+
+
+    Dealer:
+      type: object
+      description: the dealer organization that made the order
+      required:
+        - dealerCode
+      properties:
+        dealerCode:
+          type: string
+          description: code of the dealer like '1018'.
+        dealerName:
+          type: string
+          readOnly: true
+          description: name of the dealer like 'BtC Amager'.
+        salesAgentCode:
+          type: string
+          description: shall contain sales agent code (as handled by DealerAdmin), so far not used.
+        salesAgentName:
+          type: string
+          readOnly: true
+          description: Name of the sales representative.
+        posDealerId:
+          type: string
+          description: id of the dealer in ODOO
+        posSalesAgentId:
+          type: string
+          description: id of the sales agent in ODOO
+
+    NotificationRecipient:
+      type: object
+      description: Recipients registered here should be notified upon event that interests given role. So far used only to return recipients on NEO orders.
+      required:
+        - role
+      properties:
+        role:
+          type: string
+          enum:
+            - CUSTOMER
+            - SALES_AGENT
+            - SALES_MANAGER
+            - EXTERNAL_SHIPPING_PARTNER
+        email:
+          type: string
+        telephoneNumber:
+          type: string
+
+    PartyRole:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          PERSON: '#/components/schemas/Person'
+          ORGANIZATION: '#/components/schemas/Organization'
+      required:
+        - type
+      properties:
+        type:
+          type: string
+        email:
+          type: string
+          minLength: 5
+        customerId:
+          type: string
+        telephoneNumber:
+          $ref: '#/components/schemas/TelephoneNumber'
+        address:
+          $ref: '#/components/schemas/Address'
+
+    Person:
+      allOf:
+        - $ref: '#/components/schemas/PartyRole'
+      type: object
+      required:
+        - firstName
+        - lastName
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthday:
+          type: string
+          format: date
+          description: Birthday in format YYYY-MM-DD (according to ISO 8601).
+        cpr:
+          type: string
+          minLength: 10
+          maxLength: 10
+
+    Organization:
+      allOf:
+        - $ref: '#/components/schemas/PartyRole'
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        additionalName:
+          type: string
+        cvr:
+          type: string
+          minLength: 8
+          maxLength: 8
+
+    Address:
+      type: object
+      description: Parent for all addresses
+      discriminator:
+        propertyName: type
+        mapping:
+          DANISH_ADDRESS: '#/components/schemas/DanishAddress'
+          UNSTRUCTURED_ADDRESS: '#/components/schemas/UnstructuredAddress'
+      required:
+        - type
+        - city
+        - zipCode
+        - country
+      properties:
+        type:
+          type: string
+          enum:
+            - DANISH_ADDRESS
+            - UNSTRUCTURED_ADDRESS
+        city:
+          type: string
+        zipCode:
+          type: string
+        country:
+          type: string
+        coName:
+          type: string
+          description: Name of C/O (in care of) person.
+        attention:
+          type: string
+          description: Name of person (recipient). Mainly used for organization addresse where recipient is a specific person.
+
+    DanishAddress:
+      allOf:
+        - $ref: '#/components/schemas/Address'
+      type: object
+      description: more info to be found here [http://www.bitboost.com/ref/international-address-formats/denmark/]
+      required:
+        - streetName
+        - streetNumber
+      properties:
+        streetName:
+          type: string
+          description: Street name (e.g. Karl Johans Gate)
+        streetNumber:
+          type: string
+          description: "Street number (e.g. 20)"
+        streetNumberSuffix:
+          type: string
+          description: "Usually a letter right after the number (A in 10A, B in 15B)"
+        floorNumber:
+          type: string
+          description: "Floor number identifying the floor (e.g. 5)"
+        doorNumber:
+          type: string
+          description: "Door number identifying the door (e.g. 10)"
+        direction:
+          type: string
+          description: like 'tv' (meaning 'til venstre' -> left)
+        locality:
+          type: string
+          description: for ex. V is the locality in COPENHAGEN V
+
+    UnstructuredAddress:
+      allOf:
+        - $ref: '#/components/schemas/Address'
+      type: object
+      required:
+        - address1
+      properties:
+        address1:
+          type: string
+        address2:
+          type: string
+        address3:
+          type: string
+
+    InstallationAddress:
+      type: object
+      description: Installation address of device, fixed line and so on.
+      required:
+        - postalAddress
+      properties:
+        postalAddress:
+          $ref: '#/components/schemas/Address'
+        streetCode:
+          type: string
+        municipalityCode:
+          type: string
+        siteId:
+          type: string
+        kvh:
+          type: string
+        kvhx:
+          type: string
+        addressRefId:
+          type: string
+          description: This attribute is sent to LineInquiryAPI as DawaId. The field in LineInquiryAPI request for this is called addressId.
+
+    TelephoneNumber:
+      type: object
+      description: Telephone number with it's details.
+      required:
+        - countryCode
+        - localNumber
+      properties:
+        countryCode:
+          type: string
+          description: country code like '45' for Denmark or '372' for Estonia
+        areaCode:
+          type: string
+          description: local area code
+        localNumber:
+          type: string
+          description: the actual phone number
+
+
+    ValidationError:
+      type: object
+      description: Validation errors related to OrderPart or OrderItem are placed here.
+      required:
+        - errorCode
+      properties:
+        errorCode:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationErrorParameter'
+
+    ValidationErrorParameter:
+      type: object
+      required:
+        - target
+      properties:
+        target:
+          type: string
+        reason:
+          type: string
+
+    OrderPart:
+      type: object
+      description: Order Part - container for LineItems belonging together
+      required:
+        - type
+        - activity
+      properties:
+        references:
+          type: array
+          description: Used to refer to existing entities like account or subscription. When ordering new additionalProduct on subscription, place subscription identifier here.
+          items:
+            $ref: '#/components/schemas/OrderPartReference'
+        type:
+          type: string
+          enum:
+            - ACCOUNT
+            - SUBSCRIPTION
+            - HARDWARE
+        activity:
+          type: string
+          enum:
+            - CREATE
+            - CHANGE
+            - TERMINATE
+            - SUSPEND
+            - REACTIVATE
+        changeTypes:
+          type: array
+          description: a Set of the types of changes contained in the orderpart
+          items:
+            type: string
+            enum:
+              - PRICEPLAN
+              - HANDOVER
+              - CALL_FORWARDING
+              - SIMCARD
+              - ADDITIONAL_PRODUCTS
+          readOnly: true
+        processingStatus:
+          $ref: '#/components/schemas/ProcessingStatus'
+        processingStatusDetail:
+          type: string
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        orderParts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderPart'
+        validationErrors:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        id:
+          type: integer
+          description: Identifies the element in collection uniquely in whole order. Is assigned by OrderAPI.
+          readOnly: true
+        channelOrderPartId:
+          type: string
+          description: Intended to identify the element uniquely in whole order. Can be assigned by external services.
+          readOnly: false
+        splitOrderId:
+          type: string
+          description: Intended to identify the element uniquely in whole order. Is assigned by OrderAPI.
+          readOnly: true
+        taskUrl:
+          type: string
+          description: Link to task for manual handling of the orderPart.
+          readOnly: true
+        partTotal:
+          $ref: '#/components/schemas/Amount'
+          description: Sum of all one time fees, charges, and additional product one time price (like hardware price).
+        hardwareTotal:
+          $ref: '#/components/schemas/Amount'
+          description: Sum of hardware amount.
+          deprecated: true
+        hardwareTotalUpfront:
+          $ref: '#/components/schemas/PaymentAmount'
+          description: Sum of hardware upfront amount (to be paid immediately).
+          deprecated: true
+        productTotal:
+          $ref: '#/components/schemas/Amount'
+          description: Sum of product amount.
+        productTotalUpfront:
+          $ref: '#/components/schemas/PaymentAmount'
+          description: Sum of product upfront amount (to be paid immediately).
+        servicesRecurringTotal:
+          $ref: '#/components/schemas/Amount'
+          description: All services recurring prices.
+        hardwareRecurringTotal:
+          $ref: '#/components/schemas/PaymentAmount'
+          description: All hardware installment recurring payments per month.
+
+
+    PortingDetailsItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Details about porting
+      properties:
+        networkOperatorId:
+          type: string
+          description: Id of a network operator where the number is currently registered. Also known as number owner.
+        donorSimNumber:
+          type: string
+          description:
+        poaDocumentUrl:
+          type: string
+          description: Location of document within Norlys domain.
+        poaDocumentId:
+          type: string
+        digitalPoaAllowed:
+          type: boolean
+          description: Indicates whether electronic Power of Attorney can be used.
+        powerOfAttorneyManualHandling:
+          type: boolean
+          description: Indicates whether the POA shall be signed via manual flow.
+        earliestPortingDate:
+          type: string
+          format: date
+          description: date in format YYYY-MM-DD (according to ISO 8601).
+        portAfterCommitment:
+          type: boolean
+          description: true if customer wishes to be ported in after end of commitment at the current operator. Use instead of earliestPortingDate.
+        actualPortingDate:
+          type: string
+          format: date
+          readOnly: true
+          description: The date at which the porting is planned. Date in format YYYY-MM-DD (according to ISO 8601).
+        donorConsent:
+          $ref: '#/components/schemas/Consent'
+        portingProcessConditionsConsent:
+          $ref: '#/components/schemas/Consent'
+
+    OrderPartReference:
+      type: object
+      description: References of this OrderPart to existing entities. SUBSCRIPTION_TELEPHONE_NUMBER must be a local phone number (8 digits).
+      required:
+        - type
+        - value
+      properties:
+        type:
+          type: string
+          enum:
+            - SUBSCRIPTION_TELEPHONE_NUMBER
+            - SUBSCRIPTION_ID
+            - BILLING_ACCOUNT_NUMBER
+            - INTERNAL_CIRCUIT_ID
+            - DOCUMENT_ID
+            - DST_ORDER_ID
+            - ORIGINAL_ORDER_ID
+        value:
+          type: string
+
+    OrderItem:
+      type: object
+      description: Parent for all orderItems
+      discriminator:
+        propertyName: type
+        mapping:
+          ACCOUNT_ITEM: '#/components/schemas/AccountItem'
+          SUBSCRIPTION_ITEM: '#/components/schemas/SubscriptionItem'
+          ADDITIONAL_PRODUCT_ITEM: '#/components/schemas/AdditionalProductItem'
+          HARDWARE_SWAP_ITEM: '#/components/schemas/HardwareSwapItem'
+          HARDWARE_PAYMENT_ITEM: '#/components/schemas/HardwarePaymentItem'
+          FEE_ITEM: '#/components/schemas/FeeItem'
+          PORTING_DETAILS_ITEM: '#/components/schemas/PortingDetailsItem'
+          CALL_FORWARDING_ITEM: '#/components/schemas/CallForwardingItem'
+          CALL_WAIT_ITEM: '#/components/schemas/CallWaitItem'
+          TERMINATION_ITEM: '#/components/schemas/TerminationItem'
+          CHARGE_ITEM: '#/components/schemas/ChargeItem'
+          CONSENT_ITEM: '#/components/schemas/ConsentItem'
+          REACTIVATION_ITEM: '#/components/schemas/ReactivationItem'
+          SUSPENSION_ITEM: '#/components/schemas/SuspensionItem'
+          DISCOUNT_ITEM: '#/components/schemas/DiscountItem'
+          REGRET_ITEM: '#/components/schemas/RegretItem'
+          CREDIT_WATCH_ITEM: '#/components/schemas/CreditWatchItem'
+          SUBSCRIPTION_OWNER_CONTROL_ITEM: '#/components/schemas/SubscriptionOwnerControlItem'
+          ACCOUNT_OWNER_CONTROL_ITEM: '#/components/schemas/AccountOwnerControlItem'
+          PAYMENT_METHOD_CHANGE_ITEM: '#/components/schemas/PaymentMethodChangeItem'
+      required:
+        - type
+        - activity
+      properties:
+        type:
+          type: string
+          enum:
+            - ACCOUNT_ITEM
+            - SUBSCRIPTION_ITEM
+            - ADDITIONAL_PRODUCT_ITEM
+            - HARDWARE_SWAP_ITEM
+            - HARDWARE_PAYMENT_ITEM
+            - FEE_ITEM
+            - PORTING_DETAILS_ITEM
+            - CALL_FORWARDING_ITEM
+            - CALL_WAIT_ITEM
+            - TERMINATION_ITEM
+            - CHARGE_ITEM
+            - CONSENT_ITEM
+            - REACTIVATION_ITEM
+            - SUSPENSION_ITEM
+            - DISCOUNT_ITEM
+            - REGRET_ITEM
+            - CREDIT_WATCH_ITEM
+            - SUBSCRIPTION_OWNER_CONTROL_ITEM
+            - ACCOUNT_OWNER_CONTROL_ITEM
+            - PAYMENT_METHOD_CHANGE_ITEM
+        activity:
+          type: string
+          enum:
+            - CREATE
+            - CHANGE
+            - REMOVE
+            - KEEP
+            - BUYBACK
+        id:
+          type: integer
+          description: Identifies the element uniquely in whole order. Is assigned by OrderAPI.
+          readOnly: true
+        channelOrderItemId:
+          type: string
+          description: Intended to identify the element uniquely in whole order. Is assigned by the channel.
+        validationErrors:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        origin:
+          type: string
+          enum:
+            - CLIENT
+            - SYSTEM
+          readOnly: true
+
+    AccountItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: The AccountItem is an account representation in ordering domain. Can hold new account definition or changes to an existing one.
+      properties:
+        billingAccountNumber:
+          type: string
+          readOnly: true
+          description: BAN assigned to newly created account during processing.
+        legalParty:
+          $ref: '#/components/schemas/PartyRole'
+        billingParty:
+          $ref: '#/components/schemas/PartyRole'
+        billingCycle:
+          type: string
+          description: interval of payments
+          enum:
+            - MONTHLY
+            - QUARTERLY
+        invoiceType:
+          type: string
+          enum:
+            - PDF_BY_EMAIL
+            - PAPER_INVOICE
+            - OIO
+        delayOfPayment:
+          type: integer
+          description: Delay of payment in days. 0 - 999 values applicable.
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        bank:
+          $ref: '#/components/schemas/Bank'
+        ean:
+          type: string
+          description: In case of OIO invoice type the EAN number must be given.
+        label:
+          type: string
+          description: Serves for naming the account.
+        upTransferChargeCode:
+          type: string
+          description: Code to define what is paid by the root ban and what is paid by the child ban.
+        category:
+          type: string
+          description: Category of the account
+          enum:
+            - AXAPTA_B2B
+            - AXAPTA_WHOLESALE
+            - BG_BANK
+            - CALL_ME_PREPAID_MIGRATED
+            - CALL_ME_PREPAID_MIG
+            - CALL_ME_RKI
+            - CALL_ME_PRIVATE
+            - CALL_ME_COMPANIES
+            - CALL_ME_SMALL_COMPANIES
+            - COMPANIES
+            - COMPANY_EMPLOYEES
+            - EMPLOYEE_BROADBAND
+            - EXCEPTIONAL_CONTROL_ACCOUNT
+            - GENSELGERE_B2B2B
+            - GENSELGERE_B2B2C
+            - HOLM_ERHVERV
+            - HOLM_PRIVATE
+            - KISBI_ENTERPRISE
+            - KISBI_SOHO
+            - MAJOR_COMPANIES
+            - TELIA_PRIVATE
+            - RESELLERS
+            - SMALL_MEDIUM_COMPANY
+            - SOHO
+            - TELIA
+            - VERO_SME
+            - VERO_SOHO
+            - VIP_BUSINESS
+            - VIP_EXCELLENCE
+            - VIP_GS_ICC
+            - VIP_IPA
+            - VIP_PREMIUM
+            - VIP_SWEDISH_VAT
+            - VIP_TML_ROOT
+            - VIP
+        productGroup:
+          type: string
+          description: Currently home office or business internet, given in addInfo (cope order)
+
+    PaymentMethod:
+      type: string
+      enum:
+        - PBS
+        - GIRO
+        - CARD
+        - OTHER
+
+    FeeItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Order item for fee charges.
+      required:
+        - feeType
+        - billingCode
+        - amount
+        - waived
+      properties:
+        feeType:
+          type: string
+          description: type of fee
+          enum:
+            - ACT_FEE
+            - ACT_FEE_EXVAT
+            - ACT_FEE_DISCOUNT
+            - ADMIN_FEE
+            - ADMIN_FEE_EXVAT
+            - ADMIN_FEE_CREDIT_ACCOUNT
+            - ADMIN_FEE_CREDIT_ACCOUNT_EXVAT
+            - ADMIN_FEE_GIRO
+            - ADMIN_FEE_GIRO_EXVAT
+            - ADMIN_FEE_PBS
+            - ADMIN_FEE_PBS_EXVAT
+            - ADMIN_FEE_PAYMENT_CARD
+            - INSTALLATION_FEE
+            - PAYMENT_FEE
+            - PRO_FEE
+            - PRO_FEE_EXVAT
+            - PRO_FEE_DISCOUNT
+            - SHIPMENT_FEE
+            - SIGN_UP_FEE
+            - SIM_SWAP_FEE
+            - SIM_SWAP_FEE_EXVAT
+            - TRANSFER_FEE
+            - TRANSFER_FEE_EXVAT
+        billingCode:
+          type: string
+          description: Billing code
+        displayName:
+          type: string
+          description: Name of the fee
+        price:
+          $ref: '#/components/schemas/Amount'
+        waived:
+          type: boolean
+          description: Information if the item has been left
+        recurring:
+          type: boolean
+
+    TerminationItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Order item containing information about termination.
+      required:
+        - effectiveDate
+        - reasonCode
+      properties:
+        effectiveDate:
+          type: string
+          format: date
+          description: Effective date in format YYYY-MM-DD (according to ISO 8601).
+        reasonCode:
+          type: string
+          description: Reason code of termination
+          enum:
+            - REPAYMENT_SCHEME_CHURN_BAD_DEBT
+            - AKKORD
+            - CANCELLATION
+            - AUTOMATIC_SHUTDOWN
+            - SUSPENSION_OF_PAYMENTS
+            - REGRET_AFTER_REGRET_PERIOD
+            - REGRET_IN_REGRET_PERIOD
+            - LACK_OF_QUALITY_IN_SALES
+            - CANCELLATION_WRITTEN_REQUEST_CANC
+            - NON_PAYMENT
+            - MOVE_FROM_POSTPAID_TO_CASH
+            - CUSTOMER_REQUEST
+            - CONVERSION
+            - DUMMY_CANCELLATION
+            - FRAUD_OR_DEALER_ERROR
+            - FRAUD_DEPARTMENT_DECREASING_STOCK
+            - DEBT_SETTLEMENT
+            - INTERNAL_TERMINATION_NO_CHURN
+            - INTERNAL_PORTING
+            - BANKRUPTCY
+            - LEAVE_TO_COMPETITION
+            - CUSTOMER_CANNOT_AFFORD
+            - DEATH
+            - CANCELLATION_WRITTEN_REQUEST_KS50
+            - OTHER
+            - CEASED
+            - PORT_OUT
+            - FORCED_CANCELLATION
+            - UNALLOCATED
+            - AMENDMENT_OF_TERMS
+        retention:
+          type: boolean
+          description: Flag for subscription retention
+        waiveTerminationFees:
+          type: boolean
+          description: Flag indicating if fees connected to termination shall be waived.
+        shouldTransferToDifferentPool:
+          type: boolean
+          description: Flag indicating if the number should be transferred to a different pool after termination
+        shouldReReserve:
+          type: boolean
+          description: Flag indicating if the number should be re-reserved after termination
+
+    SuspensionItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Order item containing information about subscription suspension.
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+          description: Reason of suspension.
+
+    ReactivationItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Order item containing information about subscription reactivation.
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+          description: Reason of reactivation.
+
+    DiscountItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Order item containing information about Discount suspension.
+      required:
+        - discountCode
+      properties:
+        discountCode:
+          type: string
+          description: Discount code as registered in Fokus
+        reason:
+          type: string
+          description: Reason for the discount
+
+    RegretItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Used for regretting subscription creation order. Currently working for broadband only.
+      required:
+        - effectiveDate
+      properties:
+        effectiveDate:
+          type: string
+          format: date
+          description: Effective date in format YYYY-MM-DD (according to ISO 8601).
+
+    SubscriptionItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: The Subscription is a subscription representation in ordering domain. Can hold new subscription definition as well as changes to an existing one.
+      properties:
+        telephoneNumber:
+          description: Has to be present when creating a new subscription. When asking for change on an existing subscription put local telephone number to OrderPart reference.
+          $ref: '#/components/schemas/TelephoneNumber'
+        telephoneNumberCategory:
+          type: string
+          enum:
+            - MOBILE
+            - FIXED
+            - PBX
+            - MISCELLANEOUS
+        productType: # maybe serviceDeliveryTechnology
+          type: string
+          description: Type of the new offering (priceplan). Present only if newOfferingCode is present. (priceplans.xlsx.productType)
+          enum:
+            - MOBILE_VOICE
+            - MOBILE_DATA
+            - MOBILE_BROADBAND
+            - BROADBAND_FIBER
+            - BROADBAND_COAX
+            - BROADBAND_DSL
+            - FIXED_WIRELESS_ACCESS
+        offeringChangeType:
+          type: string
+          description: Offering change type. Only for output.
+          enum:
+            - NEW
+            - UPGRADE
+            - PROLONGING
+        newOffering:
+          $ref: '#/components/schemas/Offering'
+        currentOffering:
+          $ref: '#/components/schemas/Offering'
+        productCategory:
+          type: string
+          description: Can contain TOUCHPOINT.MASTER, TOUCHPOINT.AA AND so on.
+        fixedNetDetails:
+          $ref: '#/components/schemas/FixedNetDetails'
+        isTransfer:
+          type: boolean
+          readOnly: true
+          description: The subscription is to be transfered to account that has different legal owner than the previous account.
+        subscriptionUser:
+          $ref: '#/components/schemas/SubscriptionUser'
+        publishLevel:
+          type: string
+          description: publish level (also known as directory listing)
+          enum:
+            - ALL_INFORMATION_PROVIDED
+            - OMITTED_NUMBER
+            - SECRET_ADDRESS
+            - NAME_AND_ADDRESS
+            - EVERYTHING_EXCEPT_ADDITIONAL_INFORMATION
+            - EVERYTHING_EXCEPT_EMAIL
+            - NAME_AND_EMAIL
+            - EVERYTHING_EXCEPT_ADDRESS
+            - NAME_AND_FURTHER_INFORMATION
+            - ADDRESS_ONLY
+            - ADDRESS_AND_EMAIL
+            - ALL_BUT_NAME
+            - ADDRESS_AND_FURTHER_INFORMATION
+            - EMAIL_ONLY
+            - EMAIL_AND_FURTHER_INFORMATION
+            - ONLY_FURTHER_INFORMATION
+        recurringPrice:
+          $ref: '#/components/schemas/Amount'
+        preferredActivationDate:
+          type: string
+          format: date
+          description: Date YYYY-MM-DD (according to ISO 8601) of when the subscription shall be activated.
+        realActivationDate:
+          type: string
+          format: date
+          readOnly: true
+          description: Date YYYY-MM-DD (according to ISO 8601) of when the subscription was really activated.
+        productDeliveryAsap:
+          type: boolean
+          description: Replaces the preferred activation date with installation and activation as soon as possible.
+        secret:
+          type: boolean
+        label:
+          type: string
+          description: Label for additional info about subscription
+        terminationPeriod:
+          $ref: '#/components/schemas/TimePeriod'
+        effectiveMoveDate:
+          type: string
+          format: date
+          readOnly: true
+          description: Date YYYY-MM-DD (according to ISO 8601) of when the subscription was really activated.
+        billingSystem:
+          type: string
+          description: Specifies the billing system on subscription going to NOOS
+          enum:
+            - FOKUS
+            - CERILLION
+            - CCB
+            - NAVIBILLING
+            - NAVISION
+            - SSP
+
+    TimePeriod:
+      type: object
+      description: Time period in amount of units like 1 month.
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          type: integer
+        unit:
+          $ref: '#/components/schemas/TimeUnit'
+
+    TimeUnit:
+      type: object
+      description: Unit of time like Month, Year.
+      enum:
+        - DAY
+        - WEEK
+        - MONTH
+        - YEAR
+
+    Bank:
+      type: object
+      description: Information about bank
+      required:
+        - branch
+        - accountNumber
+        - name
+      properties:
+        branch:
+          type: string
+          description: branch
+        accountNumber:
+          type: string
+          description: account number
+        name:
+          type: string
+          description: name of the bank
+
+    Offering:
+      type: object
+      description: Codes identifying the ordered service.
+      required:
+        - priceplan
+        - productType
+      properties:
+        priceplan:
+          type: string
+          description: Priceplan SOC code.
+        campaign:
+          type: string
+          description: Campaign SOC code.
+        discount:
+          type: string
+          description: Discount SOC code.
+        name:
+          type: string
+          readOnly: true
+          description: Name of the whole offering that's to be displayed on web or documents.
+        bindingPeriod:
+          type: string
+          description: Type of the product (GSM, ...).
+        monthlyPrice:
+          $ref: '#/components/schemas/Amount'
+        productOfferingId:
+          type: string
+          description: Id of the offering as provided by ProductCatalog.
+
+    SubscriptionUser:
+      type: object
+      required:
+        - firstName
+        - lastName
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        birthDate:
+          type: string
+          format: date
+          description: BirthDate in format YYYY-MM-DD (according to ISO 8601).
+        email:
+          type: string
+
+    CallForwardingItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Call forwarding
+      properties:
+        all:
+          $ref: "#/components/schemas/ForwardingSetting"
+        inCall:
+          $ref: "#/components/schemas/ForwardingSetting"
+        noContact:
+          $ref: "#/components/schemas/ForwardingSetting"
+        noAnswer:
+          $ref: "#/components/schemas/NoAnswerForwardingSetting"
+
+    ForwardingSetting:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+        targetNumber:
+          type: string
+          example: "4512345678"
+          description: "Where to forward calls. Parameter is mandatory if enabled is set to true."
+
+    NoAnswerForwardingSetting:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+        targetNumber:
+          type: string
+          example: "4512345678"
+          description: "Where to forward calls. Parameter is mandatory if enabled is set to true."
+        delay:
+          type: integer
+          multipleOf: 5
+          minimum: 5
+          maximum: 30
+          example: 30
+          description: "Delay after which to forward the call. Parameter is mandatory if enabled is set to true."
+
+    SerialNumber:
+      type: object
+      description: Serial Numbers.
+      required:
+        - type
+        - value
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+
+    CallWaitItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Call waiting
+      properties:
+        enabled:
+          type: boolean
+
+    AdditionalProductItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Additonal products that can be optionally selected.
+      required:
+        - productCode
+      properties:
+        productCode:
+          type: string
+          description:
+        productName:
+          type: string
+          description:
+        productCategory:
+          type: string
+          description: The 'family' or group of additionalproducts. Can be null!
+          enum:
+            - VOICE
+            - MESSAGE
+            - DATA
+            - VAS
+            - DISCOUNT
+            - SERVICE
+            - BARRING
+            - OSPACKAGE
+            - QOS
+            - SIM
+            - ESIM
+            - HARDWARE
+            - BROADBAND
+            - EXTRADATACARD
+            - INSURANCE
+            - TV
+            - DSL
+            - FIBER
+            - COAX
+            - TPX
+        productCategories:
+          type: array
+          description: List of categories from product catalog
+          items:
+            type: string
+        recurringPrice:
+          $ref: '#/components/schemas/Amount'
+        discountCode:
+          type: string
+        unitPrice:
+          $ref: '#/components/schemas/Amount'
+        quantity:
+          type: integer
+          description: quantity of ordered items.
+        simDetails:
+          $ref: '#/components/schemas/SimDetails'
+        hardwareDetails:
+          $ref: '#/components/schemas/HardwareDetails'
+        shippingDetails:
+          $ref: '#/components/schemas/ShippingDetails'
+        returnDetails:
+          $ref: '#/components/schemas/ReturnDetails'
+
+    HardwareSwapItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Order item containing info about hardware swapping
+      required:
+        - oldSerialNumber
+      properties:
+        shippingStatus:
+          type: string
+          description: Status of hardware shipping
+        oldSerialNumber:
+          type: string
+          description: Serial number of old hardware to swap
+
+    ShippingDetails:
+      type: object
+      description: Details and information about shipping
+      properties:
+        toDeliverQuantity:
+          type: integer
+          description: Quantity to deliver.
+        tsfOffering:
+          type: string
+          description: tsfOffering from ProductCatalog.
+        erpTsProduct:
+          type: string
+          description: erpTsProduct from ProductCatalog.
+        hardwareDeliveryId:
+          type: integer
+          description: Id of delivery address.
+        userName:
+          type: string
+          description: UserName label for the piece of hardware
+        userId:
+          type: string
+          description: UserName label for the piece of hardware
+        department:
+          type: string
+          description: UserName label for the piece of hardware
+        deliveryStatus:
+          type: string
+          enum:
+            - READY_TO_SEND_ORDER
+            - ORDER_SENT
+            - PICKING_GOODS_FROM_WAREHOUSE
+            - WAITING_FOR_STOCK
+            - IN_STOCK
+            - ORDER_SENT_TO_WAREHOUSE
+            - GOODS_ISSUED
+            - IN_TRANSIT_TO_CUSTOMER
+            - WAITING_FOR_CUSTOMER_PICKUP
+            - DELIVERED
+            - RETURNING_FROM_CUSTOMER
+            - RETURNED_BY_COURIER
+            - RETURN_APPROVED
+            - NON_TRACKABLE
+            - CANCELLED
+            - ERROR
+        trackAndTraceNumber:
+          type: string
+        trackAndTraceUrl:
+          type: string
+        shippingConfirmedDate:
+          type: string
+          format: date
+          description: date in format YYYY-MM-DD (according to ISO 8601).
+
+    ReturnDetails:
+      type: object
+      description: Details and information about returning the hardware.
+      properties:
+        returnQuantity:
+          type: number
+          format: decimal
+          readOnly: true
+          description: Quantity to return
+        creditInvoiceNumber:
+          type: string
+          readOnly: true
+          description: Credit invoice number for returned hardware of this order.
+        creditInvoiceDate:
+          type: string
+          format: date
+          readOnly: true
+          description: date in format YYYY-MM-DD (according to ISO 8601) when was the credit invoice issued.
+
+    HardwareDetails:
+      type: object
+      description: Details and information about hardware
+      properties:
+        materialId:
+          type: string
+          description: Id of material.
+        hardwareType:
+          $ref: '#/components/schemas/HardwareType'
+        name:
+          type: string
+          description: Name of hardware.
+        serialNumbers:
+          type: array
+          description: Serial numbers.
+          items:
+            $ref: '#/components/schemas/SerialNumber'
+        packageType:
+          type: string
+          description: Type of package
+
+    HardwareType:
+      type: string
+      description: Type of hardware.
+      enum:
+        - SIM
+        - HANDSET
+        - LAPTOP
+        - ACCESSORY
+        - TABLET
+        - MODEM
+        - FEMTO
+        - IWATCH
+        - OTHER
+
+    SimDetails:
+      type: object
+      description: Details and information about sim card
+      required:
+        - icc
+      properties:
+        simType:
+          type: string
+          description: Type of sim card.
+          enum:
+            - MAIN_HARDWARE_SIM
+            - EXTRA_HARDWARE_SIM
+            - MAIN_ELECTRONIC_SIM
+            - EXTRA_ELECTRONIC_SIM
+        icc:
+          type: string
+          description: ICC.
+        imsi:
+          type: string
+          description: IMSI.
+        oldIcc:
+          type: string
+          description: Icc to be replaced
+        oldImsi:
+          type: string
+          description: IMSI to be replaced
+        eid:
+          type: string
+          description: new EID.
+        imei:
+          type: string
+          description: new IMEI.
+        bindDeviceType:
+          type: string
+        bindDeviceName:
+          type: string
+          description: Name of the device to be binded.
+        alternateSmdpFqdn:
+          type: string
+          readOnly: true
+        waiveSimSwapFee:
+          type: boolean
+          description: Indicates whether to apply the sim swap fee.
+
+    FixedNetDetails:
+      type: object
+      description: Installation details of services requiring fixed network
+      properties:
+        fixedNetFlags:
+          $ref: '#/components/schemas/FixedNetFlags'
+        internalCircuitId:
+          type: string
+          description: Internal circuit id identifying the fixed line in Telia systems
+        diggingDistance:
+          type: integer
+          description: Length of the distance from existing local line termination point to customer's premises.
+        installationAddress:
+          $ref: '#/components/schemas/InstallationAddress'
+        lastMileAccessPointAddress:
+          $ref: '#/components/schemas/InstallationAddress'
+        speedProduct:
+          type: string
+        technicalProduct:
+          type: string
+        speedDown:
+          type: string
+        speedUp:
+          type: string
+        packageId:
+          type: string
+        accessType:
+          type: string
+        dslTechnologyType:
+          type: string
+        previousTdcCircuitId:
+          type: string
+        destinationTdcCircuitId:
+          type: string
+        previousLinePhoneNumber:
+          type: string
+        destinationLinePhoneNumber:
+          type: string
+        ipAddressType:
+          type: string
+        cpeMode:
+          type: string
+        dslType:
+          type: string
+        sla:
+          type: string
+        addExtraBeChannel:
+          type: string
+        allowRedColor:
+          type: string
+        networkConfiguration:
+          type: array
+          items:
+            $ref: '#/components/schemas/NetworkConfiguration'
+        flowType:
+          type: string
+        doItYourselfInstallation:
+          type: string
+        doItYourselfContactName:
+          type: string
+        doItYourselfContactNumber:
+          type: string
+        providerReuseOfAddress:
+          type: string
+          description: 'Tells the provider that there is already a broadband connection, but it is not yours and you need to terminate it to create your own broadband connection.'
+        providerAoCustomerRefNumber:
+          type: string
+          description: Reference number of customer within current provider.
+        currentProviderName:
+          type: string
+          description: Name of the current connectivity provider.
+        aoCustomerReference:
+          type: string
+        vendor:
+          type: string
+        vendorProductCode:
+          type: string
+        vendorProductCatalogId:
+          type: string
+        customerProductId:
+          type: string
+        existingVendorProductCode:
+          type: string
+        fixedIp:
+          type: boolean
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEventDetails'
+
+    OrderEventDetails:
+        type: object
+        description: Details about events that happen in the order
+        properties:
+            category:
+              type: string
+            description:
+              type: string
+            expectedCompletionDate:
+              type: string
+              format: date
+            id:
+              type: integer
+            startDate:
+              type: string
+              format: date
+            purchaseOrderId:
+              type: string
+            state:
+              type: string
+            technicianDetails:
+              $ref: '#/components/schemas/TechnicianDetails'
+
+    TechnicianDetails:
+        type: object
+        description: Details about the technician
+        properties:
+            installationAddress:
+              type: string
+            technicianFee:
+              $ref: '#/components/schemas/Amount'
+            technicianName:
+              type: string
+            technicianNumber:
+              type: string
+            technicianVisitDate:
+              type: string
+              format: date
+
+
+    FixedNetFlags:
+      type: object
+      description: Flags driving fixed net broadband order processing, valid only for current order.
+      properties:
+        skipStateEvent:
+          type: boolean
+        skipCpeTechnician:
+          type: boolean
+        skipIp:
+          type: boolean
+        skipInvoice:
+          type: boolean
+        hasInstallationTypeConflict:
+          type: boolean
+        manualChangeProvider:
+          type: boolean
+        coaxDifferentProvider:
+          type: boolean
+        diggingNeeded:
+          type: boolean
+        manualOrdering:
+          type: boolean
+        moveToDifferentAddress:
+          type: boolean
+        lineTakeOver:
+          type: boolean
+        activeBlockingLinePresent:
+          type: boolean
+        activeLineTerminated:
+          type: boolean
+        plugPresentPositiveValidation:
+          type: boolean
+        providerChangeAccountNumberMissing:
+          type: boolean
+          description: AO reference number is required to be captured in order for State Event
+        customerRequestsChangeProvider:
+          type: boolean
+          description: When customer wants Telia to do change provider on behalf of customer.(SBBU)
+
+    NetworkConfiguration:
+      type: object
+      description: 'Configuration of network details'
+      properties:
+        cpeName:
+          type: string
+        qosProfileName:
+          type: string
+        vrfName:
+          type: string
+        vpnInstance:
+          type: string
+        pppMultilinkGroup:
+          type: string
+        ipHelper:
+          type: string
+        routingProtocol:
+          type: string
+        asNumber:
+          type: string
+        timeslots:
+          type: string
+        internetPorts:
+          type: string
+        cpeSerial:
+          type: string
+        mobileDialerIp:
+          type: string
+        mobileCpeSerial:
+          type: string
+        mobileNetworkIp:
+          type: string
+        mobileNetworkNetmask:
+          type: string
+        proactivity:
+          type: string
+        proactivityProactivityPhone:
+          type: string
+        secondaryLanIpConfig:
+          $ref: '#/components/schemas/IpConfiguration'
+        staticRouteIpConfig:
+          $ref: '#/components/schemas/IpConfiguration'
+        snmpAclIpConfig:
+          $ref: '#/components/schemas/IpConfiguration'
+        linkIpNetworkNetmask:
+          type: string
+        linkIpNetworkIp:
+          type: string
+        lanIpAddressIp:
+          type: string
+        lanIpAddressNetmask:
+          type: string
+        lanIpAddressHsrip:
+          type: string
+        dhcpAddressRange:
+          type: string
+        dhcpLeaseTime:
+          type: string
+        dhcpDomainName:
+          type: string
+        dhcpWinsPrimary:
+          type: string
+        dhcpWinsSecondary:
+          type: string
+        dhcpDnsPrimary:
+          type: string
+        dhcpDnsSecondary:
+          type: string
+        snmpCommunity:
+          type: string
+
+    IpConfiguration:
+      type: object
+      properties:
+        ip:
+          type: string
+        netmask:
+          type: string
+        defaultGateway:
+          type: string
+
+    ChargeItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Used to charge some amount on a given Account
+      properties:
+        chargeCode:
+          type: string
+          description: Charge code
+        price:
+          $ref: '#/components/schemas/Amount'
+        description:
+          type: string
+          description: Charge description
+
+    ConsentItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Used to change consent
+      properties:
+        consentId:
+          type: string
+          format: uuid
+          description: consent identifier
+        version:
+          type: integer
+        state:
+          type: string
+          description: Whether the consent is 'given', 'unconfirmed' or 'declined'.
+
+    HardwarePaymentItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      type: object
+      description: Details about how the hardware is paid.
+      required:
+        - paymentType
+        - totalPayment
+      properties:
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+        purchaseId:
+          type: string
+          description: id of purchase in PaymentAPI
+        totalPayment:
+          $ref: '#/components/schemas/PaymentAmount'
+        upfrontPayment:
+          $ref: '#/components/schemas/PaymentAmount'
+        downPaymentPlan:
+          $ref: '#/components/schemas/DownPaymentPlan'
+
+    DownPaymentPlan:
+      type: object
+      description: Plan of Credit Agreement payments.
+      required:
+        - downPaymentType
+        - creditProvider
+        - downPaymentAmount
+        - numberOfInstallments
+      properties:
+        downPaymentType:
+          type: string
+          enum:
+            - MOBILE_AGREEMENT
+            - CREDIT_AGREEMENT
+        creditProvider:
+          type: string
+          enum:
+            - CALL_ME
+            - TELIA_DK
+            - TELIA_FINANCE
+            - RESURS
+        downPaymentAmount:
+          $ref: '#/components/schemas/PaymentAmount'
+        installmentAmount:
+          $ref: '#/components/schemas/PaymentAmount'
+        numberOfInstallments:
+          type: number
+          format: int32
+
+    Amount:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          format: decimal
+          description: amount including VAT
+        vat:
+          type: number
+          format: decimal
+          description: VAT amount
+        currency:
+          type: string
+          enum:
+            - DKK
+        catalogAmount:
+          type: number
+          format: decimal
+          description: original amount including VAT before applying any discount
+        catalogVat:
+          type: number
+          format: decimal
+          description: original VAT amount before applying any discount
+        discount:
+          $ref: '#/components/schemas/Discount'
+
+    Discount:
+      type: object
+      required:
+        - amount
+        - reason
+      properties:
+        amount:
+          type: number
+          format: decimal
+          description: discount amount including VAT
+        vat:
+          type: number
+          format: decimal
+          description: discount VAT amount
+        percentage:
+          type: number
+          format: int32
+          description: percentage discount
+        comment:
+          type: string
+          description: comment for discount
+        reason:
+          type: string
+          description: justification of applying discount
+
+    PaymentAmount:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          format: decimal
+          description: amount including VAT
+        vat:
+          type: number
+          format: decimal
+          description: VAT amount
+        currency:
+          type: string
+          enum:
+            - DKK
+        amountWithoutVat:
+          type: number
+          format: decimal
+          description: amount without VAT
+
+    PilPayment:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          description: Id of related payment entity in PaymentIntegrationLayer API
+        updatedAt:
+          type: string
+          format: date
+          description: Date time with timezone according to ISO-8601
+        totalAmount:
+          type: number
+          format: decimal
+          description: Payed amount including VAT
+        totalVat:
+          type: number
+          format: decimal
+          description: Payed VAT amount
+        paymentRoundingError:
+          type: number
+          format: decimal
+          description: Difference between hardware total upfront amount and payed total amount
+
+    Document:
+      type: object
+      properties:
+        documentType:
+          type: string
+          description: Type of document, enum comes from DocumentAPI (located in components.schemas.Document.properties.type)
+        url:
+          type: string
+          description: URL the document is located at
+
+    CreditWatchItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: decimal
+          description: Credit watch amount limit in DKK.
+        waiveFees:
+          type: boolean
+        expirationDate:
+          type: string
+          format: date
+          description: Credit watch expiration date in format YYYY-MM-DD (according to ISO 8601)
+
+    SubscriptionOwnerControlItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      properties:
+        nationalUsageAllowance:
+          $ref: '#/components/schemas/SubscriptionControlOption'
+          description: NUA - Controls domestic TOP-UP purchase
+        roamingCostControl:
+          $ref: '#/components/schemas/SubscriptionControlOption'
+          description: RCC - Controls limit settings for roaming
+        retailRoaming:
+          $ref: '#/components/schemas/SubscriptionControlOption'
+          description: TSRR - Controls roaming TOP-UP purchase
+        unlimited:
+          type: boolean
+          description: Indicates whether the costLimit is actually unlimited.
+        costLimit:
+          type: integer
+          description: The cost limit in DKK.
+
+
+    AccountOwnerControlItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      properties:
+        nationalUsageAllowance:
+          $ref: '#/components/schemas/AccountControlOption'
+          description: NUA - Controls domestic TOP-UP purchase
+        roamingCostControl:
+          $ref: '#/components/schemas/AccountControlOption'
+          description: RCC - Controls limit settings for roaming
+        retailRoaming:
+          $ref: '#/components/schemas/AccountControlOption'
+          description: TSRR - Controls roaming TOP-UP purchase
+        unlimited:
+          type: boolean
+          description: Indicates whether the costLimit is actually unlimited.
+        costLimit:
+          type: integer
+          description: The cost limit in DKK.
+
+    PaymentMethodChangeItem:
+      type: object
+      description: Order item representing payment method change
+      allOf:
+        - $ref: '#/components/schemas/OrderItem'
+      required:
+        - paymentMethodDetail
+      properties:
+        paymentMethodDetail:
+          $ref: '#/components/schemas/PaymentMethodDetail'
+        reasonCode:
+          type: string
+        memoText:
+          type: string
+
+    SubscriptionControlOption:
+      type: string
+      enum: [ 'BLOCK', 'NO_BLOCK', 'ON_BAN' ]
+
+    AccountControlOption:
+      type: string
+      enum: [ 'BLOCK', 'NO_BLOCK', 'SOFT_BLOCK', 'FORCE_BLOCK' ]
+
+    PaymentMethodDetail:
+      type: object
+      description: Parent type for all specific payment method detail types
+      discriminator:
+        propertyName: paymentMethod
+        mapping:
+          GIRO: '#/components/schemas/GiroPaymentMethodDetail'
+          CARD: '#/components/schemas/CardPaymentMethodDetail'
+          MOBILE_PAY: '#/components/schemas/MobilePaymentMethodDetail'
+          PBS: '#/components/schemas/PbsPaymentMethodDetail'
+      required:
+        - paymentMethod
+      properties:
+        paymentMethod:
+          type: string
+          enum:
+            - GIRO
+            - CARD
+            - MOBILE_PAY
+            - PBS
+
+    GiroPaymentMethodDetail:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PaymentMethodDetail'
+      description: Type representing Giro payment method detail
+
+    CardPaymentMethodDetail:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PaymentMethodDetail'
+      required:
+        - creditCard
+      description: Type representing Card payment method detail
+      properties:
+        creditCard:
+          $ref: '#/components/schemas/CreditCard'
+
+    MobilePaymentMethodDetail:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PaymentMethodDetail'
+      required:
+        - mobilePayAgreementId
+      description: Type representing Mobile payment method detail
+      properties:
+        mobilePayAgreementId:
+          type: string
+
+    PbsPaymentMethodDetail:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PaymentMethodDetail'
+      required:
+        - bankAccount
+      description: Type representing PBS payment method detail
+      properties:
+        bankAccount:
+          $ref: '#/components/schemas/BankAccount'
+
+    CreditCard:
+      type: object
+      required:
+        - name
+        - maskedPan
+        - token
+        - expirationDate
+      properties:
+        name:
+          type: string
+        maskedPan:
+          type: string
+        token:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+          description: Date in format YYYY-MM-DD (according to ISO 8601).
+
+    BankAccount:
+      type: object
+      required:
+        - bankName
+        - bankBranchCode
+        - accountNumber
+      properties:
+        bankName:
+          type: string
+        bankBranchCode:
+          type: string
+        accountNumber:
+          type: string
+
+    OrderApproval:
+      type: object
+      properties:
+        approvalComment:
+          type: string
+        approvalIp:
+          type: string
+
+    MarketingConsents:
+      type: object
+      description: Marketing consents
+      required:
+        - leadSourceId
+        - directMarketing
+        - tracking
+      properties:
+        leadSourceId:
+          type: string
+        directMarketing:
+          type: boolean
+        tracking:
+          type: boolean
+        url:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorContent'
+
+    ErrorContent:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorParameter'
+
+    ErrorParameter:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
