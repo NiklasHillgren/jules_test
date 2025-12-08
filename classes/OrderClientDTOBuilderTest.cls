@@ -1971,7 +1971,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test builder pattern initialization
     @isTest
-    static void testBaseAddressBuilderInitialization() {
+    static void BaseAddressBuilder_initialization_notNull() {
         // ARRANGE
         OrderClientDTOBuilder.AddressBuilder baseBuilder;
 
@@ -1984,7 +1984,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test fluent interface methods
     @isTest
-    static void testFluentInterfaceMethods() {
+    static void AddressBuilder_fluentInterface_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.AddressBuilder builder = new OrderClientDTOBuilder.AddressBuilder()
             .withCoName('Test Company')
@@ -2006,7 +2006,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test OrderClientDTOBuilder.UnstructuredAddressBuilder
     @isTest
-    static void testUnstructuredAddressBuilder() {
+    static void UnstructuredAddressBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.UnstructuredAddressBuilder unstructuredBuilder = new OrderClientDTOBuilder.UnstructuredAddressBuilder()
             .withAddress1('123 Main St')
@@ -2029,7 +2029,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test DanishAddressBuilder
     @isTest
-    static void testDanishAddressBuilder() {
+    static void DanishAddressBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.DanishAddressBuilder danishBuilder = new OrderClientDTOBuilder.DanishAddressBuilder()
             .withStreetName('Øster Voldgade')
@@ -2059,7 +2059,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test builder chain validation
     @isTest
-    static void testBuilderChainValidation() {
+    static void AddressBuilder_chaining_maintainsState() {
         // ARRANGE
         OrderClientDTOBuilder.AddressBuilder builder = new OrderClientDTOBuilder.AddressBuilder();
         String testValue = 'Test Value';
@@ -2074,7 +2074,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test null handling
     @isTest
-    static void testNullHandling() {
+    static void AddressBuilder_build_handlesNulls() {
         // ARRANGE
         OrderClientDTOBuilder.AddressBuilder builder = new OrderClientDTOBuilder.AddressBuilder();
 
@@ -2087,7 +2087,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test AmountBuilder
     @isTest
-    static void testAmountBuilder() {
+    static void AmountBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.AmountBuilder builder = new OrderClientDTOBuilder.AmountBuilder()
             .withAmount(TEST_AMOUNT)
@@ -2109,7 +2109,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testAmountBuilderWithDiscount() {
+    static void AmountBuilder_buildWithDiscount_setsDiscount() {
         // ARRANGE
         OrderClientDTOBuilder.DiscountBuilder discountBuilder = new OrderClientDTOBuilder.DiscountBuilder()
             .withAmount(TEST_AMOUNT)
@@ -2138,7 +2138,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test BankBuilder
     @isTest
-    static void testBankBuilder() {
+    static void BankBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.BankBuilder builder = new OrderClientDTOBuilder.BankBuilder()
             .withAccountNumber(TEST_STRING)
@@ -2156,7 +2156,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test BankAccountBuilder
     @isTest
-    static void testBankAccountBuilder() {
+    static void BankAccountBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.BankAccountBuilder builder = new OrderClientDTOBuilder.BankAccountBuilder()
             .withBankName(TEST_STRING)
@@ -2174,7 +2174,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test ChangeActivationDateOrderPatchBuilder
     @isTest
-    static void testChangeActivationDateOrderPatchBuilder() {
+    static void ChangeActivationDateOrderPatchBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ChangeActivationDateOrderPatchBuilder builder = new OrderClientDTOBuilder.ChangeActivationDateOrderPatchBuilder()
             .withNewActivationDate(TEST_DATE)
@@ -2190,7 +2190,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test ConsentBuilder
     @isTest
-    static void testConsentBuilder() {
+    static void ConsentBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.PhysicalIdentificationBuilder physicalBuilder = new OrderClientDTOBuilder.PhysicalIdentificationBuilder(); // Assuming this exists
         OrderClientDTOBuilder.ConsentBuilder builder = new OrderClientDTOBuilder.ConsentBuilder()
@@ -2207,7 +2207,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test CreditCardBuilder
     @isTest
-    static void testCreditCardBuilder() {
+    static void CreditCardBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.CreditCardBuilder builder = new OrderClientDTOBuilder.CreditCardBuilder()
             .withName(TEST_STRING)
@@ -2227,7 +2227,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test CreditEvaluationDetailsBuilder
     @isTest
-    static void testCreditEvaluationDetailsBuilder() {
+    static void CreditEvaluationDetailsBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.CreditEvaluationDetailsBuilder builder = new OrderClientDTOBuilder.CreditEvaluationDetailsBuilder()
             .withEmploymentType(OrderClientDTOEnums.CreditEvaluationDetailsEmploymentTypeEnum.EMPLOYEE)
@@ -2255,7 +2255,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test DealerBuilder
     @isTest
-    static void testDealerBuilder() {
+    static void DealerBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.DealerBuilder builder = new OrderClientDTOBuilder.DealerBuilder()
             .withDealerName(TEST_STRING)
@@ -2279,7 +2279,7 @@ public class OrderClientDTOBuilderTest {
 
     // Test DiscountBuilder
     @isTest
-    static void testDiscountBuilder() {
+    static void DiscountBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.DiscountBuilder builder = new OrderClientDTOBuilder.DiscountBuilder()
             .withAmount(TEST_AMOUNT)
@@ -2300,7 +2300,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testDocumentBuilder() {
+    static void DocumentBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.DocumentBuilder builder = new OrderClientDTOBuilder.DocumentBuilder()
             .withDocumentType(TEST_STRING)
@@ -2315,7 +2315,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testDownPaymentPlanBuilder() {
+    static void DownPaymentPlanBuilder_build_setsProperties() {
         // Arrange
         OrderClientDTOBuilder.PaymentAmountBuilder mockDownPaymentAmount = new OrderClientDTOBuilder.PaymentAmountBuilder();
         OrderClientDTOBuilder.PaymentAmountBuilder mockInstallmentAmount = new OrderClientDTOBuilder.PaymentAmountBuilder();
@@ -2342,7 +2342,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testErrorContentBuilder() {
+    static void ErrorContentBuilder_build_setsProperties() {
         // Arrange
         OrderClientDTOBuilder.ErrorParameterListBuilder mockParams = new OrderClientDTOBuilder.ErrorParameterListBuilder();
         mockParams.withErrorParameterBuilder(new OrderClientDTOBuilder.ErrorParameterBuilder());
@@ -2362,7 +2362,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testErrorResponseBuilder() {
+    static void ErrorResponseBuilder_build_setsError() {
         // ARRANGE
         OrderClientDTOBuilder.ErrorResponseBuilder builder = new OrderClientDTOBuilder.ErrorResponseBuilder()
             .withErrorContentBuilder(new OrderClientDTOBuilder.ErrorContentBuilder());
@@ -2375,7 +2375,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testFixedNetDetailsBuilder() {
+    static void FixedNetDetailsBuilder_build_setsProperties() {
         // Arrange
         OrderClientDTOBuilder.NetworkConfigurationListBuilder mockNetworkConfig = new OrderClientDTOBuilder.NetworkConfigurationListBuilder();
         mockNetworkConfig.withNetworkConfigurationBuilder(new OrderClientDTOBuilder.NetworkConfigurationBuilder());
@@ -2438,7 +2438,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testFixedNetFlagsBuilder() {
+    static void FixedNetFlagsBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.FixedNetFlagsBuilder builder = new OrderClientDTOBuilder.FixedNetFlagsBuilder()
             .withSkipStateEvent(true)
@@ -2470,7 +2470,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testForwardingSettingBuilder() {
+    static void ForwardingSettingBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ForwardingSettingBuilder builder = new OrderClientDTOBuilder.ForwardingSettingBuilder()
             .withEnabled(true)
@@ -2485,7 +2485,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testHardwareDeliveryBuilder() {
+    static void HardwareDeliveryBuilder_build_setsProperties() {
         // Arrange
         OrderClientDTOBuilder.PartyRoleBuilder mockRecipient = new OrderClientDTOBuilder.PartyRoleBuilder();
         OrderClientDTOBuilder.PartyRoleBuilder mockBilling = new OrderClientDTOBuilder.PartyRoleBuilder();
@@ -2517,7 +2517,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testBuildersWithNullValues() {
+    static void Builder_build_handlesNulls() {
         // ARRANGE
         // Test DownPaymentPlanBuilder with null values
         OrderClientDTOBuilder.DownPaymentPlanBuilder dpBuilder = new OrderClientDTOBuilder.DownPaymentPlanBuilder()
@@ -2544,7 +2544,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    public static void testHardwarePaymentConfigurationPatchBuilder() {
+    public static void HardwarePaymentConfigurationPatchBuilder_build_setsProperties() {
         // ARRANGE
         // Create builders needed for testing
         OrderClientDTOBuilder.PaymentAmountBuilder totalAmountBuilder = new OrderClientDTOBuilder.PaymentAmountBuilder()
@@ -2601,7 +2601,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    public static void testHomeOfficeOrderPatchBuilder() {
+    public static void HomeOfficeOrderPatchBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.PersonBuilder legalPartyBuilder = (OrderClientDTOBuilder.PersonBuilder) new OrderClientDTOBuilder.PersonBuilder()
             .withFirstName('John')
@@ -2656,7 +2656,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    public static void testInstallationAddressBuilder() {
+    public static void InstallationAddressBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.InstallationAddressBuilder builder = new OrderClientDTOBuilder.InstallationAddressBuilder()
             .withPostalAddressBuilder(new OrderClientDTOBuilder.AddressBuilder().withCity('CITY'))
@@ -2681,7 +2681,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    public static void testIpConfigurationBuilder() {
+    public static void IpConfigurationBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.IpConfigurationBuilder builder = new OrderClientDTOBuilder.IpConfigurationBuilder()
             .withIp('192.168.1.1')
@@ -2698,7 +2698,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    public static void testMarketingConsentBuilder() {
+    public static void MarketingConsentBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.MarketingConsentBuilder builder = new OrderClientDTOBuilder.MarketingConsentBuilder()
             .withLeadSourceId('LEAD123')
@@ -2717,7 +2717,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testNetworkConfigurationBuilder_BasicProperties() {
+    static void NetworkConfigurationBuilder_build_setsBasicProperties() {
         // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withCpeName('Test_CPE')
@@ -2761,7 +2761,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testNetworkConfigurationBuilder_NetworkProperties() {
+    static void NetworkConfigurationBuilder_build_setsNetworkProperties() {
         // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withLinkIpNetworkIp('192.168.1.1')
@@ -2780,7 +2780,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testErrorParameterBuilder() {
+    static void ErrorParameterBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ErrorParameterBuilder builder = new OrderClientDTOBuilder.ErrorParameterBuilder();
 
@@ -2795,7 +2795,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testNetworkConfigurationBuilder_DHCPProperties() {
+    static void NetworkConfigurationBuilder_build_setsDHCPProperties() {
         // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withDhcpAddressRange('192.168.1.100-192.168.1.200')
@@ -2816,7 +2816,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testNoAnswerForwardingSettingBuilder() {
+    static void NoAnswerForwardingSettingBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.NoAnswerForwardingSettingBuilder builder = new OrderClientDTOBuilder.NoAnswerForwardingSettingBuilder()
             .withEnabled(true)
@@ -2833,7 +2833,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testNotificationRecipientBuilder() {
+    static void NotificationRecipientBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.NotificationRecipientBuilder builder = new OrderClientDTOBuilder.NotificationRecipientBuilder()
             .withRole(OrderClientDTOEnums.NotificationRecipientRoleEnum.CUSTOMER)
@@ -2850,7 +2850,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOfferingBuilder() {
+    static void OfferingBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.AmountBuilder amountBuilder = new OrderClientDTOBuilder.AmountBuilder()
             .withCurrency(OrderClientDTOEnums.AmountCurrencyEnum.DKK)
@@ -2877,7 +2877,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testBuilderChain() {
+    static void NetworkConfigurationBuilder_chaining_maintainsState() {
         // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withCpeName('Test_CPE')
@@ -2895,7 +2895,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testNullValues() {
+    static void NetworkConfigurationBuilder_build_handlesNulls() {
         // ARRANGE
         OrderClientDTOBuilder.NetworkConfigurationBuilder builder = new OrderClientDTOBuilder.NetworkConfigurationBuilder()
             .withCpeName(null)
@@ -2911,7 +2911,7 @@ public class OrderClientDTOBuilderTest {
 
     // OrderAdditionalInfoPatchBuilder Tests
     @isTest
-    static void testOrderAdditionalInfoPatchBuilder() {
+    static void OrderAdditionalInfoPatchBuilder_build_setsOrderMemo() {
         // ARRANGE
         String expectedMemo = 'Test Memo';
         OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder builder = new OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder()
@@ -2925,7 +2925,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderAdditionalInfoPatchBuilder_NullInput() {
+    static void OrderAdditionalInfoPatchBuilder_build_handlesNull() {
         // ARRANGE
         OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder builder = new OrderClientDTOBuilder.OrderAdditionalInfoPatchBuilder()
             .withOrderMemo(null);
@@ -2939,7 +2939,7 @@ public class OrderClientDTOBuilderTest {
 
     // OrderApprovalBuilder Tests
     @isTest
-    static void testOrderApprovalBuilder() {
+    static void OrderApprovalBuilder_build_setsProperties() {
         // ARRANGE
         String expectedComment = 'Test Comment';
         String expectedIp = '192.168.1.1';
@@ -2956,7 +2956,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderApprovalBuilder_NullInputs() {
+    static void OrderApprovalBuilder_build_handlesNulls() {
         // ARRANGE
         OrderClientDTOBuilder.OrderApprovalBuilder builder = new OrderClientDTOBuilder.OrderApprovalBuilder()
             .withApprovalComment(null)
@@ -2972,7 +2972,7 @@ public class OrderClientDTOBuilderTest {
 
     // OrderEventDetailsBuilder Tests
     @isTest
-    static void testOrderEventDetailsBuilder_Full() {
+    static void OrderEventDetailsBuilder_build_setsAllProperties() {
         // ARRANGE
         String category = 'Installation';
         String description = 'New Installation';
@@ -3012,7 +3012,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderEventDetailsBuilder_NoTechnician() {
+    static void OrderEventDetailsBuilder_build_handlesNoTechnician() {
         // ARRANGE
         String category = 'Installation';
         OrderClientDTOBuilder.OrderEventDetailsBuilder builder = new OrderClientDTOBuilder.OrderEventDetailsBuilder()
@@ -3027,7 +3027,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderFlagsBuilder() {
+    static void OrderFlagsBuilder_build_setsProperties() {
         // ARRANGE
         Boolean expectedOrderConfirmed = true;
         Boolean expectedTermsAccepted = false;
@@ -3044,7 +3044,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testShippingDetailsBuilder() {
+    static void ShippingDetailsBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ShippingDetailsBuilder builder = new OrderClientDTOBuilder.ShippingDetailsBuilder();
         
@@ -3067,7 +3067,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testSerialNumberBuilder() {
+    static void SerialNumberBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.SerialNumberBuilder builder = new OrderClientDTOBuilder.SerialNumberBuilder();
         
@@ -3082,7 +3082,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testPhysicalIdentificationBuilder() {
+    static void PhysicalIdentificationBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.PhysicalIdentificationBuilder pysId = new OrderClientDTOBuilder.PhysicalIdentificationBuilder();
         
@@ -3097,7 +3097,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testPilPaymentBuilder() {
+    static void PilPaymentBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.PilPaymentBuilder builder = new OrderClientDTOBuilder.PilPaymentBuilder();
 
@@ -3114,7 +3114,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testReturnDetailsBuilder() {
+    static void ReturnDetailsBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ReturnDetailsBuilder builder = new OrderClientDTOBuilder.ReturnDetailsBuilder();
         
@@ -3129,7 +3129,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testSimDetailsBuilder() {
+    static void SimDetailsBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.SimDetailsBuilder builder = new OrderClientDTOBuilder.SimDetailsBuilder();
 
@@ -3161,7 +3161,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testSubscriptionUserBuilder() {
+    static void SubscriptionUserBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.SubscriptionUserBuilder builder = new OrderClientDTOBuilder.SubscriptionUserBuilder();
         
@@ -3179,7 +3179,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderFlagsBuilder_AllProperties() {
+    static void OrderFlagsBuilder_build_setsAllProperties() {
         // ARRANGE
         OrderClientDTOBuilder.OrderFlagsBuilder builder = new OrderClientDTOBuilder.OrderFlagsBuilder()
             .withOrderConfirmed(true)
@@ -3234,7 +3234,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderItemBuilderBasicProperties() {
+    static void OrderItemBuilder_build_setsBasicProperties() {
         // ARRANGE
         // Create builder instance
         OrderClientDTOBuilder.OrderItemBuilder builder = new OrderClientDTOBuilder.OrderItemBuilder();
@@ -3265,7 +3265,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testCreditWatchItemBuilder() {
+    static void CreditWatchItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.CreditWatchItemBuilder builder = new OrderClientDTOBuilder.CreditWatchItemBuilder();
         Decimal amount = 100.00;
@@ -3291,7 +3291,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testDiscountItemBuilder() {
+    static void DiscountItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.DiscountItemBuilder builder = new OrderClientDTOBuilder.DiscountItemBuilder();
         String discountCode = 'TEST_DISCOUNT';
@@ -3313,7 +3313,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testFeeItemBuilder() {
+    static void FeeItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.FeeItemBuilder builder = new OrderClientDTOBuilder.FeeItemBuilder();
         OrderClientDTOEnums.FeeItemFeeTypeEnum feeType = OrderClientDTOEnums.FeeItemFeeTypeEnum.ACT_FEE;
@@ -3339,7 +3339,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testHardwarePaymentItemBuilder() {
+    static void HardwarePaymentItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.HardwarePaymentItemBuilder builder = new OrderClientDTOBuilder.HardwarePaymentItemBuilder();
         OrderClientDTOEnums.PaymentType paymentType = OrderClientDTOEnums.PaymentType.INVOICE;
@@ -3362,7 +3362,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testHardwareSwapItemBuilder() {
+    static void HardwareSwapItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.HardwareSwapItemBuilder builder = new OrderClientDTOBuilder.HardwareSwapItemBuilder();
         String shippingStatus = 'IN_TRANSIT';
@@ -3385,7 +3385,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testCallForwardingItemBuilder() {
+    static void CallForwardingItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.CallForwardingItemBuilder builder = new OrderClientDTOBuilder.CallForwardingItemBuilder();
         OrderClientDTOBuilder.ForwardingSettingBuilder forwardingBuilder = new OrderClientDTOBuilder.ForwardingSettingBuilder();
@@ -3406,7 +3406,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testChargeItemBuilder() {
+    static void ChargeItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ChargeItemBuilder builder = new OrderClientDTOBuilder.ChargeItemBuilder();
         String chargeCode = 'TEST_CHARGE';
@@ -3428,7 +3428,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testConsentItemBuilder() {
+    static void ConsentItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ConsentItemBuilder builder = new OrderClientDTOBuilder.ConsentItemBuilder();
         String consentId = 'TEST_CONSENT';
@@ -3454,7 +3454,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testAccountItemBuilder() {
+    static void AccountItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.AccountItemBuilder builder = new OrderClientDTOBuilder.AccountItemBuilder();
         String billingAccountNumber = '123456789';
@@ -3480,7 +3480,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testAdditionalProductItemBuilder() {
+    static void AdditionalProductItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.AdditionalProductItemBuilder builder = new OrderClientDTOBuilder.AdditionalProductItemBuilder();
         String productCode = 'TEST_PRODUCT';
@@ -3506,7 +3506,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testPaymentMethodChangeItemBuilder() {
+    static void PaymentMethodChangeItemBuilder_build_setsProperties() {
         // Arrange
         OrderClientDTOBuilder.PaymentMethodDetailBuilder mockPaymentDetailBuilder = new OrderClientDTOBuilder.PaymentMethodDetailBuilder();
 
@@ -3531,7 +3531,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testPortingDetailsItemBuilder() {
+    static void PortingDetailsItemBuilder_build_setsProperties() {
         // Arrange
         OrderClientDTOBuilder.ConsentBuilder mockConsentBuilder = new OrderClientDTOBuilder.ConsentBuilder();
 
@@ -3560,7 +3560,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testReactivationItemBuilder() {
+    static void ReactivationItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.ReactivationItemBuilder builder = new OrderClientDTOBuilder.ReactivationItemBuilder()
             .withReason('Test Reason');
@@ -3579,7 +3579,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testRegretItemBuilder() {
+    static void RegretItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.RegretItemBuilder builder = new OrderClientDTOBuilder.RegretItemBuilder();
         
@@ -3598,7 +3598,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testSubscriptionItemBuilder() {
+    static void SubscriptionItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.AmountBuilder mockAmountBuilder = new OrderClientDTOBuilder.AmountBuilder();
         OrderClientDTOBuilder.SubscriptionUserBuilder mockUserBuilder = new OrderClientDTOBuilder.SubscriptionUserBuilder();
@@ -3627,7 +3627,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testSuspensionItemBuilder() {
+    static void SuspensionItemBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.SuspensionItemBuilder builder = new OrderClientDTOBuilder.SuspensionItemBuilder().withReason('Test Reason');
 
@@ -3645,7 +3645,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testTerminationItemBuilder_BasicFlow() {
+    static void TerminationItemBuilder_build_setsProperties() {
         // Arrange
         Date testDate = Date.today();
         OrderClientDTOEnums.TerminationItemReasonCodeEnum reason = OrderClientDTOEnums.TerminationItemReasonCodeEnum.CANCELLATION;
@@ -3672,7 +3672,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testTerminationItemBuilder_NullValues() {
+    static void TerminationItemBuilder_build_handlesNulls() {
         // ARRANGE
         OrderClientDTOBuilder.TerminationItemBuilder builder = new OrderClientDTOBuilder.TerminationItemBuilder()
             .withEffectiveDate(null)
@@ -3697,7 +3697,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderPartBuilder_BasicFlow() {
+    static void OrderPartBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.OrderPartBuilder builder = new OrderClientDTOBuilder.OrderPartBuilder()
             .withType(OrderClientDTOEnums.OrderPartTypeEnum.ACCOUNT)
@@ -3723,7 +3723,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderPartBuilder_ChangeTypesCollection() {
+    static void OrderPartBuilder_build_setsChangeTypes() {
         // ARRANGE
         List<OrderClientDTOEnums.OrderPartChangeTypesEnum> expectedChanges = new List<OrderClientDTOEnums.OrderPartChangeTypesEnum>{
             OrderClientDTOEnums.OrderPartChangeTypesEnum.ADDITIONAL_PRODUCTS,
@@ -3743,7 +3743,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderPartBuilder_NullValues() {
+    static void OrderPartBuilder_build_handlesNulls() {
         // ARRANGE
         OrderClientDTOBuilder.OrderPartBuilder builder = new OrderClientDTOBuilder.OrderPartBuilder()
             .withType(null)
@@ -3762,7 +3762,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderPartReferenceBuilder() {
+    static void OrderPartReferenceBuilder_build_setsProperties() {
         // ARRANGE
         // Test valid construction
         OrderClientDTOBuilder.OrderPartReferenceBuilder referenceBuilder = new OrderClientDTOBuilder.OrderPartReferenceBuilder();
@@ -3788,7 +3788,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderPatchRequestBuilder() {
+    static void OrderPatchRequestBuilder_build_setsProperties() {
         // ARRANGE
         // Test valid construction
         OrderClientDTOBuilder.OrderPatchRequestBuilder builder = new OrderClientDTOBuilder.OrderPatchRequestBuilder()
@@ -3825,7 +3825,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderSourceBuilder() {
+    static void OrderSourceBuilder_build_setsProperties() {
         // ARRANGE
         // Test valid construction
         OrderClientDTOBuilder.OrderSourceBuilder builder = new OrderClientDTOBuilder.OrderSourceBuilder()
@@ -3858,7 +3858,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderV10Builder_BasicFields() {
+    static void OrderV10Builder_build_setsBasicFields() {
         // ARRANGE
         // Test basic fields
         OrderClientDTOBuilder.OrderV10Builder builder = new OrderClientDTOBuilder.OrderV10Builder()
@@ -3916,7 +3916,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderV10Builder_CompositeBuilders() {
+    static void OrderV10Builder_build_setsCompositeBuilders() {
         // ARRANGE
         // Test composite builders
         OrderClientDTOBuilder.OrderV10Builder builder = new OrderClientDTOBuilder.OrderV10Builder()
@@ -3940,7 +3940,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testOrderV10Builder_NullValues() {
+    static void OrderV10Builder_build_handlesNulls() {
         // ARRANGE
         // Test null values
         OrderClientDTOBuilder.OrderV10Builder builder = new OrderClientDTOBuilder.OrderV10Builder().withValidationErrors(null);
@@ -3970,7 +3970,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testTimePeriodBuilder() {
+    static void TimePeriodBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.TimePeriodBuilder t = new OrderClientDTOBuilder.TimePeriodBuilder();
 
@@ -3985,7 +3985,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void testHardwareDetailsBuilder() {
+    static void HardwareDetailsBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.HardwareDetailsBuilder b = new OrderClientDTOBuilder.HardwareDetailsBuilder();
 
@@ -4002,7 +4002,7 @@ public class OrderClientDTOBuilderTest {
     }
 
     @isTest
-    static void TelephoneNumberBuilder() {
+    static void TelephoneNumberBuilder_build_setsProperties() {
         // ARRANGE
         OrderClientDTOBuilder.TelephoneNumberBuilder b = new OrderClientDTOBuilder.TelephoneNumberBuilder();
         
