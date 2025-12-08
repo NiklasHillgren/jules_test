@@ -285,7 +285,7 @@ public with sharing class OrderClientDTOBuilder {
         private Decimal catalogVat;
         private DiscountBuilder discountBuilder;
 
-        public AmountBuilder withAmount(Decimal amount) {
+/**\n * amount including VAT\n */\n        public AmountBuilder withAmount(Decimal amount) {
             this.amount = amount;
             return this;
         }
@@ -300,12 +300,12 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public AmountBuilder withCatalogAmount(Decimal catalogAmount) {
+/**\n * original amount including VAT before applying any discount\n */\n        public AmountBuilder withCatalogAmount(Decimal catalogAmount) {
             this.catalogAmount = catalogAmount;
             return this;
         }
 
-        public AmountBuilder withCatalogVat(Decimal catalogVat) {
+/**\n * original VAT amount before applying any discount\n */\n        public AmountBuilder withCatalogVat(Decimal catalogVat) {
             this.catalogVat = catalogVat;
             return this;
         }
@@ -349,17 +349,17 @@ public with sharing class OrderClientDTOBuilder {
         private String branch;
         private String name;
 
-        public BankBuilder withAccountNumber(String accountNumber) {
+/**\n * account number\n */\n        public BankBuilder withAccountNumber(String accountNumber) {
             this.accountNumber = accountNumber;
             return this;
         }
 
-        public BankBuilder withBranch(String branch) {
+/**\n * branch\n */\n        public BankBuilder withBranch(String branch) {
             this.branch = branch;
             return this;
         }
 
-        public BankBuilder withName(String name) {
+/**\n * name of the bank\n */\n        public BankBuilder withName(String name) {
             this.name = name;
             return this;
         }
@@ -434,7 +434,7 @@ public with sharing class OrderClientDTOBuilder {
         private String teliaCircuitId;
         private Date newActivationDate;
 
-        public ChangeActivationDateOrderPatchBuilder withNewActivationDate(Date newActivationDate) {
+/**\n * New activation date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public ChangeActivationDateOrderPatchBuilder withNewActivationDate(Date newActivationDate) {
             this.newActivationDate = newActivationDate;
             return this;
         }
@@ -530,7 +530,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public CreditCardBuilder withExpirationDate(Date expirationDate) {
+/**\n * Date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public CreditCardBuilder withExpirationDate(Date expirationDate) {
             this.expirationDate = expirationDate;
             return this;
         }
@@ -584,12 +584,12 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public CreditEvaluationDetailsBuilder withCreditLimit(Decimal creditLimit) {
+/**\n * Comes from credit check\n */\n        public CreditEvaluationDetailsBuilder withCreditLimit(Decimal creditLimit) {
             this.creditLimit = creditLimit;
             return this;
         }
 
-        public CreditEvaluationDetailsBuilder withCreditClass(String creditClass) {
+/**\n * Comes from credit check\n */\n        public CreditEvaluationDetailsBuilder withCreditClass(String creditClass) {
             this.creditClass = creditClass;
             return this;
         }
@@ -626,32 +626,32 @@ public with sharing class OrderClientDTOBuilder {
         private String posDealerId;
         private String posSalesAgentId;
 
-        public DealerBuilder withDealerName(String dealerName) {
+/**\n * name of the dealer like 'BtC Amager'.\n */\n        public DealerBuilder withDealerName(String dealerName) {
             this.dealerName = dealerName;
             return this;
         }
 
-        public DealerBuilder withDealerCode(String dealerCode) {
+/**\n * code of the dealer like '1018'.\n */\n        public DealerBuilder withDealerCode(String dealerCode) {
             this.dealerCode = dealerCode;
             return this;
         }
 
-        public DealerBuilder withSalesAgentCode(String salesAgentCode) {
+/**\n * shall contain sales agent code (as handled by DealerAdmin), so far not used.\n */\n        public DealerBuilder withSalesAgentCode(String salesAgentCode) {
             this.salesAgentCode = salesAgentCode;
             return this;
         }
 
-        public DealerBuilder withSalesAgentName(String salesAgentName) {
+/**\n * Name of the sales representative.\n */\n        public DealerBuilder withSalesAgentName(String salesAgentName) {
             this.salesAgentName = salesAgentName;
             return this;
         }
 
-        public DealerBuilder withPosDealerId(String posDealerId) {
+/**\n * id of the dealer in ODOO\n */\n        public DealerBuilder withPosDealerId(String posDealerId) {
             this.posDealerId = posDealerId;
             return this;
         }
 
-        public DealerBuilder withPosSalesAgentId(String posSalesAgentId) {
+/**\n * id of the sales agent in ODOO\n */\n        public DealerBuilder withPosSalesAgentId(String posSalesAgentId) {
             this.posSalesAgentId = posSalesAgentId;
             return this;
         }
@@ -689,7 +689,7 @@ public with sharing class OrderClientDTOBuilder {
         private String comment;
         private String reason;
 
-        public DiscountBuilder withAmount(Decimal amount) {
+/**\n * discount amount including VAT\n */\n        public DiscountBuilder withAmount(Decimal amount) {
             this.amount = amount;
             return this;
         }
@@ -699,17 +699,17 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public DiscountBuilder withPercentage(Decimal percentage) {
+/**\n * percentage discount\n */\n        public DiscountBuilder withPercentage(Decimal percentage) {
             this.percentage = percentage;
             return this;
         }
 
-        public DiscountBuilder withComment(String comment) {
+/**\n * comment for discount\n */\n        public DiscountBuilder withComment(String comment) {
             this.comment = comment;
             return this;
         }
 
-        public DiscountBuilder withReason(String reason) {
+/**\n * justification of applying discount\n */\n        public DiscountBuilder withReason(String reason) {
             this.reason = reason;
             return this;
         }
@@ -743,12 +743,12 @@ public with sharing class OrderClientDTOBuilder {
         private String url;
         private String documentType;
 
-        public DocumentBuilder withDocumentType(String documentType) {
+/**\n * Type of document, enum comes from DocumentAPI (located in components.schemas.Document.properties.type)\n */\n        public DocumentBuilder withDocumentType(String documentType) {
             this.documentType = documentType;
             return this;
         }
 
-        public DocumentBuilder withUrl(String url) {
+/**\n * URL the document is located at\n */\n        public DocumentBuilder withUrl(String url) {
             this.url = url;
             return this;
         }
@@ -1029,7 +1029,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public FixedNetDetailsBuilder withDiggingDistance(Integer diggingDistance) {
+/**\n * Length of the distance from existing local line termination point to customer's premises.\n */\n        public FixedNetDetailsBuilder withDiggingDistance(Integer diggingDistance) {
             this.diggingDistance = diggingDistance;
             return this;
         }
@@ -1139,17 +1139,17 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public FixedNetDetailsBuilder withProviderReuseOfAddress(String providerReuseOfAddress) {
+/**\n * Tells the provider that there is already a broadband connection, but it is not yours and you need to terminate it to create your own broadband connection.\n */\n        public FixedNetDetailsBuilder withProviderReuseOfAddress(String providerReuseOfAddress) {
             this.providerReuseOfAddress = providerReuseOfAddress;
             return this;
         }
 
-        public FixedNetDetailsBuilder withProviderAoCustomerRefNumber(String providerAoCustomerRefNumber) {
+/**\n * Reference number of customer within current provider.\n */\n        public FixedNetDetailsBuilder withProviderAoCustomerRefNumber(String providerAoCustomerRefNumber) {
             this.providerAoCustomerRefNumber = providerAoCustomerRefNumber;
             return this;
         }
 
-        public FixedNetDetailsBuilder withCurrentProviderName(String currentProviderName) {
+/**\n * Name of the current connectivity provider.\n */\n        public FixedNetDetailsBuilder withCurrentProviderName(String currentProviderName) {
             this.currentProviderName = currentProviderName;
             return this;
         }
@@ -1351,12 +1351,12 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public FixedNetFlagsBuilder withProviderChangeAccountNumberMissing(Boolean providerChangeAccountNumberMissing) {
+/**\n * AO reference number is required to be captured in order for State Event\n */\n        public FixedNetFlagsBuilder withProviderChangeAccountNumberMissing(Boolean providerChangeAccountNumberMissing) {
             this.providerChangeAccountNumberMissing = providerChangeAccountNumberMissing;
             return this;
         }
 
-        public FixedNetFlagsBuilder withCustomerRequestsChangeProvider(Boolean customerRequestsChangeProvider) {
+/**\n * When customer wants Telia to do change provider on behalf of customer.(SBBU)\n */\n        public FixedNetFlagsBuilder withCustomerRequestsChangeProvider(Boolean customerRequestsChangeProvider) {
             this.customerRequestsChangeProvider = customerRequestsChangeProvider;
             return this;
         }
@@ -1406,7 +1406,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public ForwardingSettingBuilder withTargetNumber(String targetNumber) {
+/**\n * Where to forward calls. Parameter is mandatory if enabled is set to true.\n */\n        public ForwardingSettingBuilder withTargetNumber(String targetNumber) {
             this.targetNumber = targetNumber;
             return this;
         }
@@ -1443,7 +1443,7 @@ public with sharing class OrderClientDTOBuilder {
         private DateTime dispatchDate;
         private DateTime preferredSendDate;
 
-        public HardwareDeliveryBuilder withId(Integer id) {
+/**\n * Unique identifier of hardware delivery.\n */\n        public HardwareDeliveryBuilder withId(Integer id) {
             this.id = id;
             return this;
         }
@@ -1458,7 +1458,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public HardwareDeliveryBuilder withDeliveryMethod(String deliveryMethod) {
+/**\n * String identifier of delivery method.\n */\n        public HardwareDeliveryBuilder withDeliveryMethod(String deliveryMethod) {
             this.deliveryMethod = deliveryMethod;
             return this;
         }
@@ -1475,7 +1475,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public HardwareDeliveryBuilder withDispatchDate(DateTime dispatchDate) {
+/**\n * Date time with timezone according to ISO-8601. Timestamp of when the hardware has been sent out from warehouse.\n */\n        public HardwareDeliveryBuilder withDispatchDate(DateTime dispatchDate) {
             this.dispatchDate = dispatchDate;
             return this;
         }
@@ -1640,7 +1640,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public HomeOfficeOrderPatchBuilder withEmployeeId(String employeeId) {
+/**\n * Id of employee\n */\n        public HomeOfficeOrderPatchBuilder withEmployeeId(String employeeId) {
             this.employeeId = employeeId;
             return this;
         }
@@ -2129,12 +2129,12 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public NoAnswerForwardingSettingBuilder withTargetNumber(String targetNumber) {
+/**\n * Where to forward calls. Parameter is mandatory if enabled is set to true.\n */\n        public NoAnswerForwardingSettingBuilder withTargetNumber(String targetNumber) {
             this.targetNumber = targetNumber;
             return this;
         }
 
-        public NoAnswerForwardingSettingBuilder withDelay(Integer delay) {
+/**\n * Delay after which to forward the call. Parameter is mandatory if enabled is set to true.\n */\n        public NoAnswerForwardingSettingBuilder withDelay(Integer delay) {
             this.delay = delay;
             return this;
         }
@@ -2212,30 +2212,30 @@ public with sharing class OrderClientDTOBuilder {
         private String productOfferingId;
         private AmountBuilder monthlyPriceAmountBuilder;
 
-        public OfferingBuilder withPriceplan(String priceplan) {
+/**\n * Priceplan SOC code.\n */\n        public OfferingBuilder withPriceplan(String priceplan) {
             this.priceplan = priceplan;
             return this;
         }
 
-        public OfferingBuilder withCampaign(String campaign) {
+/**\n * Campaign SOC code.\n */\n        public OfferingBuilder withCampaign(String campaign) {
             this.campaign = campaign;
 
             return this;
         }
 
-        public OfferingBuilder withDiscount(String discount) {
+/**\n * Discount SOC code.\n */\n        public OfferingBuilder withDiscount(String discount) {
             this.discount = discount;
 
             return this;
         }
 
-        public OfferingBuilder withName(String name) {
+/**\n * Name of the whole offering that's to be displayed on web or documents.\n */\n        public OfferingBuilder withName(String name) {
             this.name = name;
 
             return this;
         }
 
-        public OfferingBuilder withBindingPeriod(String bindingPeriod) {
+/**\n * Type of the product (GSM, ...).\n */\n        public OfferingBuilder withBindingPeriod(String bindingPeriod) {
             this.bindingPeriod = bindingPeriod;
 
             return this;
@@ -2246,7 +2246,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public OfferingBuilder withProductOfferingId(String ProductOfferingId) {
+/**\n * Id of the offering as provided by ProductCatalog.\n */\n        public OfferingBuilder withProductOfferingId(String ProductOfferingId) {
             this.productOfferingId = productOfferingId;
             return this;
         }
@@ -2452,47 +2452,47 @@ public with sharing class OrderClientDTOBuilder {
         private Boolean newDivaFlow;
         private Boolean isSubOrder;
 
-        public OrderFlagsBuilder withOrderConfirmed(Boolean orderConfirmed) {
+/**\n * Whether the order is confirmed or approved.\n */\n        public OrderFlagsBuilder withOrderConfirmed(Boolean orderConfirmed) {
             this.orderConfirmed = orderConfirmed;
             return this;
         }
 
-        public OrderFlagsBuilder withTermsAccepted(Boolean termsAccepted) {
+/**\n * If customer agrees with terms and conditions. Must be true :)\n */\n        public OrderFlagsBuilder withTermsAccepted(Boolean termsAccepted) {
             this.termsAccepted = termsAccepted;
             return this;
         }
 
-        public OrderFlagsBuilder withCprCheckFailed(Boolean cprCheckFailed) {
+/**\n * If the CPR check failed.\n */\n        public OrderFlagsBuilder withCprCheckFailed(Boolean cprCheckFailed) {
             this.cprCheckFailed = cprCheckFailed;
             return this;
         }
 
-        public OrderFlagsBuilder withCreditCheckFailed(Boolean creditCheckFailed) {
+/**\n * When the credit check failed.\n */\n        public OrderFlagsBuilder withCreditCheckFailed(Boolean creditCheckFailed) {
             this.creditCheckFailed = creditCheckFailed;
             return this;
         }
 
-        public OrderFlagsBuilder withNeedsConfirmation(Boolean needsConfirmation) {
+/**\n * Customer shall confirm the order as sales agent made it on their behalf.\n */\n        public OrderFlagsBuilder withNeedsConfirmation(Boolean needsConfirmation) {
             this.needsConfirmation = needsConfirmation;
             return this;
         }
 
-        public OrderFlagsBuilder withMembershipCheck(Boolean membershipCheck) {
+/**\n * If there is any membership to be checked (voucher number or so)\n */\n        public OrderFlagsBuilder withMembershipCheck(Boolean membershipCheck) {
             this.membershipCheck = membershipCheck;
             return this;
         }
 
-        public OrderFlagsBuilder withDirty(Boolean dirty) {
+/**\n * The order is missing mandatory information\n */\n        public OrderFlagsBuilder withDirty(Boolean dirty) {
             this.dirty = dirty;
             return this;
         }
 
-        public OrderFlagsBuilder withDoCommunication(Boolean doCommunication) {
+/**\n * Shall the backend send communication\n */\n        public OrderFlagsBuilder withDoCommunication(Boolean doCommunication) {
             this.doCommunication = doCommunication;
             return this;
         }
 
-        public OrderFlagsBuilder withDoLogistics(Boolean doLogistics) {
+/**\n * Shall the backend send request for hardware shipment\n */\n        public OrderFlagsBuilder withDoLogistics(Boolean doLogistics) {
             this.doLogistics = doLogistics;
             return this;
         }
@@ -2502,62 +2502,62 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public OrderFlagsBuilder withPosFlow(Boolean posFlow) {
+/**\n * Order has been created via new POS\n */\n        public OrderFlagsBuilder withPosFlow(Boolean posFlow) {
             this.posFlow = posFlow;
             return this;
         }
 
-        public OrderFlagsBuilder withHomeOfficeOrder(Boolean homeOfficeOrder) {
+/**\n * If order represents Home Office order\n */\n        public OrderFlagsBuilder withHomeOfficeOrder(Boolean homeOfficeOrder) {
             this.homeOfficeOrder = homeOfficeOrder;
             return this;
         }
 
-        public OrderFlagsBuilder withCreateDraftOrder(Boolean createDraftOrder) {
+/**\n * If draft order should be created during shopping cart submission\n */\n        public OrderFlagsBuilder withCreateDraftOrder(Boolean createDraftOrder) {
             this.createDraftOrder = createDraftOrder;
             return this;
         }
 
-        public OrderFlagsBuilder withManualSigning(Boolean manualSigning) {
+/**\n * If order follows manual signing flow\n */\n        public OrderFlagsBuilder withManualSigning(Boolean manualSigning) {
             this.manualSigning = manualSigning;
             return this;
         }
 
-        public OrderFlagsBuilder withSimOnly(Boolean simOnly) {
+/**\n * If order is from Tango and has only SIM AdditionalProductItems\n */\n        public OrderFlagsBuilder withSimOnly(Boolean simOnly) {
             this.simOnly = simOnly;
             return this;
         }
 
-        public OrderFlagsBuilder withHasUpfrontPayment(Boolean hasUpfrontPayment) {
+/**\n * If order is from Tango and has at least one upfront payment on any HardwarePaymentItem\n */\n        public OrderFlagsBuilder withHasUpfrontPayment(Boolean hasUpfrontPayment) {
             this.hasUpfrontPayment = hasUpfrontPayment;
             return this;
         }
 
-        public OrderFlagsBuilder withTfFinancingNeeded(Boolean tfFinancingNeeded) {
+/**\n * If order is from Tango and has at least one down payment on any HardwarePaymentItem\n */\n        public OrderFlagsBuilder withTfFinancingNeeded(Boolean tfFinancingNeeded) {
             this.tfFinancingNeeded = tfFinancingNeeded;
             return this;
         }
 
-        public OrderFlagsBuilder withPhysicalIdPreidentified(Boolean physicalIdPreidentified) {
+/**\n * If order is from Tango and order was sold in shop\n */\n        public OrderFlagsBuilder withPhysicalIdPreidentified(Boolean physicalIdPreidentified) {
             this.physicalIdPreidentified = physicalIdPreidentified;
             return this;
         }
 
-        public OrderFlagsBuilder withShopSales(Boolean shopSales) {
+/**\n * If order is from Tango and order was sold in external store\n */\n        public OrderFlagsBuilder withShopSales(Boolean shopSales) {
             this.shopSales = shopSales;
             return this;
         }
 
-        public OrderFlagsBuilder withOrderExpired(Boolean orderExpired) {
+/**\n * If order is already expired.\n */\n        public OrderFlagsBuilder withOrderExpired(Boolean orderExpired) {
             this.orderExpired = orderExpired;
             return this;
         }
 
-        public OrderFlagsBuilder withNewDivaFlow(Boolean newDivaFlow) {
+/**\n * Go with the new DIVA flow.\n */\n        public OrderFlagsBuilder withNewDivaFlow(Boolean newDivaFlow) {
             this.newDivaFlow = newDivaFlow;
             return this;
         }
 
-        public OrderFlagsBuilder withIsSubOrder(Boolean isSubOrder) {
+/**\n * If order is a sub order. Applies to return orders.\n */\n        public OrderFlagsBuilder withIsSubOrder(Boolean isSubOrder) {
             this.isSubOrder = isSubOrder;
             return this;
         }
@@ -2625,12 +2625,12 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public OrderItemBuilder withId(Integer id) {
+/**\n * Identifies the element uniquely in whole order. Is assigned by OrderAPI.\n */\n        public OrderItemBuilder withId(Integer id) {
             this.id = id;
             return this;
         }
 
-        public OrderItemBuilder withChannelOrderItemId(String channelOrderItemId) {
+/**\n * Intended to identify the element uniquely in whole order. Is assigned by the channel.\n */\n        public OrderItemBuilder withChannelOrderItemId(String channelOrderItemId) {
             this.channelOrderItemId = channelOrderItemId;
             return this;
         }
@@ -2681,7 +2681,7 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.CREDIT_WATCH_ITEM);
         }
 
-        public CreditWatchItemBuilder withAmount(Decimal amount) {
+/**\n * Credit watch amount limit in DKK.\n */\n        public CreditWatchItemBuilder withAmount(Decimal amount) {
             this.amount = amount;
             return this;
         }
@@ -2691,7 +2691,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public CreditWatchItemBuilder withExpirationDate(Date expirationDate) {
+/**\n * Credit watch expiration date in format YYYY-MM-DD (according to ISO 8601)\n */\n        public CreditWatchItemBuilder withExpirationDate(Date expirationDate) {
             this.expirationDate = expirationDate;
             return this;
         }
@@ -2730,12 +2730,12 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.DISCOUNT_ITEM);
         }
 
-        public DiscountItemBuilder withDiscountCode(String discountCode) {
+/**\n * Discount code as registered in Fokus\n */\n        public DiscountItemBuilder withDiscountCode(String discountCode) {
             this.discountCode = discountCode;
             return this;
         }
 
-        public DiscountItemBuilder withReason(String reason) {
+/**\n * Reason for the discount\n */\n        public DiscountItemBuilder withReason(String reason) {
             this.reason = reason;
             return this;
         }
@@ -2777,17 +2777,17 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.FEE_ITEM);
         }
 
-        public FeeItemBuilder withFeeType(OrderClientDTOEnums.FeeItemFeeTypeEnum feeType) {
+/**\n * type of fee\n */\n        public FeeItemBuilder withFeeType(OrderClientDTOEnums.FeeItemFeeTypeEnum feeType) {
             this.feeType = feeType;
             return this;
         }
 
-        public FeeItemBuilder withBillingCode(String billingCode) {
+/**\n * Billing code\n */\n        public FeeItemBuilder withBillingCode(String billingCode) {
             this.billingCode = billingCode;
             return this;
         }
 
-        public FeeItemBuilder withDisplayName(String displayName) {
+/**\n * Name of the fee\n */\n        public FeeItemBuilder withDisplayName(String displayName) {
             this.displayName = displayName;
             return this;
         }
@@ -2797,7 +2797,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public FeeItemBuilder withFeeType(Boolean waived) {
+/**\n * type of fee\n */\n        public FeeItemBuilder withFeeType(Boolean waived) {
             this.waived = waived;
             return this;
         }
@@ -2856,7 +2856,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public HardwarePaymentItemBuilder withPurchaseId(String purchaseId) {
+/**\n * id of purchase in PaymentAPI\n */\n        public HardwarePaymentItemBuilder withPurchaseId(String purchaseId) {
             this.purchaseId = purchaseId;
             return this;
         }
@@ -2925,12 +2925,12 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.HARDWARE_SWAP_ITEM);
         }
 
-        public HardwareSwapItemBuilder withShippingStatus(String shippingStatus) {
+/**\n * Status of hardware shipping\n */\n        public HardwareSwapItemBuilder withShippingStatus(String shippingStatus) {
             this.shippingStatus = shippingStatus;
             return this;
         }
 
-        public HardwareSwapItemBuilder withOldSerialNumber(String oldSerialNumber) {
+/**\n * Serial number of old hardware to swap\n */\n        public HardwareSwapItemBuilder withOldSerialNumber(String oldSerialNumber) {
             this.oldSerialNumber = oldSerialNumber;
             return this;
         }
@@ -3081,12 +3081,12 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.CHARGE_ITEM);
         }
 
-        public ChargeItemBuilder withChargeCode(String chargeCode) {
+/**\n * Charge code\n */\n        public ChargeItemBuilder withChargeCode(String chargeCode) {
             this.chargeCode = chargeCode;
             return this;
         }
 
-        public ChargeItemBuilder withDescription(String description) {
+/**\n * Charge description\n */\n        public ChargeItemBuilder withDescription(String description) {
             this.description = description;
             return this;
         }
@@ -3129,7 +3129,7 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.CONSENT_ITEM);
         }
 
-        public ConsentItemBuilder withConsentId(String consentId) {
+/**\n * consent identifier\n */\n        public ConsentItemBuilder withConsentId(String consentId) {
             this.consentId = consentId;
             return this;
         }
@@ -3139,7 +3139,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public ConsentItemBuilder withState(String state) {
+/**\n * Whether the consent is 'given', 'unconfirmed' or 'declined'.\n */\n        public ConsentItemBuilder withState(String state) {
             this.state = state;
             return this;
         }
@@ -3189,12 +3189,12 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.ACCOUNT_ITEM);
         }
 
-        public AccountItemBuilder withBillingAccountNumber(String billingAccountNumber) {
+/**\n * BAN assigned to newly created account during processing.\n */\n        public AccountItemBuilder withBillingAccountNumber(String billingAccountNumber) {
             this.billingAccountNumber = billingAccountNumber;
             return this;
         }
 
-        public AccountItemBuilder withBillingCycle(OrderClientDTOEnums.AccountItemBillingCycleEnum billingCycle) {
+/**\n * interval of payments\n */\n        public AccountItemBuilder withBillingCycle(OrderClientDTOEnums.AccountItemBillingCycleEnum billingCycle) {
             this.billingCycle = billingCycle;
             return this;
         }
@@ -3204,7 +3204,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public AccountItemBuilder withDelayOfPayment(Integer delayOfPayment) {
+/**\n * Delay of payment in days. 0 - 999 values applicable.\n */\n        public AccountItemBuilder withDelayOfPayment(Integer delayOfPayment) {
             this.delayOfPayment = delayOfPayment;
             return this;
         }
@@ -3219,28 +3219,28 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public AccountItemBuilder withEan(String ean) {
+/**\n * In case of OIO invoice type the EAN number must be given.\n */\n        public AccountItemBuilder withEan(String ean) {
             this.ean = ean;
             return this;
         }
 
-        public AccountItemBuilder withLabel(String label) {
+/**\n * Serves for naming the account.\n */\n        public AccountItemBuilder withLabel(String label) {
             this.label = label;
 
             return this;
         }
 
-        public AccountItemBuilder withUpTransferChargeCode(String upTransferChargeCode) {
+/**\n * Code to define what is paid by the root ban and what is paid by the child ban.\n */\n        public AccountItemBuilder withUpTransferChargeCode(String upTransferChargeCode) {
             this.upTransferChargeCode = upTransferChargeCode;
             return this;
         }
 
-        public AccountItemBuilder withCategory(OrderClientDTOEnums.AccountItemCategoryEnum category) {
+/**\n * Category of the account\n */\n        public AccountItemBuilder withCategory(OrderClientDTOEnums.AccountItemCategoryEnum category) {
             this.category = category;
             return this;
         }
 
-        public AccountItemBuilder withProductGroup(String productGroup) {
+/**\n * Currently home office or business internet, given in addInfo (cope order)\n */\n        public AccountItemBuilder withProductGroup(String productGroup) {
             this.productGroup = productGroup;
             return this;
         }
@@ -3334,7 +3334,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public AccountOwnerControlItemBuilder withCostLimit(Integer costLimit) {
+/**\n * The cost limit in DKK.\n */\n        public AccountOwnerControlItemBuilder withCostLimit(Integer costLimit) {
             this.costLimit = costLimit;
             return this;
         }
@@ -3407,7 +3407,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public AdditionalProductItemBuilder withProductCategories(List<String> productCategories) {
+/**\n * List of categories from product catalog\n */\n        public AdditionalProductItemBuilder withProductCategories(List<String> productCategories) {
             this.productCategories = productCategories;
             return this;
         }
@@ -3427,7 +3427,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public AdditionalProductItemBuilder withQuantity(Integer quantity) {
+/**\n * quantity of ordered items.\n */\n        public AdditionalProductItemBuilder withQuantity(Integer quantity) {
             this.quantity = quantity;
             return this;
         }
@@ -3578,7 +3578,7 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.PORTING_DETAILS_ITEM);
         }
 
-        public PortingDetailsItemBuilder withNetworkOperatorId(String networkOperatorId) {
+/**\n * Id of a network operator where the number is currently registered. Also known as number owner.\n */\n        public PortingDetailsItemBuilder withNetworkOperatorId(String networkOperatorId) {
             this.networkOperatorId = networkOperatorId;
             return this;
         }
@@ -3588,32 +3588,32 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public PortingDetailsItemBuilder withPoaDocumentUrl(String poaDocumentUrl) {
+/**\n * Location of document within Norlys domain.\n */\n        public PortingDetailsItemBuilder withPoaDocumentUrl(String poaDocumentUrl) {
             this.poaDocumentUrl = poaDocumentUrl;
             return this;
         }
 
-        public PortingDetailsItemBuilder withDigitalPoaAllowed(Boolean digitalPoaAllowed) {
+/**\n * Indicates whether electronic Power of Attorney can be used.\n */\n        public PortingDetailsItemBuilder withDigitalPoaAllowed(Boolean digitalPoaAllowed) {
             this.digitalPoaAllowed = digitalPoaAllowed;
             return this;
         }
 
-        public PortingDetailsItemBuilder withPowerOfAttorneyManualHandling(Boolean powerOfAttorneyManualHandling) {
+/**\n * Indicates whether the POA shall be signed via manual flow.\n */\n        public PortingDetailsItemBuilder withPowerOfAttorneyManualHandling(Boolean powerOfAttorneyManualHandling) {
             this.powerOfAttorneyManualHandling = powerOfAttorneyManualHandling;
             return this;
         }
 
-        public PortingDetailsItemBuilder withEarliestPortingDate(Date earliestPortingDate) {
+/**\n * date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public PortingDetailsItemBuilder withEarliestPortingDate(Date earliestPortingDate) {
             this.earliestPortingDate = earliestPortingDate;
             return this;
         }
 
-        public PortingDetailsItemBuilder withPortAfterCommitment(Boolean portAfterCommitment) {
+/**\n * true if customer wishes to be ported in after end of commitment at the current operator. Use instead of earliestPortingDate.\n */\n        public PortingDetailsItemBuilder withPortAfterCommitment(Boolean portAfterCommitment) {
             this.portAfterCommitment = portAfterCommitment;
             return this;
         }
 
-        public PortingDetailsItemBuilder withActualPortingDate(Date actualPortingDate) {
+/**\n * The date at which the porting is planned. Date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public PortingDetailsItemBuilder withActualPortingDate(Date actualPortingDate) {
             this.actualPortingDate = actualPortingDate;
             return this;
         }
@@ -3681,7 +3681,7 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.REACTIVATION_ITEM);
         }
 
-        public ReactivationItemBuilder withReason(String reason) {
+/**\n * Reason of reactivation.\n */\n        public ReactivationItemBuilder withReason(String reason) {
             this.reason = reason;
             return this;
         }
@@ -3716,7 +3716,7 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.REGRET_ITEM);
         }
 
-        public RegretItemBuilder withEffectiveDate(Date effectiveDate) {
+/**\n * Effective date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public RegretItemBuilder withEffectiveDate(Date effectiveDate) {
             this.effectiveDate = effectiveDate;
             return this;
         }
@@ -3818,7 +3818,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public SubscriptionItemBuilder withProductCategory(String productCategory) {
+/**\n * Can contain TOUCHPOINT.MASTER, TOUCHPOINT.AA AND so on.\n */\n        public SubscriptionItemBuilder withProductCategory(String productCategory) {
             this.productCategory = productCategory;
             return this;
         }
@@ -3840,22 +3840,22 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public SubscriptionItemBuilder withPreferredActivationDate(Date preferredActivationDate) {
+/**\n * Date YYYY-MM-DD (according to ISO 8601) of when the subscription shall be activated.\n */\n        public SubscriptionItemBuilder withPreferredActivationDate(Date preferredActivationDate) {
             this.preferredActivationDate = preferredActivationDate;
             return this;
         }
 
-        public SubscriptionItemBuilder withRealActivationDate(Date realActivationDate) {
+/**\n * Date YYYY-MM-DD (according to ISO 8601) of when the subscription was really activated.\n */\n        public SubscriptionItemBuilder withRealActivationDate(Date realActivationDate) {
             this.realActivationDate = realActivationDate;
             return this;
         }
 
-        public SubscriptionItemBuilder withEffectiveMoveDate(Date effectiveMoveDate) {
+/**\n * Date YYYY-MM-DD (according to ISO 8601) of when the subscription was really activated.\n */\n        public SubscriptionItemBuilder withEffectiveMoveDate(Date effectiveMoveDate) {
             this.effectiveMoveDate = effectiveMoveDate;
             return this;
         }
 
-        public SubscriptionItemBuilder withLabel(String label) {
+/**\n * Label for additional info about subscription\n */\n        public SubscriptionItemBuilder withLabel(String label) {
             this.label = label;
             return this;
         }
@@ -3865,7 +3865,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public SubscriptionItemBuilder withProductDeliveryAsap(Boolean productDeliveryAsap) {
+/**\n * Replaces the preferred activation date with installation and activation as soon as possible.\n */\n        public SubscriptionItemBuilder withProductDeliveryAsap(Boolean productDeliveryAsap) {
             this.productDeliveryAsap = productDeliveryAsap;
             return this;
         }
@@ -3955,7 +3955,7 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.SUSPENSION_ITEM);
         }
 
-        public SuspensionItemBuilder withReason(String reason) {
+/**\n * Reason of suspension.\n */\n        public SuspensionItemBuilder withReason(String reason) {
             this.reason = reason;
             return this;
         }
@@ -3995,32 +3995,32 @@ public with sharing class OrderClientDTOBuilder {
             withType(OrderClientDTOEnums.OrderItemTypeEnum.TERMINATION_ITEM);
         }
 
-        public TerminationItemBuilder withEffectiveDate(Date effectiveDate) {
+/**\n * Effective date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public TerminationItemBuilder withEffectiveDate(Date effectiveDate) {
             this.effectiveDate = effectiveDate;
             return this;
         }
 
-        public TerminationItemBuilder withReasonCode(OrderClientDTOEnums.TerminationItemReasonCodeEnum reasonCode) {
+/**\n * Reason code of termination\n */\n        public TerminationItemBuilder withReasonCode(OrderClientDTOEnums.TerminationItemReasonCodeEnum reasonCode) {
             this.reasonCode = reasonCode;
             return this;
         }
 
-        public TerminationItemBuilder withRetention(Boolean retention) {
+/**\n * Flag for subscription retention\n */\n        public TerminationItemBuilder withRetention(Boolean retention) {
             this.retention = retention;
             return this;
         }
 
-        public TerminationItemBuilder withWaiveTerminationFees(Boolean waiveTerminationFees) {
+/**\n * Flag indicating if fees connected to termination shall be waived.\n */\n        public TerminationItemBuilder withWaiveTerminationFees(Boolean waiveTerminationFees) {
             this.waiveTerminationFees = waiveTerminationFees;
             return this;
         }
 
-        public TerminationItemBuilder withShouldTransferToDifferentPool(Boolean shouldTransferToDifferentPool) {
+/**\n * Flag indicating if the number should be transferred to a different pool after termination\n */\n        public TerminationItemBuilder withShouldTransferToDifferentPool(Boolean shouldTransferToDifferentPool) {
             this.shouldTransferToDifferentPool = shouldTransferToDifferentPool;
             return this;
         }
 
-        public TerminationItemBuilder withShouldReReserve(Boolean shouldReReserve) {
+/**\n * Flag indicating if the number should be re-reserved after termination\n */\n        public TerminationItemBuilder withShouldReReserve(Boolean shouldReReserve) {
             this.shouldReReserve = shouldReReserve;
             return this;
         }
@@ -4156,7 +4156,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public OrderPartBuilder withTaskUrl(String taskUrl) {
+/**\n * Link to task for manual handling of the orderPart.\n */\n        public OrderPartBuilder withTaskUrl(String taskUrl) {
             this.taskUrl = taskUrl;
             return this;
         }
@@ -4355,7 +4355,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public OrderSourceBuilder withCaptureTimeStamp(Datetime value) {
+/**\n * Date time with timezone according to ISO-8601. Timestamp of when the order has been completed or cancelled.\n */\n        public OrderSourceBuilder withCaptureTimeStamp(Datetime value) {
             this.captureTimeStamp = value;
             return this;
         }
@@ -4908,7 +4908,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public PersonBuilder withBirthday(Date birthday) {
+/**\n * Birthday in format YYYY-MM-DD (according to ISO 8601).\n */\n        public PersonBuilder withBirthday(Date birthday) {
             this.birthday = birthday;
             return this;
         }
@@ -4950,17 +4950,17 @@ public with sharing class OrderClientDTOBuilder {
         private OrderClientDTOEnums.PaymentAmountCurrencyEnum currency_x;
         private Decimal amountWithoutVat;
 
-        public PaymentAmountBuilder withAmount(Decimal amount) {
+/**\n * amount including VAT\n */\n        public PaymentAmountBuilder withAmount(Decimal amount) {
             this.amount = amount;
             return this;
         }
 
-        public PaymentAmountBuilder withVat(Decimal vat) {
+/**\n * VAT amount\n */\n        public PaymentAmountBuilder withVat(Decimal vat) {
             this.vat = this.vat;
             return this;
         }
 
-        public PaymentAmountBuilder withAmountWithoutVat(Decimal amountWithoutVat) {
+/**\n * amount without VAT\n */\n        public PaymentAmountBuilder withAmountWithoutVat(Decimal amountWithoutVat) {
             this.amountWithoutVat = this.amountWithoutVat;
             return this;
         }
@@ -5071,27 +5071,27 @@ public with sharing class OrderClientDTOBuilder {
         private Decimal totalVat;
         private Decimal paymentRoundingError;
 
-        public PilPaymentBuilder withPaymentId(String paymentId) {
+/**\n * Id of related payment entity in PaymentIntegrationLayer API\n */\n        public PilPaymentBuilder withPaymentId(String paymentId) {
             this.paymentId = paymentId;
             return this;
         }
 
-        public PilPaymentBuilder withUpdatedAt(Date updatedAt) {
+/**\n * Date time with timezone according to ISO-8601\n */\n        public PilPaymentBuilder withUpdatedAt(Date updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }
 
-        public PilPaymentBuilder withTotalAmount(Decimal totalAmount) {
+/**\n * Payed amount including VAT\n */\n        public PilPaymentBuilder withTotalAmount(Decimal totalAmount) {
             this.totalAmount = totalAmount;
             return this;
         }
 
-        public PilPaymentBuilder withTotalVat(Decimal totalVat) {
+/**\n * Payed VAT amount\n */\n        public PilPaymentBuilder withTotalVat(Decimal totalVat) {
             this.totalVat = totalVat;
             return this;
         }
 
-        public PilPaymentBuilder withPaymentRoundingError(Decimal paymentRoundingError) {
+/**\n * Difference between hardware total upfront amount and payed total amount\n */\n        public PilPaymentBuilder withPaymentRoundingError(Decimal paymentRoundingError) {
             this.paymentRoundingError = paymentRoundingError;
             return this;
         }
@@ -5184,17 +5184,17 @@ public with sharing class OrderClientDTOBuilder {
         private String creditInvoiceNumber;
         private Date creditInvoiceDate;
 
-        public ReturnDetailsBuilder withReturnQuantity(Decimal returnQuantity) {
+/**\n * Quantity to return\n */\n        public ReturnDetailsBuilder withReturnQuantity(Decimal returnQuantity) {
             this.returnQuantity = returnQuantity;
             return this;
         }
 
-        public ReturnDetailsBuilder withCreditInvoiceNumber(String creditInvoiceNumber) {
+/**\n * Credit invoice number for returned hardware of this order.\n */\n        public ReturnDetailsBuilder withCreditInvoiceNumber(String creditInvoiceNumber) {
             this.creditInvoiceNumber = creditInvoiceNumber;
             return this;
         }
 
-        public ReturnDetailsBuilder withCreditInvoiceDate(Date creditInvoiceDate) {
+/**\n * date in format YYYY-MM-DD (according to ISO 8601) when was the credit invoice issued.\n */\n        public ReturnDetailsBuilder withCreditInvoiceDate(Date creditInvoiceDate) {
             this.creditInvoiceDate = creditInvoiceDate;
             return this;
         }
@@ -5271,7 +5271,7 @@ public with sharing class OrderClientDTOBuilder {
         private String trackAndTraceUrl;
         private Date shippingConfirmedDate;
 
-        public ShippingDetailsBuilder withToDeliverQuantity(Integer toDeliverQuantity) {
+/**\n * Quantity to deliver.\n */\n        public ShippingDetailsBuilder withToDeliverQuantity(Integer toDeliverQuantity) {
             this.toDeliverQuantity = toDeliverQuantity;
             return this;
         }
@@ -5286,22 +5286,22 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public ShippingDetailsBuilder withHardwareDeliveryId(Integer hardwareDeliveryId) {
+/**\n * Id of delivery address.\n */\n        public ShippingDetailsBuilder withHardwareDeliveryId(Integer hardwareDeliveryId) {
             this.hardwareDeliveryId = hardwareDeliveryId;
             return this;
         }
 
-        public ShippingDetailsBuilder withUserName(String userName) {
+/**\n * UserName label for the piece of hardware\n */\n        public ShippingDetailsBuilder withUserName(String userName) {
             this.userName = userName;
             return this;
         }
 
-        public ShippingDetailsBuilder withUserId(String userId) {
+/**\n * UserName label for the piece of hardware\n */\n        public ShippingDetailsBuilder withUserId(String userId) {
             this.userId = userId;
             return this;
         }
 
-        public ShippingDetailsBuilder withDepartment(String department) {
+/**\n * UserName label for the piece of hardware\n */\n        public ShippingDetailsBuilder withDepartment(String department) {
             this.department = department;
             return this;
         }
@@ -5323,7 +5323,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public ShippingDetailsBuilder withShippingConfirmedDate(Date shippingConfirmedDate) {
+/**\n * date in format YYYY-MM-DD (according to ISO 8601).\n */\n        public ShippingDetailsBuilder withShippingConfirmedDate(Date shippingConfirmedDate) {
             this.shippingConfirmedDate = shippingConfirmedDate;
             return this;
         }
@@ -5372,37 +5372,37 @@ public with sharing class OrderClientDTOBuilder {
         private String alternateSmdpFqdn;
         private Boolean waiveSimSwapFee;
 
-        public SimDetailsBuilder withSimType(OrderClientDTOEnums.SimDetailsSimTypeEnum simType) {
+/**\n * Type of sim card.\n */\n        public SimDetailsBuilder withSimType(OrderClientDTOEnums.SimDetailsSimTypeEnum simType) {
             this.simType = simType;
             return this;
         }
 
-        public SimDetailsBuilder withIcc(String icc) {
+/**\n * ICC.\n */\n        public SimDetailsBuilder withIcc(String icc) {
             this.icc = icc;
             return this;
         }
 
-        public SimDetailsBuilder withImsi(String imsi) {
+/**\n * IMSI.\n */\n        public SimDetailsBuilder withImsi(String imsi) {
             this.imsi = imsi;
             return this;
         }
 
-        public SimDetailsBuilder withOldIcc(String oldIcc) {
+/**\n * Icc to be replaced\n */\n        public SimDetailsBuilder withOldIcc(String oldIcc) {
             this.oldIcc = oldIcc;
             return this;
         }
 
-        public SimDetailsBuilder withOldImsi(String oldImsi) {
+/**\n * IMSI to be replaced\n */\n        public SimDetailsBuilder withOldImsi(String oldImsi) {
             this.oldImsi = oldImsi;
             return this;
         }
 
-        public SimDetailsBuilder withEid(String eid) {
+/**\n * new EID.\n */\n        public SimDetailsBuilder withEid(String eid) {
             this.eid = eid;
             return this;
         }
 
-        public SimDetailsBuilder withImei(String imei) {
+/**\n * new IMEI.\n */\n        public SimDetailsBuilder withImei(String imei) {
             this.imei = imei;
             return this;
         }
@@ -5412,7 +5412,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public SimDetailsBuilder withBindDeviceName(String bindDeviceName) {
+/**\n * Name of the device to be binded.\n */\n        public SimDetailsBuilder withBindDeviceName(String bindDeviceName) {
             this.bindDeviceName = bindDeviceName;
             return this;
         }
@@ -5422,7 +5422,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public SimDetailsBuilder withWaiveSimSwapFee(Boolean waiveSimSwapFee) {
+/**\n * Indicates whether to apply the sim swap fee.\n */\n        public SimDetailsBuilder withWaiveSimSwapFee(Boolean waiveSimSwapFee) {
             this.waiveSimSwapFee = waiveSimSwapFee;
             return this;
         }
@@ -5504,7 +5504,7 @@ public with sharing class OrderClientDTOBuilder {
         private PaymentAmountBuilder downPaymentAmountBuilder;
         private Date numberOfInstallments;
 
-        public SplitPaymentPatchRequestBuilder withTotalPaymentAmount(PaymentAmountBuilder totalPaymentAmountBuilder) {
+/**\n * Total payment amount\n */\n        public SplitPaymentPatchRequestBuilder withTotalPaymentAmount(PaymentAmountBuilder totalPaymentAmountBuilder) {
             this.totalPaymentAmountBuilder = totalPaymentAmountBuilder;
             return this;
         }
@@ -5583,7 +5583,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public SubscriptionUserBuilder withBirthDate(Date birthDay) {
+/**\n * BirthDate in format YYYY-MM-DD (according to ISO 8601).\n */\n        public SubscriptionUserBuilder withBirthDate(Date birthDay) {
             this.birthDay = birthDay;
 
             return this;
@@ -6026,12 +6026,12 @@ public with sharing class OrderClientDTOBuilder {
         private SerialNumberListBuilder serialNumberListBuilder;
         private String packageType;
 
-        public HardwareDetailsBuilder withName(String name) {
+/**\n * Name of hardware.\n */\n        public HardwareDetailsBuilder withName(String name) {
             this.name = name;
             return this;
         }
 
-        public HardwareDetailsBuilder withMaterialId(String materialId) {
+/**\n * Id of material.\n */\n        public HardwareDetailsBuilder withMaterialId(String materialId) {
             this.materialId = materialId;
             return this;
         }
@@ -6041,7 +6041,7 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
-        public HardwareDetailsBuilder withPackageType(String packageType) {
+/**\n * Type of package\n */\n        public HardwareDetailsBuilder withPackageType(String packageType) {
             this.packageType = packageType;
             return this;
         }
