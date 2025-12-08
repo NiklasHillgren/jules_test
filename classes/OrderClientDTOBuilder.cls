@@ -2702,11 +2702,17 @@ public with sharing class OrderClientDTOBuilder {
             return this;
         }
 
+        /**
+         * Identifies the element uniquely in whole order. Is assigned by OrderAPI.
+         */
         public OrderItemBuilder withId(Integer id) {
             this.id = id;
             return this;
         }
 
+        /**
+         * Intended to identify the element uniquely in whole order. Is assigned by the channel.
+         */
         public OrderItemBuilder withChannelOrderItemId(String channelOrderItemId) {
             this.channelOrderItemId = channelOrderItemId;
             return this;
