@@ -39,4 +39,12 @@ private class RegexUtilsTest {
         System.assertEquals(true, m.find(), 'Should find a match for object attribute with comma');
         System.assertEquals('"attr": {"key": "value"},', m.group(0).trim());
     }
+
+    @isTest
+    static void testRemoveAttribute() {
+        String myJSONString = '[{"attributes":{"type":"Account","url":"/services/data/v65.0/sobjects/Account/001RR00000r0loWYAQ"},"Id":"001RR00000r0loWYAQ","Name":"KM Kirurgi","BillingPostalCode":"2665","Billing_Street_Name__c":"Strandparksvej","Billing_Street_Number__c":"11","BillingCity":"Vallensbæk Strand","BillingCountry":"Denmark","CVR__c":"38120026","OwnerId":"005P6000003g59dIAA"}]';
+        String expected = '[{"Id":"001RR00000r0loWYAQ","Name":"KM Kirurgi","BillingPostalCode":"2665","Billing_Street_Name__c":"Strandparksvej","Billing_Street_Number__c":"11","BillingCity":"Vallensbæk Strand","BillingCountry":"Denmark","CVR__c":"38120026","OwnerId":"005P6000003g59dIAA"}]';
+        String result = RegexUtils.removeAttribute(myJSONString);
+        System.assertEquals(expected, result, 'Should remove the attributes key-value pair');
+    }
 }
