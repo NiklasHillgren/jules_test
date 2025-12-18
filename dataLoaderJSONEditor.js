@@ -66,10 +66,27 @@ export default class DataLoaderJSONEditor extends LightningElement {
   @wire(getStaticResourceContent, { staticResourceName: "DataLoaderConfig" })
   configLoad({ data, error }) {
     this.handleError(error);
+    this.dataTable = [];
+    this.filteredData = [];
+
     if (data) {
-      this.configData = data;
-      this.dataTable = JSON.parse(this.configData);
-      this.filteredData = [...this.dataTable];
+      try {
+        this.configData = data;
+        const parsedData = JSON.parse(this.configData);
+
+        if (Array.isArray(parsedData)) {
+          this.dataTable = parsedData;
+          this.filteredData = [...this.dataTable];
+        } else {
+          throw new Error("Configuration data is not a valid JSON array.");
+        }
+      } catch (e) {
+        this.handleError(
+          new Error(
+            `Invalid JSON in DataLoaderConfig static resource. Details: ${e.message}`
+          )
+        );
+      }
     }
     this.handleLoading();
   }
