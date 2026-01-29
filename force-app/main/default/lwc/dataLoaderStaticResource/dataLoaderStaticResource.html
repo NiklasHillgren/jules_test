@@ -1,0 +1,33 @@
+<template>
+    <lightning-card title="Data Loader" icon-name="utility:file">
+        <div class="slds-m-around_medium">
+            <template if:true={isLoading}>
+                <lightning-spinner alt-text="Loading" size="medium"></lightning-spinner>
+            </template>
+
+            <div class="slds-m-bottom_small">
+                <lightning-button
+                    label="Upsert selected"
+                    name="upsertSelected"
+                    variant="brand"
+                    onclick={handleClick}
+                    class="slds-m-right_x-small">
+                </lightning-button>
+                <lightning-button
+                    label="Upsert all"
+                    name="upsertAll"
+                    onclick={handleClick}>
+                </lightning-button>
+            </div>
+
+            <div style="height: 300px;">
+                <lightning-datatable
+                    key-field="Id"
+                    data={dataLoaders}
+                    columns={columns}
+                    onrowselection={onSelectedRow}>
+                </lightning-datatable>
+            </div>
+        </div>
+    </lightning-card>
+</template>
