@@ -1,0 +1,15 @@
+<template>
+    <div class="alert-container">
+        <template for:each={alerts} for:item="alert">
+            <div key={alert.id} class={alert.className} role="alert">
+                <button type="button" class="close" name={alert.id} onclick={handleClose} aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <template lwc:if={alert.label}>
+                    <strong>{alert.label}</strong>&nbsp;
+                </template>
+                {alert.message}
+            </div>
+        </template>
+    </div>
+</template>
