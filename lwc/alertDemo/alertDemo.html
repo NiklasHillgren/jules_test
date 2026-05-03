@@ -1,0 +1,15 @@
+<template>
+    <lightning-card title="Alert Demo" icon-name="utility:announcement">
+        <div class="slds-m-around_medium">
+            <p class="slds-m-bottom_small">Click the buttons below to trigger different types of alerts on the page:</p>
+            <lightning-button-group>
+                <lightning-button label="Success" variant="success" onclick={handleSuccess}></lightning-button>
+                <lightning-button label="Info" variant="brand" onclick={handleInfo}></lightning-button>
+                <lightning-button label="Warning" variant="neutral" onclick={handleWarning}></lightning-button>
+                <lightning-button label="Danger" variant="destructive" onclick={handleDanger}></lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <c-alert-list></c-alert-list>
+    </lightning-card>
+</template>
